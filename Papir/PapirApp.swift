@@ -12,7 +12,8 @@ import SwiftData
 struct PapirApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            ItemRow.self,
+            Invoice.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +26,7 @@ struct PapirApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
         }
         .modelContainer(sharedModelContainer)
     }

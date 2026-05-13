@@ -24,7 +24,7 @@ class ItemRow {
         self.colors = colors
     }
     
-    var totalForItems : Double {
+    var totalForItem : Double {
         return Double(unitCount) * Double(itemsPerUnit) * price
     }
 }
