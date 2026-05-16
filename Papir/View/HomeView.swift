@@ -43,16 +43,16 @@ struct HomeView: View {
                         ))
 
                 case .history:
-                    MyInvoicesView(currentScreen: $currentScreen)
+                    NewInvoiceView(currentScreen: $currentScreen)
                         .transition(.asymmetric(
-                            insertion: .move(edge: .bottom).combined(with: .opacity),   // was .top
+                            insertion: .move(edge: .bottom).combined(with: .opacity),
                             removal: .opacity
                         ))
 
                 case .newInvoice:
-                    NewInvoiceView(currentScreen: $currentScreen)
+                    MyInvoicesView(currentScreen: $currentScreen)
                         .transition(.asymmetric(
-                            insertion: .move(edge: .top).combined(with: .opacity),      // was .bottom
+                            insertion: .move(edge: .top).combined(with: .opacity),
                             removal: .opacity
                         ))
                 }
@@ -86,6 +86,7 @@ struct HomeView: View {
     private var homeContent: some View {
         VStack(spacing: 0) {
             Spacer()
+            
             VStack(spacing: 4) {
                 Image(systemName: "arrow.up")
                     .font(.largeTitle)
@@ -97,7 +98,8 @@ struct HomeView: View {
                     .fontDesign(.monospaced)
                     .tracking(3)
                     .foregroundStyle(.primary)
-            }
+                
+            }.padding(.top, 40)
                    
                     
             Spacer()
@@ -105,7 +107,6 @@ struct HomeView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     ScrollText()
                     DirectionText(direction: "UP")
-                    
                 }
                 .padding(.leading, 40).padding(.bottom, 30)
                 
@@ -155,7 +156,7 @@ struct HomeView: View {
                     .font(.largeTitle)
                     .fontWeight(.light)
                     .foregroundStyle(silverGradient)
-            }
+            }.padding(.bottom, 40)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -163,6 +164,11 @@ struct HomeView: View {
         .onAppear {
             withAnimation(.linear(duration: 3).repeatForever(autoreverses: true)) {
                 shimmerOffset = 1
+            }
+        }
+        .onDisappear {
+            withAnimation(.linear(duration: 0)) {
+                shimmerOffset = -1
             }
         }
         
@@ -184,7 +190,6 @@ struct HomeView: View {
                 
                 let absolute = abs(dragOffset)
                 
-                // Threshold 1 medium tap
                 if absolute > threshold1 && !passedThreshold1 {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     passedThreshold1 = true
@@ -192,7 +197,6 @@ struct HomeView: View {
                     passedThreshold1 = false
                 }
                 
-                // Threshold 2 immediate commit
                 if absolute > threshold2 {
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                     commit()
@@ -228,7 +232,7 @@ struct HomeView: View {
     private func commit() {
         guard !isCommitting else { return }
         isCommitting = true
-        commitDirection = dragOffset   // capture BEFORE reset
+        commitDirection = dragOffset
         
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
             if commitDirection < 0 {
