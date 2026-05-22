@@ -8,8 +8,6 @@
 
 ## Demo
 
-## Demo
-
 | Creating an invoice | Browsing invoices |
 |---|---|
 | ![Create invoice](docs/gifs/create.gif) | ![My invoices](docs/gifs/menu.gif) |
