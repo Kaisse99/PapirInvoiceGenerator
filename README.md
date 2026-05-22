@@ -65,7 +65,7 @@ Papir/
 
 ## Try It
 
-Papir is available for testing via TestFlight:
+Papir is available for testing and use via TestFlight:
 
 **[Download on TestFlight](https://testflight.apple.com/join/1QJGaxaS)**
 
@@ -81,14 +81,17 @@ Papir uses a deliberately minimal visual language: monospaced typography through
 
 ## License
 
-This project is **source-available**, not open source.
+Papir is **source-available**.
 
-You're welcome to view, study, learn from, and contribute to the code. Contributions are welcome via pull requests. **Commercial use of any kind requires prior written permission from the author.** See [LICENSE](LICENSE) for the full terms.
+You're free to download, use, and even run it in your own business at no
+cost, and to study, modify, and contribute to the code. **You may not
+resell Papir or offer it as a paid or subscription-based product**
+without prior written permission. See [LICENSE](LICENSE) for full terms.
 
 ---
 
 ## Author
 
-**Mykyta Kaisenberg**
+**Mykyta Varnikov**
 
-Built as a real, small, and simple tool for a real person.
+Built as a simple, quick, and convinient utility app for a real person.
