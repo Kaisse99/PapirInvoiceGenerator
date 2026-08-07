@@ -18,6 +18,7 @@
 //
 
 import SwiftUI
+import os
 import SwiftData
 import Combine
 
@@ -168,7 +169,7 @@ final class NewInvoiceViewModel: ObservableObject {
                 name: draft.name,
                 unitCount: UInt16(Double(draft.unitCount) ?? 0),
                 itemsPerUnit: UInt16(Double(draft.itemsPerUnit) ?? 0),
-                price: Double(draft.price) ?? 0,
+                price: (Double(draft.price) ?? 0).moneyRounded,
                 colors: draft.colors
             )
             row.colorPacks = draft.colorPacks
@@ -210,6 +211,7 @@ final class NewInvoiceViewModel: ObservableObject {
             }
         } catch {
             Haptics.error()
+            AppLog.data.error("Invoice save failed: \(error.localizedDescription, privacy: .public)")
             isSaving = false
             saveErrorMessage = error.localizedDescription
             completion(nil)
@@ -228,6 +230,7 @@ final class NewInvoiceViewModel: ObservableObject {
                 try context.save()
                 Haptics.success()
             } catch {
+                AppLog.pdf.error("PDF write failed: \(error.localizedDescription, privacy: .public)")
                 Haptics.error()
             }
             isSaving = false

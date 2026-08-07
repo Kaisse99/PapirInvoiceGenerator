@@ -15,6 +15,7 @@
 //
 
 import SwiftUI
+import os
 import SwiftData
 import Combine
 
@@ -50,7 +51,7 @@ final class StockViewModel: ObservableObject {
             return
         }
 
-        let model = StockModel(code: code, pricePerPiece: max(0, Double(newModelPrice) ?? 0))
+        let model = StockModel(code: code, pricePerPiece: max(0, Double(newModelPrice) ?? 0).moneyRounded)
         context.insert(model)
         save(context)
 
@@ -62,7 +63,7 @@ final class StockViewModel: ObservableObject {
     }
 
     func setPrice(_ price: Double, on model: StockModel, context: ModelContext) {
-        model.pricePerPiece = max(0, price)
+        model.pricePerPiece = max(0, price).moneyRounded
         save(context)
         Haptics.success()
     }
@@ -137,6 +138,7 @@ final class StockViewModel: ObservableObject {
             try context.save()
         } catch {
             Haptics.error()
+            AppLog.data.error("Stock save failed: \(error.localizedDescription, privacy: .public)")
             notice = StockNotice(
                 title: L.t(.couldNotSave),
                 message: error.localizedDescription

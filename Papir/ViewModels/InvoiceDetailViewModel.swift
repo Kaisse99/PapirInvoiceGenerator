@@ -10,6 +10,7 @@
 //
 
 import SwiftUI
+import os
 import SwiftData
 import Combine
 
@@ -24,10 +25,10 @@ final class InvoiceDetailViewModel: ObservableObject {
     func viewExistingPDF(for invoice: Invoice) {
         guard let fileName = invoice.pdfFileName,
               let url = PDFStorage.pdfURL(fileName: fileName) else {
-            generationError = "No PDF found for this invoice. Try Re-generate."
+            generationError = L.t(.noPDFOnDisk)
             return
         }
-        pdfPreviewTitle = invoice.receiver.isEmpty ? "Invoice" : invoice.receiver
+        pdfPreviewTitle = invoice.receiver.isEmpty ? L.t(.invoice) : invoice.receiver
         pdfPreviewURL = url
     }
     
@@ -50,10 +51,11 @@ final class InvoiceDetailViewModel: ObservableObject {
 
                 if let url = PDFStorage.pdfURL(fileName: fileName) {
                     Haptics.success()
-                    pdfPreviewTitle = invoice.receiver.isEmpty ? "Invoice" : invoice.receiver
+                    pdfPreviewTitle = invoice.receiver.isEmpty ? L.t(.invoice) : invoice.receiver
                     pdfPreviewURL = url
                 }
             } catch {
+                AppLog.pdf.error("PDF generation failed: \(error.localizedDescription, privacy: .public)")
                 generationError = error.localizedDescription
                 Haptics.error()
             }

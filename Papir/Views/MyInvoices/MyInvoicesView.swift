@@ -94,7 +94,7 @@ struct MyInvoicesView: View {
                 Text(L.t(.cannotBeUndone))
             }
             .alert(
-                "Delete \(viewModel.selectedIDs.count) invoice\(viewModel.selectedIDs.count == 1 ? "" : "s")?",
+                L.t(.deleteSelectedTitle),
                 isPresented: $viewModel.showBatchDeleteAlert
             ) {
                 Button(L.t(.delete), role: .destructive) {

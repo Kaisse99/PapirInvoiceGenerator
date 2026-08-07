@@ -13,6 +13,7 @@
 //
 
 import SwiftUI
+import os
 import SwiftData
 
 struct SettingsSheet: View {
@@ -253,6 +254,7 @@ struct SettingsSheet: View {
             Haptics.success()
         } catch {
             Haptics.error()
+            AppLog.export.error("Export failed: \(error.localizedDescription, privacy: .public)")
             exportError = "\(L.t(.couldNotSave, language)): \(error.localizedDescription)"
         }
     }

@@ -13,6 +13,7 @@
 //
 
 import SwiftUI
+import os
 import SwiftData
 import Combine
 
@@ -101,6 +102,7 @@ final class AddressBookViewModel: ObservableObject {
             Haptics.success()
         } catch {
             Haptics.error()
+            AppLog.data.error("Contact save failed: \(error.localizedDescription, privacy: .public)")
             saveError = error.localizedDescription
         }
     }

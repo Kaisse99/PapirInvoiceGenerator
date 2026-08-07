@@ -10,6 +10,13 @@
 //  next to the currency: display for reading, which groups thousands and drops
 //  trailing zeros, and editable for putting back into a text field, which must
 //  stay something Double(_:) can parse and so never carries separators.
+//  moneyRounded pins a price to two decimal places at the moments one enters
+//  the store. Money stays Double rather than Decimal on purpose: retyping a
+//  stored column is exactly the silent-null migration hazard the schema plan
+//  exists to prevent, and CloudKit mirroring has no native Decimal. At
+//  hryvnia sizes with two-decimal prices and integer quantities the float
+//  error sits under a millionth of a kopiyka; rounding at the boundaries
+//  keeps it from ever accumulating into a displayed figure.
 //  Used by: SettingsSheet, the invoice screens, the stock screens, PDFGenerator.
 //
 
@@ -39,6 +46,12 @@ enum AppCurrency: String, CaseIterable, Identifiable {
         case .rouble:  return "RUB"
         case .dollar:  return "USD"
         }
+    }
+}
+
+extension Double {
+    var moneyRounded: Double {
+        (self * 100).rounded() / 100
     }
 }
 

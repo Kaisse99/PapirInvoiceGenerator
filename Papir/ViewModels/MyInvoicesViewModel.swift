@@ -16,6 +16,7 @@
 //
 
 import SwiftUI
+import os
 import SwiftData
 import Combine
 
@@ -118,7 +119,7 @@ final class MyInvoicesViewModel: ObservableObject {
         Haptics.light()
         guard let fileName = invoice.pdfFileName,
               let url = PDFStorage.pdfURL(fileName: fileName) else { return }
-        previewTitle = invoice.receiver.isEmpty ? "Invoice" : invoice.receiver
+        previewTitle = invoice.receiver.isEmpty ? L.t(.invoice) : invoice.receiver
         previewURL = url
     }
     
@@ -193,6 +194,7 @@ final class MyInvoicesViewModel: ObservableObject {
             try context.save()
         } catch {
             Haptics.error()
+            AppLog.data.error("Invoice list save failed: \(error.localizedDescription, privacy: .public)")
             saveError = error.localizedDescription
         }
     }
