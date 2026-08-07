@@ -54,7 +54,9 @@ struct PapirApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            LockGate {
+                HomeView()
+            }
         }
         .modelContainer(sharedModelContainer)
     }

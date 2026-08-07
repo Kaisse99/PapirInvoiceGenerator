@@ -202,6 +202,11 @@ enum LKey: String {
     case shortfallOnShipment = "Some colors went negative. Recount them when you can."
     case notInStockYet = "This code is not in stock yet."
     case lowStock = "Low"
+    case privacyCaps = "PRIVACY"
+    case appLock = "Face ID"
+    case appLockCaption = "Ask for Face ID when the app opens"
+    case unlock = "Unlock"
+    case unlockReason = "Unlock Papir"
     case iCloudSync = "iCloud"
     case allModels = "All models"
     case lockedWhileShipped = "Return to draft to make changes"
@@ -274,6 +279,9 @@ enum L {
         .shortfallOnShipment: "Деякі кольори пішли в мінус.",
         .notInStockYet: "Цього коду ще немає на складі.",
         .lowStock: "Мало",
+        .privacyCaps: "ПРИВАТНІСТЬ", .appLock: "Face ID",
+        .appLockCaption: "Питати Face ID при відкритті застосунку",
+        .unlock: "Розблокувати", .unlockReason: "Розблокуйте Papir",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладні та склад на всіх пристроях",
         .allModels: "Усі моделі", .lockedWhileShipped: "Поверніть у чернетку, щоб змінити", .allDays: "Усі дні",
         .clearHistory: "Очистити історію", .clearHistoryCaption: "Прибрати всі записи руху",
@@ -380,12 +388,15 @@ enum L {
         .shortfallOnShipment: "Некоторые цвета ушли в минус.",
         .notInStockYet: "Этого кода ещё нет на складе.",
         .lowStock: "Мало",
-        .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладні та склад на всіх пристроях",
-        .allModels: "Усі моделі", .lockedWhileShipped: "Поверніть у чернетку, щоб змінити", .allDays: "Усі дні",
-        .clearHistory: "Очистити історію", .clearHistoryCaption: "Прибрати всі записи руху",
-        .clearHistoryWarning: "Залишки не зміняться, але як вони склались буде втрачено.",
-        .restartToApply: "Перезапустіть застосунок.",
-        .iCloudUnavailable: "iCloud недоступний, дані зберігаються локально. Перевірте вхід.", .lowStockThreshold: "Мало на складе",
+        .privacyCaps: "ПРИВАТНОСТЬ", .appLock: "Face ID",
+        .appLockCaption: "Спрашивать Face ID при открытии приложения",
+        .unlock: "Разблокировать", .unlockReason: "Разблокируйте Papir",
+        .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладные и склад на всех устройствах",
+        .allModels: "Все модели", .lockedWhileShipped: "Верните в черновик, чтобы изменить", .allDays: "Все дни",
+        .clearHistory: "Очистить историю", .clearHistoryCaption: "Убрать все записи движения",
+        .clearHistoryWarning: "Остатки не изменятся, но как они сложились будет потеряно.",
+        .restartToApply: "Перезапустите приложение.",
+        .iCloudUnavailable: "iCloud недоступен, данные хранятся локально. Проверьте вход.", .lowStockThreshold: "Мало на складе",
         .lowStockCaption: "Предупреждать от этого количества",
         .history: "История", .noMovements: "Пока ничего не двигалось",
         .movementReceived: "Принято", .movementRemoved: "Списано",
@@ -486,6 +497,9 @@ enum L {
         .shortfallOnShipment: "Niektóre kolory zeszły poniżej zera. Przelicz je przy okazji.",
         .notInStockYet: "Tego kodu nie ma jeszcze w magazynie.",
         .lowStock: "Mało", .lowStockThreshold: "Niski stan",
+        .privacyCaps: "PRYWATNOŚĆ", .appLock: "Face ID",
+        .appLockCaption: "Pytaj o Face ID przy otwarciu aplikacji",
+        .unlock: "Odblokuj", .unlockReason: "Odblokuj Papir",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Faktury i magazyn na wszystkich urządzeniach",
         .allModels: "Wszystkie modele", .lockedWhileShipped: "Wróć do szkicu, aby edytować", .allDays: "Wszystkie dni",
         .clearHistory: "Wyczyść historię", .clearHistoryCaption: "Usuń wszystkie zapisy ruchu",

@@ -25,6 +25,7 @@ enum AppSettings {
     static let currencyKey = "appCurrency"
     static let lowStockKey = "lowStockThreshold"
     static let defaultSenderKey = "defaultSender"
+    static let appLockKey = "appLockEnabled"
     static let cloudSyncKey = "iCloudSyncEnabled"
     static let cloudFailureKey = "iCloudSyncUnavailable"
     static let cloudContainerID = "iCloud.com.kaissenberg.Papir"
@@ -55,6 +56,10 @@ enum AppSettings {
 
     static var defaultSender: String {
         UserDefaults.standard.string(forKey: defaultSenderKey) ?? ""
+    }
+
+    static var appLockEnabled: Bool {
+        UserDefaults.standard.bool(forKey: appLockKey)
     }
 
     static var cloudSyncEnabled: Bool {
