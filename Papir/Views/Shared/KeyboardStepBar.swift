@@ -8,13 +8,13 @@
 //  It is ToolbarContent rather than a view so a caller drops it straight into
 //  its own .toolbar alongside the title, and it decides nothing about which
 //  field comes next; the caller owns the order because only the caller knows
-//  it. Every button carries its own bottom padding, because the bar puts its
-//  contents flush against the top of the keys otherwise and a round tap target
-//  touching the key rows reads as a mistake. The padding sits on the button
-//  and not on the glyph inside it: on the label it grows the round background
-//  downwards instead, which leaves the glyph riding high in its own circle. Done is the keyboard glyph rather
-//  than the word, which needed no translating and left the bar quieter.
-//  Used by: ContactEditorSheet, InvoiceRowCard, NewInvoiceView.
+//  it. The buttons sit where the system puts them: padding them off the keys
+//  moved the glyphs without moving the bar itself, which read worse than the
+//  thing it was meant to fix. Done is the keyboard glyph rather than the word,
+//  which needed no translating and left the bar quieter.
+//  Used by: ContactEditorSheet. The invoice screens went without one: a
+//  keyboard toolbar declared inside a card inside a scroll view never appeared
+//  there, and a row already jumps focus by itself once a number field fills.
 //
 
 import SwiftUI
@@ -36,7 +36,6 @@ struct KeyboardStepBar: ToolbarContent {
                     .font(.system(size: 16, weight: .semibold))
             }
             .disabled(!canGoBack)
-            .padding(.bottom, 8)
 
             Button {
                 Haptics.light()
@@ -46,7 +45,6 @@ struct KeyboardStepBar: ToolbarContent {
                     .font(.system(size: 16, weight: .semibold))
             }
             .disabled(!canGoForward)
-            .padding(.bottom, 8)
 
             Spacer()
 
@@ -58,7 +56,6 @@ struct KeyboardStepBar: ToolbarContent {
                     .font(.system(size: 16, weight: .semibold))
             }
             .accessibilityLabel(L.t(.done))
-            .padding(.bottom, 8)
         }
     }
 }

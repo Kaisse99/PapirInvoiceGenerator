@@ -43,6 +43,13 @@ struct SettingsSheet: View {
     @State private var showRestartNotice = false
     @State private var showClearHistoryAlert = false
     @State private var clearHistoryError: String? = nil
+    @State private var exportURLs: [URL] = []
+    @State private var exportError: String? = nil
+
+    @Query private var allInvoices: [Invoice]
+    @Query private var allStock: [StockModel]
+    @Query private var allContacts: [Contact]
+    @Query private var allMovements: [StockMovement]
 
     private var language: AppLanguage {
         AppLanguage(rawValue: languageRaw) ?? .english
@@ -57,6 +64,7 @@ struct SettingsSheet: View {
                     senderSection
                     defaultsSection
                     stockSection
+                    exportSection
                     syncSection
                     historySection
                     Spacer(minLength: 20)
@@ -92,6 +100,14 @@ struct SettingsSheet: View {
                 Button(L.t(.cancel, language), role: .cancel) {}
             } message: {
                 Text(L.t(.clearHistoryWarning, language))
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { !exportURLs.isEmpty },
+                    set: { if !$0 { exportURLs = [] } }
+                )
+            ) {
+                ShareSheet(items: exportURLs)
             }
         }
     }
@@ -187,6 +203,57 @@ struct SettingsSheet: View {
                     .padding(.horizontal, 12)
                     .padding(.top, 2)
             }
+        }
+    }
+
+    private var exportSection: some View {
+        section(title: L.t(.dataCaps, language)) {
+            VStack(spacing: 8) {
+                Button {
+                    Haptics.medium()
+                    exportEverything()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 15, weight: .semibold))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L.t(.exportEverything, language))
+                                .font(.system(size: 17, weight: .medium, design: .rounded))
+                                .foregroundStyle(.primary)
+                            Text(L.t(.exportCaption, language))
+                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 18)
+                    .frame(minHeight: 72)
+                    .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+                }
+                .buttonStyle(.plain)
+
+                if let exportError {
+                    noticeLine(exportError, tint: .red)
+                }
+            }
+        }
+    }
+
+    private func exportEverything() {
+        do {
+            exportURLs = [try DataExport.write(
+                invoices: allInvoices,
+                stock: allStock,
+                contacts: allContacts,
+                movements: allMovements,
+                currencySymbol: AppSettings.currencySymbol
+            )]
+            exportError = nil
+            Haptics.success()
+        } catch {
+            Haptics.error()
+            exportError = "\(L.t(.couldNotSave, language)): \(error.localizedDescription)"
         }
     }
 

@@ -125,16 +125,6 @@ struct NewInvoiceView: View {
                 .fontWeight(.black)
                 .padding(.horizontal, 4)
         }
-
-        if focusedHeaderField != nil {
-            KeyboardStepBar(
-                canGoBack: focusedHeaderField == .receiver,
-                canGoForward: focusedHeaderField == .sender,
-                onBack: { focusedHeaderField = .sender },
-                onForward: { focusedHeaderField = .receiver },
-                onDone: { focusedHeaderField = nil }
-            )
-        }
     }
     
     private var senderReceiverSection: some View {

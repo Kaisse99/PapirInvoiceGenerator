@@ -42,26 +42,10 @@
 import SwiftUI
 
 struct InvoiceRowCard: View {
-    enum Field: Hashable, CaseIterable {
+    enum Field: Hashable {
         case name, units, perUnit, price
     }
 
-    private var stepFields: [Field] {
-        unitsFollowColors ? [.name, .perUnit, .price] : Field.allCases
-    }
-
-    private func stepIndex() -> Int? {
-        guard let focusedField else { return nil }
-        return stepFields.firstIndex(of: focusedField)
-    }
-
-    private func step(_ offset: Int) {
-        guard let index = stepIndex() else { return }
-        let next = index + offset
-        guard stepFields.indices.contains(next) else { return }
-        focusedField = stepFields[next]
-    }
-    
     @FocusState private var focusedField: Field?
     
     let rowNumber: Int
@@ -160,17 +144,6 @@ struct InvoiceRowCard: View {
         }
         .overlay(alignment: .topTrailing) {
             lockButton.offset(x: 6, y: -6)
-        }
-        .toolbar {
-            if focusedField != nil {
-                KeyboardStepBar(
-                    canGoBack: (stepIndex() ?? 0) > 0,
-                    canGoForward: (stepIndex() ?? stepFields.count) < stepFields.count - 1,
-                    onBack: { step(-1) },
-                    onForward: { step(1) },
-                    onDone: { focusedField = nil }
-                )
-            }
         }
         .onLongPressGesture(minimumDuration: 0.5) {
             if !isLocked {
