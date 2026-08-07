@@ -7,11 +7,13 @@
 //  spread of its unit count. Nothing downstream may alter the plan: the sheet
 //  that shows it is read-only, because the invoice is the document the customer
 //  receives and the shelf has to agree with it.
-//  Matching a row to a model tries the row name as a code first, then looks
-//  for a four-digit code inside it, which is what makes a row typed as
-//  "Cotton Tee 2337" still find model 2337. A row that matches nothing is
-//  carried through as unmatched rather than dropped, so the sheet can say so
-//  instead of quietly shipping nothing.
+//  Matching a row to a model tries the row name whole first, then each word in
+//  it, which is what makes a row typed as "Cotton Tee 2337" still find model
+//  2337. Every lookup ignores case, the same way the invoice screen does when
+//  it offers a code and fills in its price: if the two disagreed, a row could
+//  show as in stock while it was being written and then ship deducting
+//  nothing. A row that matches nothing is carried through as unmatched rather
+//  than dropped, so the sheet can say so instead of quietly shipping nothing.
 //  Applying is deliberate about order: stock is moved and the exact packs are
 //  written onto the invoice in the same pass, so reverting later replays that
 //  record rather than recomputing a plan that the rows may no longer produce.
@@ -81,7 +83,7 @@ enum ShipmentPlanner {
 
     static func available(_ draft: ShipmentDraft, in stock: [StockModel]) -> Int? {
         guard let code = draft.modelCode, !draft.color.isEmpty else { return nil }
-        guard let model = stock.first(where: { $0.code == code }) else { return nil }
+        guard let model = model(code, in: stock) else { return nil }
         return model.line(for: draft.color)?.packs ?? 0
     }
 
@@ -91,7 +93,7 @@ enum ShipmentPlanner {
 
         for draft in drafts where draft.isActionable {
             guard let code = draft.modelCode,
-                  let model = stock.first(where: { $0.code == code }) else { continue }
+                  let model = model(code, in: stock) else { continue }
 
             let line: StockLine
             if let existing = model.line(for: draft.color) {
@@ -126,7 +128,7 @@ enum ShipmentPlanner {
 
     static func revert(_ invoice: Invoice, stock: [StockModel], context: ModelContext) throws {
         for line in invoice.shipment {
-            guard let model = stock.first(where: { $0.code == line.modelCode }) else { continue }
+            guard let model = model(line.modelCode, in: stock) else { continue }
             if let stockLine = model.line(for: line.color) {
                 stockLine.receive(line.packs)
             } else {
@@ -154,18 +156,22 @@ enum ShipmentPlanner {
 
     private static func match(name: String, in stock: [StockModel]) -> StockModel? {
         if let code = StockModel.normalizedCode(name),
-           let model = stock.first(where: { $0.code == code }) {
+           let model = model(code, in: stock) {
             return model
         }
 
         for token in name.split(whereSeparator: { !$0.isLetter && !$0.isNumber }) {
             if let code = StockModel.normalizedCode(String(token)),
-               let model = stock.first(where: { $0.code == code }) {
+               let model = model(code, in: stock) {
                 return model
             }
         }
 
         return nil
+    }
+
+    private static func model(_ code: String, in stock: [StockModel]) -> StockModel? {
+        stock.first { $0.code.caseInsensitiveCompare(code) == .orderedSame }
     }
 
 }

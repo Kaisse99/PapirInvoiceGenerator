@@ -6,6 +6,10 @@
 //  collects every selected invoice that actually has a PDF on disk and hands
 //  the whole set to one share sheet. Deleting an invoice deletes its PDF from
 //  disk first, since nothing else would ever go looking for that orphaned file.
+//  A duplicate copies the colour breakdown and the contact link as well as the
+//  numbers, because a copy that quietly redistributes the packs is worse than
+//  no copy at all. Every write goes through one save that reports what went
+//  wrong rather than dropping it, the way the stock and contact screens do.
 //  Holds no invoices of its own: the view owns the @Query and hands the array
 //  in.
 //  Used by: MyInvoicesView.
@@ -53,6 +57,7 @@ final class MyInvoicesViewModel: ObservableObject {
     @Published var previewURL: URL? = nil
     @Published var previewTitle: String = ""
     @Published var shareURLs: [URL] = []
+    @Published var saveError: String? = nil
     
     func filteredAndSorted(_ invoices: [Invoice]) -> [Invoice] {
         var result = invoices
@@ -139,20 +144,23 @@ final class MyInvoicesViewModel: ObservableObject {
     
     func duplicate(_ invoice: Invoice, context: ModelContext) {
         Haptics.light()
-        let copiedItems = invoice.orderedItems.map { item in
-            ItemRow(
+        let copiedItems = invoice.orderedItems.map { item -> ItemRow in
+            let copy = ItemRow(
                 name: item.name,
                 unitCount: item.unitCount,
                 itemsPerUnit: item.itemsPerUnit,
                 price: item.price,
                 colors: item.colors
             )
+            copy.colorPacks = item.colorPacks
+            return copy
         }
         let copy = Invoice(items: copiedItems, date: .now, sender: invoice.sender, receiver: invoice.receiver)
+        copy.receiverContact = invoice.receiverContact
         context.insert(copy)
-        try? context.save()
+        save(context)
     }
-    
+
     func delete(_ invoice: Invoice, context: ModelContext) {
         Haptics.warning()
         if let fileName = invoice.pdfFileName {
@@ -160,11 +168,11 @@ final class MyInvoicesViewModel: ObservableObject {
         }
         withAnimation(AppAnimation.quick) {
             context.delete(invoice)
-            try? context.save()
+            save(context)
         }
         invoiceToDelete = nil
     }
-    
+
     func deleteSelected(from invoices: [Invoice], context: ModelContext) {
         Haptics.warning()
         let toDelete = invoices.filter { selectedIDs.contains($0.id) }
@@ -175,8 +183,17 @@ final class MyInvoicesViewModel: ObservableObject {
                 }
                 context.delete(invoice)
             }
-            try? context.save()
+            save(context)
             selectedIDs.removeAll()
+        }
+    }
+
+    private func save(_ context: ModelContext) {
+        do {
+            try context.save()
+        } catch {
+            Haptics.error()
+            saveError = error.localizedDescription
         }
     }
 }

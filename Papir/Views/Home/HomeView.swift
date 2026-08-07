@@ -18,8 +18,10 @@
 //  glint across the mark share one gradient that animates while this screen is
 //  on top, and the gear sits in the corner
 //  where it is reachable from anywhere without taking a place in the swipe.
-//  Keyed on the stored language, so switching it in settings rebuilds every
-//  screen underneath in one go.
+//  Keyed on the settings that every other screen reads as plain statics rather
+//  than as bindings, the language, the currency and the low stock number, so
+//  changing any of them in settings rebuilds the whole tree underneath in one
+//  go instead of waiting for each screen to happen to redraw.
 //  Used by: PapirApp.
 //
 
@@ -33,8 +35,18 @@ struct HomeView: View {
     @AppStorage(AppSettings.languageKey)
     private var languageRaw: String = AppLanguage.english.rawValue
 
+    @AppStorage(AppSettings.currencyKey)
+    private var currencyRaw: String = AppCurrency.hryvnia.rawValue
+
+    @AppStorage(AppSettings.lowStockKey)
+    private var lowStockRaw: Int = AppSettings.fallbackLowStock
+
     private var language: AppLanguage {
         AppLanguage(rawValue: languageRaw) ?? .english
+    }
+
+    private var settingsKey: String {
+        "\(languageRaw)-\(currencyRaw)-\(lowStockRaw)"
     }
 
     private var glowColor: Color {
@@ -79,7 +91,7 @@ struct HomeView: View {
             }
             .animation(AppAnimation.smooth, value: viewModel.currentScreen)
         }
-        .id(languageRaw)
+        .id(settingsKey)
         .background(AppBackground())
         .ignoresSafeArea()
         .onChange(of: viewModel.currentScreen) { _, newValue in

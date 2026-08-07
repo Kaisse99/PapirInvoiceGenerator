@@ -26,7 +26,6 @@
 import SwiftUI
 
 struct InvoiceRowItem: View {
-    @Environment(\.colorScheme) var colorScheme
     let invoice: Invoice
 
     private static let totalFormatter: NumberFormatter = {

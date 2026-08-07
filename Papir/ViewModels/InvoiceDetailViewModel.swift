@@ -2,8 +2,10 @@
 //  InvoiceDetailViewModel.swift
 //  Opening and re-making the PDF for one invoice. Rendering takes a snapshot of
 //  the invoice, draws it off the main thread, then returns here to write the
-//  file, drop the previous one, and point the preview at the result. An invoice
-//  whose file is missing reports it instead of showing an empty viewer.
+//  file, point the preview at the result, and only then drop the previous one:
+//  deleting first meant a failed write left the invoice naming a file that was
+//  already gone. An invoice whose file is missing reports it instead of showing
+//  an empty viewer.
 //  Used by: InvoiceDetailView.
 //
 
@@ -37,12 +39,14 @@ final class InvoiceDetailViewModel: ObservableObject {
         Task {
             let pdfData = await PDFGenerator.render(snapshot, language: language, currencySymbol: currencySymbol)
             do {
-                if let old = invoice.pdfFileName {
-                    PDFStorage.deletePDF(fileName: old)
-                }
+                let previous = invoice.pdfFileName
                 let fileName = try PDFStorage.savePDF(pdfData, for: snapshot, language: language)
                 invoice.pdfFileName = fileName
                 try context.save()
+
+                if let previous, previous != fileName {
+                    PDFStorage.deletePDF(fileName: previous)
+                }
 
                 if let url = PDFStorage.pdfURL(fileName: fileName) {
                     Haptics.success()

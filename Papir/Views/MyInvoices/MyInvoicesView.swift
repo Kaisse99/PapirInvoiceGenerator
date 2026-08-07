@@ -22,7 +22,6 @@ import SwiftUI
 import SwiftData
 
 struct MyInvoicesView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.modelContext) private var modelContext
     
     @StateObject private var viewModel = MyInvoicesViewModel()
@@ -106,6 +105,17 @@ struct MyInvoicesView: View {
             }
             .onChange(of: allInvoices.count) { _, newCount in
                 viewModel.exitEditingIfEmpty(invoiceCount: newCount)
+            }
+            .alert(
+                L.t(.couldNotSave),
+                isPresented: Binding(
+                    get: { viewModel.saveError != nil },
+                    set: { if !$0 { viewModel.saveError = nil } }
+                )
+            ) {
+                Button(L.t(.ok), role: .cancel) { viewModel.saveError = nil }
+            } message: {
+                Text(viewModel.saveError ?? "")
             }
             .fullScreenCover(
                 isPresented: Binding(
@@ -401,14 +411,6 @@ struct MyInvoicesView: View {
         }
         .padding(.top, 80)
         .frame(maxWidth: .infinity)
-    }
-}
-
-struct PressableStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(AppAnimation.fast, value: configuration.isPressed)
     }
 }
 

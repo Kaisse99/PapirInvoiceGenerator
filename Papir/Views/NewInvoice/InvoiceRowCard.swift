@@ -62,7 +62,6 @@ struct InvoiceRowCard: View {
         focusedField = stepFields[next]
     }
     
-    @Environment(\.colorScheme) var colorScheme
     @FocusState private var focusedField: Field?
     
     let rowNumber: Int

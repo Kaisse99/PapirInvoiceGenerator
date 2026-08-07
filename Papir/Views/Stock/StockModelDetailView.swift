@@ -25,7 +25,6 @@ import SwiftUI
 import SwiftData
 
 struct StockModelDetailView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.modelContext) private var modelContext
 
     let model: StockModel

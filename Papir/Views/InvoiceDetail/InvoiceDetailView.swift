@@ -17,7 +17,6 @@ import SwiftUI
 import SwiftData
 
 struct InvoiceDetailView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.modelContext) private var modelContext
     
     let invoice: Invoice

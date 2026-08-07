@@ -102,12 +102,10 @@ enum LKey: String {
     case makeChanges = "Make Changes"
     case deleteInvoiceTitle = "Delete this invoice?"
     case cannotBeUndone = "This action cannot be undone."
-    case pdfReady = "PDF ready"
     case noPDF = "No PDF"
     case noReceiver = "No receiver"
     case couldNotGeneratePDF = "Couldn't generate PDF"
     case generatePDFIn = "Generate PDF in"
-    case chooseLanguage = "Choose the language"
 
     case senderAndReceiver = "Sender & Receiver"
     case sender = "Sender"
@@ -118,7 +116,6 @@ enum LKey: String {
     case to = "To"
     case date = "Date"
     case items = "Items"
-    case entry = "Entry"
     case row = "Row"
     case name = "Name"
     case units = "Units"
@@ -186,14 +183,12 @@ enum LKey: String {
     case confirmShipment = "Confirm shipment"
     case notInStock = "Not in stock"
     case notInStockHint = "No model in stock matches this row, so nothing is deducted for it."
-    case pickColor = "Pick a color"
     case notDeducted = "Not deducted"
     case noColorOnRow = "This row has no color, so stock cannot tell what to take"
     case stockUpdated = "Stock updated"
     case stockReturned = "Packs returned to stock"
     case shortfallOnShipment = "Some colors went negative. Recount them when you can."
     case notInStockYet = "This code is not in stock yet."
-    case colorsOnTheShelf = "On the shelf"
     case lowStock = "Low"
     case iCloudSync = "iCloud"
     case allModels = "All models"
@@ -262,10 +257,10 @@ enum L {
         .packsLeavingStock: "ПАЧОК ЗІ СКЛАДУ", .confirmShipment: "Підтвердити",
         .notInStock: "Немає на складі",
         .notInStockHint: "Немає такої моделі на складі.",
-        .pickColor: "Оберіть колір", .notDeducted: "Не списується", .noColorOnRow: "У рядку немає кольору, тому склад не знає, що брати", .stockUpdated: "Склад оновлено",
+ .notDeducted: "Не списується", .noColorOnRow: "У рядку немає кольору, тому склад не знає, що брати", .stockUpdated: "Склад оновлено",
         .stockReturned: "Пачки повернуто на склад",
         .shortfallOnShipment: "Деякі кольори пішли в мінус.",
-        .notInStockYet: "Цього коду ще немає на складі.", .colorsOnTheShelf: "На складі",
+        .notInStockYet: "Цього коду ще немає на складі.",
         .lowStock: "Мало",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладні та склад на всіх пристроях",
         .allModels: "Усі моделі", .lockedWhileShipped: "Поверніть у чернетку, щоб змінити", .allDays: "Усі дні",
@@ -313,15 +308,15 @@ enum L {
         .makeChanges: "Редагувати",
         .deleteInvoiceTitle: "Видалити цю накладну?",
         .cannotBeUndone: "Цю дію не можна скасувати.",
-        .pdfReady: "PDF готовий", .noPDF: "Без PDF", .noReceiver: "Без отримувача",
+ .noPDF: "Без PDF", .noReceiver: "Без отримувача",
         .couldNotGeneratePDF: "Не вдалося створити PDF",
-        .generatePDFIn: "Створити PDF", .chooseLanguage: "Оберіть мову",
+        .generatePDFIn: "Створити PDF",
         .senderAndReceiver: "Від кого / Кому",
         .sender: "Від кого", .receiver: "Кому",
         .defaultSenderPlaceholder: "Ваше імʼя або фірма",
         .defaultSenderCaption: "Підставляється у поле «Від кого» на кожній новій накладній",
         .from: "Від", .to: "Для", .date: "Дата", .items: "Позицій",
-        .entry: "Позиція", .row: "Рядок", .name: "Назва",
+ .row: "Рядок", .name: "Назва",
         .units: "Пачки", .perUnit: "У пачці", .price: "Ціна",
         .colorsCaps: "КОЛЬОРИ", .addColor: "Додати колір...",
         .addNewRow: "Ще рядок", .totalCaps: "УСЬОГО", .subtotal: "Сума",
@@ -362,10 +357,10 @@ enum L {
         .packsLeavingStock: "ПАЧЕК СО СКЛАДА", .confirmShipment: "Подтвердить",
         .notInStock: "Нет на складе",
         .notInStockHint: "Такой модели нет на складе.",
-        .pickColor: "Выберите цвет", .notDeducted: "Не списывается", .noColorOnRow: "В строке нет цвета, поэтому склад не знает, что брать", .stockUpdated: "Склад обновлён",
+ .notDeducted: "Не списывается", .noColorOnRow: "В строке нет цвета, поэтому склад не знает, что брать", .stockUpdated: "Склад обновлён",
         .stockReturned: "Пачки возвращены на склад",
         .shortfallOnShipment: "Некоторые цвета ушли в минус.",
-        .notInStockYet: "Этого кода ещё нет на складе.", .colorsOnTheShelf: "На складе",
+        .notInStockYet: "Этого кода ещё нет на складе.",
         .lowStock: "Мало",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладні та склад на всіх пристроях",
         .allModels: "Усі моделі", .lockedWhileShipped: "Поверніть у чернетку, щоб змінити", .allDays: "Усі дні",
@@ -413,15 +408,15 @@ enum L {
         .makeChanges: "Редактировать",
         .deleteInvoiceTitle: "Удалить эту накладную?",
         .cannotBeUndone: "Это действие нельзя отменить.",
-        .pdfReady: "PDF готов", .noPDF: "Без PDF", .noReceiver: "Без получателя",
+ .noPDF: "Без PDF", .noReceiver: "Без получателя",
         .couldNotGeneratePDF: "Не удалось создать PDF",
-        .generatePDFIn: "Создать PDF", .chooseLanguage: "Выберите язык",
+        .generatePDFIn: "Создать PDF",
         .senderAndReceiver: "От кого / Кому",
         .sender: "От кого", .receiver: "Кому",
         .defaultSenderPlaceholder: "Ваше имя или фирма",
         .defaultSenderCaption: "Подставляется в поле «От кого» на каждой новой накладной",
         .from: "От", .to: "Для", .date: "Дата", .items: "Позиций",
-        .entry: "Позиция", .row: "Строка", .name: "Название",
+ .row: "Строка", .name: "Название",
         .units: "Пачки", .perUnit: "В пачке", .price: "Цена",
         .colorsCaps: "ЦВЕТА", .addColor: "Добавить цвет...",
         .addNewRow: "Ещё строка", .totalCaps: "ИТОГО", .subtotal: "Сумма",
@@ -462,10 +457,10 @@ enum L {
         .packsLeavingStock: "Paczek z magazynu", .confirmShipment: "Potwierdź",
         .notInStock: "Brak w magazynie",
         .notInStockHint: "Żaden model w magazynie nie pasuje do tego wiersza, więc nic nie zostanie odjęte.",
-        .pickColor: "Wybierz kolor", .notDeducted: "Nie odjęto", .noColorOnRow: "Ten wiersz nie ma koloru, więc magazyn nie wie, co wydać", .stockUpdated: "Magazyn zaktualizowany",
+ .notDeducted: "Nie odjęto", .noColorOnRow: "Ten wiersz nie ma koloru, więc magazyn nie wie, co wydać", .stockUpdated: "Magazyn zaktualizowany",
         .stockReturned: "Paczki wrócily na magazyn",
         .shortfallOnShipment: "Niektóre kolory zeszły poniżej zera. Przelicz je przy okazji.",
-        .notInStockYet: "Tego kodu nie ma jeszcze w magazynie.", .colorsOnTheShelf: "W magazynie",
+        .notInStockYet: "Tego kodu nie ma jeszcze w magazynie.",
         .lowStock: "Mało", .lowStockThreshold: "Niski stan",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Faktury i magazyn na wszystkich urządzeniach",
         .allModels: "Wszystkie modele", .lockedWhileShipped: "Wróć do szkicu, aby edytować", .allDays: "Wszystkie dni",
@@ -513,15 +508,15 @@ enum L {
         .makeChanges: "Edytuj",
         .deleteInvoiceTitle: "Usunąć tę fakturę?",
         .cannotBeUndone: "Tej operacji nie można cofnąć.",
-        .pdfReady: "PDF gotowy", .noPDF: "Brak PDF", .noReceiver: "Brak odbiorcy",
+ .noPDF: "Brak PDF", .noReceiver: "Brak odbiorcy",
         .couldNotGeneratePDF: "Nie udało się utworzyć PDF",
-        .generatePDFIn: "Utwórz PDF w", .chooseLanguage: "Wybierz język",
+        .generatePDFIn: "Utwórz PDF w",
         .senderAndReceiver: "Nadawca i odbiorca",
         .sender: "Nadawca", .receiver: "Odbiorca",
         .defaultSenderPlaceholder: "Twoje imię lub firma",
         .defaultSenderCaption: "Wypełnia pole nadawcy na każdej nowej fakturze",
         .from: "Od", .to: "Do", .date: "Data", .items: "Pozycji",
-        .entry: "Pozycja", .row: "Wiersz", .name: "Nazwa",
+ .row: "Wiersz", .name: "Nazwa",
         .units: "Paczki", .perUnit: "W paczce", .price: "Cena",
         .colorsCaps: "KOLORY", .addColor: "Dodaj kolor...",
         .addNewRow: "Dodaj wiersz", .totalCaps: "RAZEM", .subtotal: "Suma",
