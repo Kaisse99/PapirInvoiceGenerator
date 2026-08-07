@@ -4,7 +4,18 @@
 //  scans for; the receiver sits under it as the label rather than the headline.
 //  The old card spent its height on a "PDF ready" line that was true on every
 //  invoice and so told her nothing, so only the absence of a PDF is worth a
-//  word now, and the shipped badge only appears once it means something.
+//  word now.
+//  Status is the sheet of coloured paper the card sits on: a second card of the
+//  same shape, taller by a strip, showing along the bottom edge in the status
+//  colour with the word on it. It replaced a badge tucked in beside the
+//  receiver, which had to be read to be found; a colour running the width of
+//  the row is legible while scrolling, and reads as the invoice being filed
+//  under something rather than as a warning attached to it. Every row carries
+//  one, so drafts and shipped invoices are told apart by colour rather than by
+//  one of them having a badge at all. The card's bottom corners are drawn
+//  tighter than its top ones so it sits into the strip instead of floating
+//  above it, and the item count is centred on the total rather than sharing
+//  its baseline, since a capsule hung off a baseline reads as having slipped.
 //  Used by: MyInvoicesView.
 //
 
@@ -40,16 +51,18 @@ struct InvoiceRowItem: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(formattedTotal)
-                    .font(.system(size: 30, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.primary)
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
+            HStack(alignment: .center, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(formattedTotal)
+                        .font(.system(size: 30, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.primary)
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
 
-                Text(AppSettings.currencySymbol)
-                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    Text(AppSettings.currencySymbol)
+                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
 
                 Spacer(minLength: 8)
 
@@ -60,9 +73,10 @@ struct InvoiceRowItem: View {
                         .font(.system(size: 12, weight: .semibold, design: .monospaced))
                 }
                 .foregroundStyle(.secondary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 7)
                 .background(Capsule().fill(.primary.opacity(0.06)))
+                .offset(y: -2)
             }
 
             HStack(spacing: 8) {
@@ -70,16 +84,6 @@ struct InvoiceRowItem: View {
                     .font(.system(size: 14, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-
-                if invoice.status == .shipped {
-                    Text(L.t(.shipped).uppercased())
-                        .font(.system(size: 9, weight: .heavy, design: .monospaced))
-                        .tracking(1)
-                        .foregroundStyle(InvoiceStatus.shipped.tint)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(InvoiceStatus.shipped.tint.opacity(0.18)))
-                }
 
                 if invoice.pdfFileName == nil {
                     Text(L.t(.noPDF).uppercased())
@@ -101,14 +105,36 @@ struct InvoiceRowItem: View {
         .padding(.horizontal, 18)
         .padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.secondarySystemGroupedBackground))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(.primary.opacity(0.12), lineWidth: 0.8)
-        )
+        .background(cardShape.fill(Color(.secondarySystemGroupedBackground)))
+        .overlay(cardShape.stroke(.primary.opacity(0.12), lineWidth: 0.8))
         .shadow(color: .primary.opacity(0.08), radius: 8, y: 3)
+        .padding(.bottom, Self.statusStrip)
+        .background(statusPlate)
+        .animation(AppAnimation.quick, value: invoice.status)
+    }
+
+    private static let statusStrip: CGFloat = 24
+
+    private var cardShape: UnevenRoundedRectangle {
+        UnevenRoundedRectangle(
+            topLeadingRadius: 20,
+            bottomLeadingRadius: 10,
+            bottomTrailingRadius: 10,
+            topTrailingRadius: 20
+        )
+    }
+
+    private var statusPlate: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(invoice.status.plateTint(colorScheme))
+            .overlay(alignment: .bottomLeading) {
+                Text(invoice.status.label.uppercased())
+                    .font(.system(size: 10, weight: .heavy, design: .monospaced))
+                    .tracking(1.5)
+                    .foregroundStyle(.white)
+                    .padding(.leading, 18)
+                    .padding(.bottom, 6)
+                    .contentTransition(.opacity)
+            }
     }
 }

@@ -3,13 +3,39 @@
 //  One editable invoice row. Name, units × per-unit × price, and a color list
 //  that grows a badge per entry; the running subtotal appears as soon as the
 //  three numbers parse. Filling a numeric field to its limit jumps focus to the
-//  next one, so a row can be typed without reaching for the screen. Locking
-//  collapses the card to a read-only summary and can only happen once the row
-//  is complete. The card starts locked when an existing invoice is reopened.
+//  next one, so a row can be typed without reaching for the screen. The badge
+//  in the top corner is the row's state at a glance: a ring that closes a
+//  quarter at a time as the four required fields are filled, then a solid ink
+//  disc with a tick when the row is whole. It sits there from the first
+//  keystroke rather than appearing only at the end, so the row says how far
+//  off it is while there is still something to do about it, and it mirrors the
+//  lock opposite it so the two corners read as a pair. Amber with a bang means
+//  the row is complete but carries something worth a second look, today a
+//  breakdown that does not add up or a price that is not the shelf price;
+//  neither blocks saving.
+//  Locking collapses the card to a read-only summary and can only happen once
+//  the row is complete. The card starts locked when an existing invoice is
+//  reopened.
 //  Long-pressing an unlocked card offers to delete it. Typing in the name
 //  offers matching stock codes underneath it, the way a location field does,
 //  because there are far too many models to list up front; a code that looks
 //  like a model but is not on the shelf says so instead.
+//  Once a row has colors on it the colors own the unit count: every add,
+//  remove and stepper writes their sum into Units and the field goes read-only,
+//  because typing the same total in two places is how the two ended up
+//  disagreeing. Removing the last color leaves the number where it was rather
+//  than resetting it to zero, and a row with no colors is typed by hand as
+//  before. An old row whose stored breakdown does not add up still says so,
+//  since nothing rewrites it until she touches a color.
+//  A name that matches a stock model with a price fills the price in, and the
+//  name owns that field from then on: pointing the row at another model
+//  refills it, and pointing it at nothing empties it again, so a price left
+//  over from a model that is no longer named cannot be signed off by accident.
+//  A price typed on a row that never matched anything is hers and is left
+//  alone. She may still overwrite a filled-in price; that is not an error, so
+//  the field only goes amber and says what the shelf price was, and saving is
+//  not blocked. What is saved is whatever the field says at that moment: the
+//  invoice keeps its own number and never re-reads the model afterwards.
 //  Used by: NewInvoiceView.
 //
 
@@ -48,6 +74,7 @@ struct InvoiceRowCard: View {
     @State private var visibleTotal: Double? = nil
     @State private var visibleSuggestions: [StockSuggestion] = []
     @State private var showsUnknownCode = false
+    @State private var priceSourceCode: String? = nil
     
     private var cardBackground: Color {
         Color(.systemGray6)
@@ -99,14 +126,21 @@ struct InvoiceRowCard: View {
         )
         .animation(AppAnimation.quick, value: isLocked)
         .onAppear { syncDerived(animated: false) }
-        .onChange(of: name) { _, _ in syncDerived() }
+        .onChange(of: name) { _, _ in
+            syncDerived()
+            applyStockPrice()
+        }
         .onChange(of: unitCount) { _, _ in syncDerived() }
         .onChange(of: itemsPerUnit) { _, _ in syncDerived() }
         .onChange(of: price) { _, _ in syncDerived() }
         .onChange(of: focusedField) { _, _ in syncDerived() }
+        .onChange(of: colors) { _, _ in syncUnitsToColors() }
+        .onChange(of: colorPacks) { _, _ in syncUnitsToColors() }
         .overlay(alignment: .topLeading) {
-            if isComplete && !isLocked {
-                completeCheckmark.offset(x: -6, y: -6)
+            if !isLocked {
+                statusBadge
+                    .offset(x: -6, y: -6)
+                    .transition(.scale.combined(with: .opacity))
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -177,6 +211,7 @@ struct InvoiceRowCard: View {
                     keyboardType: .numberPad,
                     centerAlign: true,
                     isError: unitsError,
+                    isDisabled: unitsFollowColors,
                     backgroundFill: cardBackground,
                     focusBinding: $focusedField,
                     focusValue: .units
@@ -185,7 +220,7 @@ struct InvoiceRowCard: View {
                 .limitInput($unitCount, to: 4)
                 .onChange(of: unitCount) { _, newValue in
                     if unitsError { onClearError(.units) }
-                    if newValue.count == 4 { focusedField = .perUnit }
+                    if newValue.count == 4 && !unitsFollowColors { focusedField = .perUnit }
                 }
                 
                 multiplySign
@@ -217,6 +252,7 @@ struct InvoiceRowCard: View {
                     keyboardType: .decimalPad,
                     centerAlign: true,
                     isError: priceError,
+                    isWarning: priceOffStock,
                     backgroundFill: cardBackground,
                     focusBinding: $focusedField,
                     focusValue: .price
@@ -226,7 +262,28 @@ struct InvoiceRowCard: View {
                     sanitizePrice(newValue)
                 }
             }
-            
+
+            if priceOffStock, let stockPrice {
+                HStack(spacing: 5) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 9))
+
+                    Text("\(L.t(.differsFromStock)): \(PriceText.display(stockPrice)) \(AppSettings.currencySymbol)")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                }
+                .foregroundStyle(Color.orange)
+                .padding(.leading, 6)
+                .transition(.opacity)
+            }
+
+            if unitsFollowColors {
+                Text(L.t(.unitsFollowColors))
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 6)
+                    .transition(.opacity)
+            }
+
             colorsSection
         }
     }
@@ -252,6 +309,42 @@ struct InvoiceRowCard: View {
             visibleSuggestions = codes
             showsUnknownCode = unknown
         }
+    }
+
+    private var unitsFollowColors: Bool {
+        !colors.isEmpty && colorPacks.count == colors.count
+    }
+
+    private func syncUnitsToColors() {
+        guard unitsFollowColors else { return }
+        let total = colorPacks.reduce(0, +)
+        guard total > 0 else { return }
+        let text = "\(total)"
+        guard unitCount != text else { return }
+        unitCount = text
+    }
+
+    private var stockPrice: Double? {
+        guard let model = matchedModel, model.pricePerPiece > 0 else { return nil }
+        return model.pricePerPiece
+    }
+
+    private var priceOffStock: Bool {
+        guard let stockPrice, let typed = Double(price) else { return false }
+        return typed != stockPrice
+    }
+
+    private func applyStockPrice() {
+        guard let model = matchedModel, model.pricePerPiece > 0 else {
+            guard priceSourceCode != nil else { return }
+            priceSourceCode = nil
+            price = ""
+            return
+        }
+
+        guard priceSourceCode != model.code else { return }
+        priceSourceCode = model.code
+        price = PriceText.editable(model.pricePerPiece)
     }
 
     private var matchedModel: StockSuggestion? {
@@ -492,14 +585,53 @@ struct InvoiceRowCard: View {
         }
     }
     
-    private var completeCheckmark: some View {
-        Image(systemName: breakdownMismatch ? "exclamationmark" : "checkmark")
-            .font(.system(size: 10, weight: .heavy))
-            .foregroundStyle(.white)
-            .frame(width: 20, height: 20)
-            .background(Circle().fill(breakdownMismatch ? Color.orange : Color.green))
-            .transition(.scale.combined(with: .opacity))
-            .animation(AppAnimation.fast, value: breakdownMismatch)
+    private var filledFieldCount: Int {
+        [name, unitCount, itemsPerUnit, price]
+            .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            .count
+    }
+
+    private var completion: Double {
+        Double(filledFieldCount) / 4
+    }
+
+    private var needsAttention: Bool {
+        isComplete && (breakdownMismatch || priceOffStock)
+    }
+
+    private var statusTint: Color {
+        needsAttention ? .orange : .primary
+    }
+
+    private var statusBadge: some View {
+        ZStack {
+            Circle()
+                .fill(cardBackground)
+
+            Circle()
+                .fill(statusTint)
+                .opacity(isComplete ? 1 : 0)
+
+            Circle()
+                .stroke(Color.primary.opacity(0.18), lineWidth: 2)
+                .opacity(isComplete ? 0 : 1)
+
+            Circle()
+                .trim(from: 0, to: completion)
+                .stroke(Color.primary.opacity(0.5), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .opacity(isComplete ? 0 : 1)
+
+            Image(systemName: needsAttention ? "exclamationmark" : "checkmark")
+                .font(.system(size: 11, weight: .heavy))
+                .foregroundStyle(Color(.systemBackground))
+                .contentTransition(.symbolEffect(.replace))
+                .opacity(isComplete ? 1 : 0)
+                .scaleEffect(isComplete ? 1 : 0.4)
+        }
+        .frame(width: 24, height: 24)
+        .animation(AppAnimation.quick, value: completion)
+        .animation(AppAnimation.quick, value: needsAttention)
     }
     
     private var lockButton: some View {
@@ -541,7 +673,9 @@ struct InvoiceRowCard: View {
                     }
                 }
 
-                reconciliationLine
+                if breakdownMismatch {
+                    reconciliationLine
+                }
             }
 
             if !suggestedColors.isEmpty {
@@ -641,15 +775,13 @@ struct InvoiceRowCard: View {
 
     private var reconciliationLine: some View {
         HStack(spacing: 6) {
-            if breakdownMismatch {
-                Image(systemName: "exclamationmark.circle.fill")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.orange)
-            }
+            Image(systemName: "exclamationmark.circle.fill")
+                .font(.system(size: 11))
+                .foregroundStyle(Color.orange)
 
             Text("\(assignedPacks) / \(unitsValue) \(L.t(.assignedToColors))")
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
-                .foregroundStyle(breakdownMismatch ? Color.orange : .secondary)
+                .foregroundStyle(Color.orange)
 
             Spacer()
         }
@@ -657,35 +789,28 @@ struct InvoiceRowCard: View {
     }
 
     private var stockColorOptions: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(L.t(.colorsOnTheShelf).uppercased())
-                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                .tracking(1.5)
-                .foregroundStyle(.secondary)
-
-            FlowLayout(spacing: 6) {
-                ForEach(suggestedColors, id: \.self) { option in
-                    Button {
-                        Haptics.light()
-                        withAnimation(AppAnimation.quick) {
-                            colors.append(option)
-                            colorPacks.append(1)
-                        }
-                    } label: {
-                        HStack(spacing: 5) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 9, weight: .bold))
-                            Text(option)
-                                .font(.system(size: 13, weight: .medium, design: .monospaced))
-                        }
-                        .padding(.horizontal, 10)
-                        .frame(height: 30)
-                        .background(Capsule().fill(Color.primary.opacity(0.05)))
-                        .overlay(Capsule().stroke(Color.primary.opacity(0.15), lineWidth: 0.8))
-                        .foregroundStyle(Color.primary)
+        FlowLayout(spacing: 6) {
+            ForEach(suggestedColors, id: \.self) { option in
+                Button {
+                    Haptics.light()
+                    withAnimation(AppAnimation.quick) {
+                        colors.append(option)
+                        colorPacks.append(1)
                     }
-                    .buttonStyle(.plain)
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 9, weight: .bold))
+                        Text(option)
+                            .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    }
+                    .padding(.horizontal, 10)
+                    .frame(height: 30)
+                    .background(Capsule().fill(Color.primary.opacity(0.05)))
+                    .overlay(Capsule().stroke(Color.primary.opacity(0.15), lineWidth: 0.8))
+                    .foregroundStyle(Color.primary)
                 }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -705,6 +830,7 @@ struct InvoiceRowCard: View {
 struct StockSuggestion: Identifiable, Equatable {
     let code: String
     let packs: Int
+    let pricePerPiece: Double
     let colorStock: [ColorAllocation]
 
     var id: String { code }

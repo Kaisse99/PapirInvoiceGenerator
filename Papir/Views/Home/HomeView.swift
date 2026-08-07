@@ -1,13 +1,23 @@
 //
 //  HomeView.swift
 //  The root screen and the app's only navigation: swipe up for the new-invoice
-//  screen, down for the invoice list, sideways for stock, and all of them come
+//  screen, down for the invoice list, left for stock, and all of them come
 //  back here. They live in one ZStack driven by HomeViewModel's screen case,
-//  so a swipe reads as one sheet of paper sliding rather than a push. The
-//  arrows shimmer through a gradient that animates while this screen is on
-//  top, and the gear sits in the corner where it is reachable from anywhere
-//  without taking a place in the swipe. Keyed on the stored language, so
-//  switching it in settings rebuilds every screen underneath in one go.
+//  so a swipe reads as one sheet of paper sliding rather than a push. Every
+//  direction is drawn the same way, its name in one type size above an arrow
+//  pointing the way the finger goes, so the four read as one set. The
+//  horizontal pair are three stacked chevrons fading back from the leading
+//  one, which says swipe more plainly than the rules that used to run to the
+//  edges; the name sits above them rather than beside them because at the same
+//  size as menu and create it would not otherwise leave the mark room to stay
+//  centred. Statistics is drawn faint because the screen behind it does not
+//  exist yet, and swiping at it springs back. The whole stack sits slightly
+//  above centre, since an optically centred column reads low. The arrows and a
+//  glint across the mark share one gradient that animates while this screen is
+//  on top, and the gear sits in the corner
+//  where it is reachable from anywhere without taking a place in the swipe.
+//  Keyed on the stored language, so switching it in settings rebuilds every
+//  screen underneath in one go.
 //  Used by: PapirApp.
 //
 
@@ -107,27 +117,24 @@ struct HomeView: View {
 
                 Spacer()
 
-                HStack(spacing: 4) {
-                    Rectangle()
-                        .frame(height: 1.5)
-                        .foregroundStyle(.primary.opacity(0.8))
-                        .shadow(color: glowColor.opacity(0.75), radius: 4)
+                HStack(spacing: 0) {
+                    directionArrow(
+                        title: L.t(.statistics, language),
+                        pointsLeft: false,
+                        available: false
+                    )
+                    .frame(maxWidth: .infinity)
 
-                    Image("smallIcon")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 60, height: 60)
-                        .foregroundStyle(.primary)
+                    centerMark
 
-                    Rectangle()
-                        .frame(height: 1.5)
-                        .foregroundStyle(.primary.opacity(0.8))
-                        .shadow(color: glowColor.opacity(0.75), radius: 4)
+                    directionArrow(
+                        title: L.t(.stock, language),
+                        pointsLeft: true,
+                        available: true
+                    )
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 16)
-
-                stockHint
-                    .padding(.top, 14)
+                .padding(.horizontal, 12)
 
                 Spacer()
 
@@ -153,6 +160,7 @@ struct HomeView: View {
 
                 Spacer()
             }
+            .offset(y: -55)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppBackground())
             .navigationBarTitleDisplayMode(.inline)
@@ -183,19 +191,60 @@ struct HomeView: View {
         }
     }
 
-    private var stockHint: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "arrow.left")
-                .font(.system(size: 11, weight: .regular))
-            Text(L.t(.stock, language))
-                .font(.caption)
+    private var centerMark: some View {
+        let mark = Image("smallIcon")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 60, height: 60)
+
+        return mark
+            .overlay {
+                LinearGradient(
+                    colors: [.clear, .white.opacity(0.16), .clear],
+                    startPoint: UnitPoint(x: viewModel.shimmerOffset, y: 0.3),
+                    endPoint: UnitPoint(x: viewModel.shimmerOffset + 0.3, y: 0.7)
+                )
+                .blendMode(.plusLighter)
+                .mask(mark)
+            }
+            .compositingGroup()
+    }
+
+    private func directionArrow(title: String, pointsLeft: Bool, available: Bool) -> some View {
+        VStack(spacing: 7) {
+            Text(title)
+                .font(.callout)
+                .fontWidth(.expanded)
                 .fontDesign(.monospaced)
                 .tracking(3)
-            Image(systemName: "arrow.right")
-                .font(.system(size: 11, weight: .regular))
+                .foregroundStyle(.primary.opacity(available ? 1 : 0.3))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+
+            HStack(spacing: -7) {
+                ForEach(0..<3, id: \.self) { index in
+                    chevron(pointsLeft: pointsLeft, available: available, index: index)
+                }
+            }
         }
-        .foregroundStyle(.primary.opacity(0.55))
-        .frame(maxWidth: .infinity)
+        .offset(y: -8)
+    }
+
+    private func chevron(pointsLeft: Bool, available: Bool, index: Int) -> some View {
+        let lead = pointsLeft ? 0 : 2
+        let fade = [1.0, 0.5, 0.25][abs(index - lead)]
+
+        let glyph = Image(systemName: pointsLeft ? "chevron.left" : "chevron.right")
+            .font(.system(size: 28, weight: .light))
+
+        return Group {
+            if available {
+                glyph.foregroundStyle(silverGradient)
+            } else {
+                glyph.foregroundStyle(.primary.opacity(0.22))
+            }
+        }
+        .opacity(fade)
     }
 
     private func dragGesture(limits: HomeViewModel.DragLimits) -> some Gesture {

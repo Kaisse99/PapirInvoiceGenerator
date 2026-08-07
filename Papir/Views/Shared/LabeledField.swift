@@ -7,7 +7,16 @@
 //  Int-specialized init for the fields that don't take part in focus jumping.
 //  A caller that passes a focus binding gets it applied alongside the field's
 //  own, which is what lets the row card both move focus between fields and know
-//  which one is being typed in.
+//  which one is being typed in. isWarning tints the border and the label amber
+//  without saying anything underneath: it marks a value that is allowed but
+//  worth a second look, and the caller writes the sentence explaining it. It
+//  outranks the focus ring, since a warning that only appears once you look
+//  away is one you meet too late to act on. Border and label read the same
+//  ladder, error then warning then focus, so the box never says one thing and
+//  its name another.
+//  Nothing typed into one of these is a word: model codes, surnames, colors
+//  and branch numbers all get autocorrected into something else, so the field
+//  turns correction off everywhere rather than per caller.
 //  Used by: InvoiceRowCard.
 //
 
@@ -23,18 +32,27 @@ struct LabeledField<FocusValue: Hashable>: View {
     var centerAlign: Bool = false
     var isError: Bool = false
     var errorMessage: String? = nil
+    var isWarning: Bool = false
     var isDisabled: Bool = false
     var backgroundFill: Color = Color(.secondarySystemGroupedBackground)
-    
+
     var focusBinding: FocusState<FocusValue?>.Binding?
     var focusValue: FocusValue?
-    
+
     @FocusState private var isFocused: Bool
-    
+
     private var borderColor: Color {
         if isError { return .red }
+        if isWarning { return .orange }
         if isFocused { return .blue.opacity(0.9) }
         return .primary.opacity(0.55)
+    }
+
+    private var labelColor: Color {
+        if isError { return .red }
+        if isWarning { return .orange }
+        if isFocused { return Color.accentColor }
+        return .secondary
     }
     
     var body: some View {
@@ -44,6 +62,7 @@ struct LabeledField<FocusValue: Hashable>: View {
                     TextField(placeholder, text: $text)
                         .font(.system(size: 16, weight: .medium, design: .monospaced))
                         .keyboardType(keyboardType)
+                        .autocorrectionDisabled()
                         .multilineTextAlignment(centerAlign ? .center : .leading)
                         .foregroundStyle(.primary)
                         .disabled(isDisabled)
@@ -79,7 +98,7 @@ struct LabeledField<FocusValue: Hashable>: View {
                     .font(.caption2)
                     .fontDesign(.monospaced)
                     .fontWeight(.semibold)
-                    .foregroundStyle(isError ? .red : (isFocused ? Color.accentColor : .secondary))
+                    .foregroundStyle(labelColor)
                     .padding(.horizontal, 6)
                     .background(backgroundFill)
                     .offset(x: 14, y: -8)
@@ -96,6 +115,7 @@ struct LabeledField<FocusValue: Hashable>: View {
         .opacity(isDisabled ? 0.5 : 1)
         .animation(AppAnimation.fast, value: isFocused)
         .animation(AppAnimation.fast, value: isError)
+        .animation(AppAnimation.fast, value: isWarning)
     }
 }
 
@@ -109,6 +129,7 @@ extension LabeledField where FocusValue == Int {
         centerAlign: Bool = false,
         isError: Bool = false,
         errorMessage: String? = nil,
+        isWarning: Bool = false,
         isDisabled: Bool = false,
         backgroundFill: Color = Color(.secondarySystemGroupedBackground)
     ) {
@@ -120,6 +141,7 @@ extension LabeledField where FocusValue == Int {
         self.centerAlign = centerAlign
         self.isError = isError
         self.errorMessage = errorMessage
+        self.isWarning = isWarning
         self.isDisabled = isDisabled
         self.backgroundFill = backgroundFill
         self.focusBinding = nil

@@ -64,6 +64,7 @@ enum LKey: String {
     case menu = "menu"
     case create = "create"
     case stock = "stock"
+    case statistics = "statistics"
 
     case settings = "Settings"
     case done = "Done"
@@ -210,6 +211,30 @@ enum LKey: String {
     case movementReturned = "Returned"
     case movementRecounted = "Recounted"
     case assignedToColors = "assigned to colors"
+    case pricePerPiece = "Price per piece"
+    case setPrice = "Set price"
+    case noPriceYet = "No price set"
+    case unitsFollowColors = "Units follow the colors below"
+    case differsFromStock = "Not the stock price"
+
+    case addressBook = "Address book"
+    case newContact = "New contact"
+    case editContact = "Contact"
+    case searchContacts = "Name, phone or city..."
+    case noContacts = "No contacts yet"
+    case noContactsHint = "Add someone you ship to and the receiver field will find them"
+    case firstName = "First name"
+    case lastName = "Last name"
+    case phone = "Phone"
+    case city = "City"
+    case novaPoshtaOne = "Nova Poshta 1"
+    case novaPoshtaTwo = "Nova Poshta 2"
+    case whoCaps = "WHO"
+    case reachThemCaps = "REACH THEM"
+    case whereToCaps = "WHERE TO"
+    case deleteContact = "Delete contact"
+    case deleteContactTitle = "Delete this contact?"
+    case deleteContactMessage = "Invoices already written keep the name on them."
     case draftExplained = "Nothing has been taken off the shelf for this invoice yet."
     case shippedExplained = "The packs on this invoice have been deducted from stock."
 }
@@ -251,6 +276,20 @@ enum L {
         .movementReturned: "Повернено",
         .movementRecounted: "Перераховано", .assignedToColors: "по кольорах", .draftExplained: "Зі складу ще нічого не списано.", .shippedExplained: "Пачки вже списані зі складу.",
         .menu: "меню", .create: "створити", .stock: "склад",
+        .statistics: "статистика",
+        .pricePerPiece: "Ціна за штуку", .setPrice: "Вказати ціну",
+        .noPriceYet: "Ціна не вказана",
+        .unitsFollowColors: "Пачки рахуються за кольорами",
+        .differsFromStock: "Не складська ціна",
+        .addressBook: "Адресна книга", .newContact: "Новий контакт",
+        .editContact: "Контакт", .searchContacts: "Імʼя, телефон або місто...",
+        .noContacts: "Ще немає контактів",
+        .noContactsHint: "Додайте, кому ви відправляєте, і поле «Кому» їх знайде",
+        .firstName: "Імʼя", .lastName: "Прізвище", .phone: "Телефон",
+        .city: "Місто", .novaPoshtaOne: "Нова пошта 1", .novaPoshtaTwo: "Нова пошта 2",
+        .whoCaps: "ХТО", .reachThemCaps: "ЗВʼЯЗОК", .whereToCaps: "КУДИ",
+        .deleteContact: "Видалити контакт", .deleteContactTitle: "Видалити цей контакт?",
+        .deleteContactMessage: "Уже виписані накладні збережуть імʼя.",
         .settings: "Налаштування", .done: "Готово", .cancel: "Скасувати",
         .delete: "Видалити", .ok: "Гаразд", .add: "Додати",
         .language: "Мова", .currency: "Валюта",
@@ -335,6 +374,20 @@ enum L {
         .movementReturned: "Возвращено",
         .movementRecounted: "Пересчитано", .assignedToColors: "по цветам", .draftExplained: "Со склада ещё ничего не списано.", .shippedExplained: "Пачки уже списаны со склада.",
         .menu: "меню", .create: "создать", .stock: "склад",
+        .statistics: "статистика",
+        .pricePerPiece: "Цена за штуку", .setPrice: "Указать цену",
+        .noPriceYet: "Цена не указана",
+        .unitsFollowColors: "Пачки считаются по цветам",
+        .differsFromStock: "Не складская цена",
+        .addressBook: "Адресная книга", .newContact: "Новый контакт",
+        .editContact: "Контакт", .searchContacts: "Имя, телефон или город...",
+        .noContacts: "Пока нет контактов",
+        .noContactsHint: "Добавьте, кому вы отправляете, и поле «Кому» их найдёт",
+        .firstName: "Имя", .lastName: "Фамилия", .phone: "Телефон",
+        .city: "Город", .novaPoshtaOne: "Новая почта 1", .novaPoshtaTwo: "Новая почта 2",
+        .whoCaps: "КТО", .reachThemCaps: "СВЯЗЬ", .whereToCaps: "КУДА",
+        .deleteContact: "Удалить контакт", .deleteContactTitle: "Удалить этот контакт?",
+        .deleteContactMessage: "Уже выписанные накладные сохранят имя.",
         .settings: "Настройки", .done: "Готово", .cancel: "Отмена",
         .delete: "Удалить", .ok: "Хорошо", .add: "Добавить",
         .language: "Язык", .currency: "Валюта",
@@ -419,6 +472,20 @@ enum L {
         .movementReturned: "Zwrócono",
         .movementRecounted: "Przeliczono", .assignedToColors: "przypisano", .draftExplained: "Nic jeszcze nie zeszło z magazynu dla tej faktury.", .shippedExplained: "Paczki z tej faktury zostały odjęte od stanu.",
         .menu: "menu", .create: "nowa", .stock: "magazyn",
+        .statistics: "statystyka",
+        .pricePerPiece: "Cena za sztukę", .setPrice: "Ustal cenę",
+        .noPriceYet: "Brak ceny",
+        .unitsFollowColors: "Paczki liczone wg kolorów",
+        .differsFromStock: "Inna niż cena z magazynu",
+        .addressBook: "Książka adresowa", .newContact: "Nowy kontakt",
+        .editContact: "Kontakt", .searchContacts: "Imię, telefon lub miasto...",
+        .noContacts: "Brak kontaktów",
+        .noContactsHint: "Dodaj odbiorcę, a pole \"Do\" go znajdzie",
+        .firstName: "Imię", .lastName: "Nazwisko", .phone: "Telefon",
+        .city: "Miasto", .novaPoshtaOne: "Nova Poshta 1", .novaPoshtaTwo: "Nova Poshta 2",
+        .whoCaps: "KTO", .reachThemCaps: "KONTAKT", .whereToCaps: "DOKĄD",
+        .deleteContact: "Usuń kontakt", .deleteContactTitle: "Usunąć ten kontakt?",
+        .deleteContactMessage: "Wystawione faktury zachowają nazwę.",
         .settings: "Ustawienia", .done: "Gotowe", .cancel: "Anuluj",
         .delete: "Usuń", .ok: "OK", .add: "Dodaj",
         .language: "Język", .currency: "Waluta",

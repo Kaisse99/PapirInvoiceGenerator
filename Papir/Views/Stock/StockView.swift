@@ -1,9 +1,10 @@
 //
 //  StockView.swift
 //  The stock list: every model she holds, searchable by code or by any color
-//  under it, with a card each. Adding a model asks only for the code, since a
-//  model with no colors yet is a normal state, the box exists before anything
-//  is counted into it. Owns the @Query and the navigation stack; tapping a
+//  under it, with a card each. Adding a model asks for the code and, if it is
+//  already agreed, the price per piece; a model with no colors and no price is
+//  a normal state, the box exists before anything is counted into it or sold
+//  out of it. Owns the @Query and the navigation stack; tapping a
 //  card opens StockModelDetailView. Rows animate on the identity of what is
 //  showing, the same way the invoice list does.
 //  Used by: HomeView.
@@ -77,7 +78,7 @@ struct StockView: View {
             }
             .sheet(isPresented: $viewModel.showAddModel) {
                 addModelSheet
-                    .presentationDetents([.height(300)])
+                    .presentationDetents([.height(400)])
                     .presentationDragIndicator(.visible)
             }
             .alert(
@@ -150,6 +151,7 @@ struct StockView: View {
             Button {
                 Haptics.light()
                 viewModel.newModelCode = ""
+                viewModel.newModelPrice = ""
                 viewModel.addModelError = nil
                 viewModel.showAddModel = true
             } label: {
@@ -226,6 +228,23 @@ struct StockView: View {
                     viewModel.addModelError = nil
                 }
 
+            HStack(spacing: 10) {
+                TextField(L.t(.pricePerPiece), text: $viewModel.newModelPrice)
+                    .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                    .keyboardType(.decimalPad)
+                    .decimalOnly($viewModel.newModelPrice)
+                    .limitInput($viewModel.newModelPrice, to: 7)
+
+                Text(AppSettings.currencySymbol)
+                    .font(.system(size: 15, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 16)
+            .frame(height: 56)
+            .background(RoundedRectangle(cornerRadius: 14).fill(Color(.secondarySystemGroupedBackground)))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(.primary.opacity(0.25), lineWidth: 1))
+            .padding(.horizontal, 20)
+
             if let error = viewModel.addModelError {
                 Text(error)
                     .font(.caption)
@@ -251,6 +270,7 @@ struct StockView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity)
+        .dismissKeyboardOnTap()
         .background(Color(.systemGroupedBackground))
     }
 

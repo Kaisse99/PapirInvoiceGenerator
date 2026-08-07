@@ -29,6 +29,23 @@ extension View {
             }
         }
     }
+
+    func decimalOnly(_ text: Binding<String>) -> some View {
+        self.onChange(of: text.wrappedValue) { _, newValue in
+            var seenDot = false
+            let filtered = newValue.reduce(into: "") { result, character in
+                if character.isNumber {
+                    result.append(character)
+                } else if character == "." && !seenDot {
+                    result.append(character)
+                    seenDot = true
+                }
+            }
+            if filtered != newValue {
+                text.wrappedValue = filtered
+            }
+        }
+    }
 }
 
 extension View {

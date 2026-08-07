@@ -27,7 +27,8 @@ struct PapirApp: App {
             ShipmentLine.self,
             StockLine.self,
             StockModel.self,
-            StockMovement.self
+            StockMovement.self,
+            Contact.self
         ])
 
         if AppSettings.cloudSyncEnabled {

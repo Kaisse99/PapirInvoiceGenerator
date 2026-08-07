@@ -8,6 +8,10 @@
 //  invoice's rows already locked, and saving overwrites it and drops its stale PDF
 //  instead of inserting a new invoice. Validation marks every empty field at
 //  once rather than stopping at the first.
+//  The receiver can be picked from the address book, which remembers which
+//  contact it was and saves that alongside the typed name. Editing the name
+//  away from the contact's own drops the link rather than leaving an invoice
+//  filed under someone it no longer names.
 //  Used by: NewInvoiceView, HomeView, EditInvoiceSheet in InvoiceDetailView.
 //
 
@@ -35,7 +39,10 @@ struct InvoiceRowDraft: Identifiable {
 final class NewInvoiceViewModel: ObservableObject {
     @Published var showHeader = false
     @Published var sender: String = ""
-    @Published var receiver: String = ""
+    @Published var receiver: String = "" {
+        didSet { dropContactIfRenamed() }
+    }
+    @Published private(set) var receiverContact: Contact? = nil
     @Published var rows: [InvoiceRowDraft] = [InvoiceRowDraft()]
     @Published var isSaving = false
     @Published var saveErrorMessage: String? = nil
@@ -50,6 +57,7 @@ final class NewInvoiceViewModel: ObservableObject {
         if let invoice = editingInvoice {
             sender = invoice.sender
             receiver = invoice.receiver
+            receiverContact = invoice.receiverContact
             showHeader = !invoice.sender.isEmpty || !invoice.receiver.isEmpty
             
             let drafts = invoice.orderedItems.map { item in
@@ -67,6 +75,18 @@ final class NewInvoiceViewModel: ObservableObject {
         }
     }
     
+    func pick(_ contact: Contact) {
+        receiverContact = contact
+        receiver = contact.displayName
+    }
+
+    private func dropContactIfRenamed() {
+        guard let contact = receiverContact else { return }
+        if receiver.trimmingCharacters(in: .whitespaces) != contact.displayName {
+            receiverContact = nil
+        }
+    }
+
     private static func formatPriceForEditing(_ value: Double) -> String {
         if value.truncatingRemainder(dividingBy: 1) == 0 {
             return "\(Int(value))"
@@ -172,6 +192,7 @@ final class NewInvoiceViewModel: ObservableObject {
                 existing.replaceItems(with: items)
                 existing.sender = sender
                 existing.receiver = receiver
+                existing.receiverContact = receiverContact
                 if let oldFileName = existing.pdfFileName {
                     PDFStorage.deletePDF(fileName: oldFileName)
                     existing.pdfFileName = nil
@@ -180,6 +201,7 @@ final class NewInvoiceViewModel: ObservableObject {
                 result = existing
             } else {
                 let invoice = Invoice(items: items, date: .now, sender: sender, receiver: receiver)
+                invoice.receiverContact = receiverContact
                 context.insert(invoice)
                 try context.save()
                 result = invoice

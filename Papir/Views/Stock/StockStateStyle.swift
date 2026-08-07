@@ -7,6 +7,10 @@
 //  only mean the record and the shelf have come apart. Orange rather than
 //  yellow so it still carries against a white background and keeps enough
 //  contrast for anyone reading it in daylight.
+//  The pack total is coloured on its own scale: red only when the shelf is
+//  actually empty, since red on a healthy total is the kind of alarm that
+//  stops being read, and the warning amber once the total is down to the
+//  number set in settings.
 //  Used by: StockModelCard, StockModelDetailView.
 //
 
@@ -42,5 +46,15 @@ extension StockState {
 
     var isFlagged: Bool {
         self != .stocked
+    }
+}
+
+extension PackTotalState {
+    var tint: Color {
+        switch self {
+        case .healthy: return .primary
+        case .low:     return Color(red: 0.90, green: 0.62, blue: 0.15)
+        case .empty:   return .red
+        }
     }
 }

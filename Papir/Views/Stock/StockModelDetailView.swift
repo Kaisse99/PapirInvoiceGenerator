@@ -8,7 +8,9 @@
 //  negative. Taking stock out is the everyday action so it is the filled
 //  button; recounting is the correction, so it is the quiet outlined one.
 //  Taking stock in is also how a new color appears, so there is no separate
-//  add-color step.
+//  add-color step. The price per piece sits under the total as a tappable
+//  capsule rather than a row in a form, because it is read far more often than
+//  it is changed and it is what a new invoice row fills itself in with.
 //  Used by: StockView.
 //
 
@@ -26,6 +28,7 @@ struct StockModelDetailView: View {
     @State private var withdrawTarget: StockLine? = nil
     @State private var recountTarget: StockLine? = nil
     @State private var showHistory = false
+    @State private var showPrice = false
 
     private var lines: [StockLine] {
         model.orderedLines
@@ -98,6 +101,14 @@ struct StockModelDetailView: View {
             .presentationDetents([.height(360)])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showPrice) {
+            SetPriceSheet(model: model) { price in
+                viewModel.setPrice(price, on: model, context: modelContext)
+                showPrice = false
+            }
+            .presentationDetents([.height(320)])
+            .presentationDragIndicator(.visible)
+        }
         .sheet(item: $recountTarget) { line in
             RecountStockSheet(modelCode: model.code, line: line) { packs in
                 viewModel.recount(line: line, to: packs, in: model, context: modelContext)
@@ -119,14 +130,58 @@ struct StockModelDetailView: View {
 
             Text("\(model.totalPacks)")
                 .font(.system(size: 64, weight: .bold, design: .monospaced))
-                .foregroundStyle(model.state.tint)
+                .foregroundStyle(model.totalState.tint)
                 .contentTransition(.numericText())
                 .animation(AppAnimation.quick, value: model.totalPacks)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
+
+            priceButton
+                .padding(.top, 6)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
+    }
+
+    private var priceButton: some View {
+        Button {
+            Haptics.light()
+            showPrice = true
+        } label: {
+            HStack(spacing: 10) {
+                Text(L.t(.pricePerPiece).uppercased())
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .tracking(1.5)
+                    .foregroundStyle(.secondary)
+
+                if model.hasPrice {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(PriceText.display(model.pricePerPiece))
+                            .font(.system(size: 26, weight: .bold, design: .monospaced))
+                            .foregroundStyle(.primary)
+                            .contentTransition(.numericText())
+                            .animation(AppAnimation.quick, value: model.pricePerPiece)
+
+                        Text(AppSettings.currencySymbol)
+                            .font(.system(size: 15, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    Text(L.t(.noPriceYet))
+                        .font(.system(size: 15, weight: .medium, design: .monospaced))
+                        .foregroundStyle(.secondary.opacity(0.8))
+                }
+
+                Image(systemName: "pencil")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Capsule().fill(Color.primary.opacity(0.05)))
+            .overlay(Capsule().stroke(Color.primary.opacity(0.15), lineWidth: 0.9))
+        }
+        .buttonStyle(.plain)
     }
 
     private var colorsOverview: some View {

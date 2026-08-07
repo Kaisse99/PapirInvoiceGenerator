@@ -3,10 +3,12 @@
 //  One model as a card in the stock list. The code leads, the pack total sits
 //  opposite it as the one number worth reading at a glance, and the colors run
 //  underneath the way she says them out loud, "Black 5, White 10, Blue 0".
-//  State is carried by the number's color and a small badge beside the code
-//  rather than a bar down the edge, which read as decoration rather than
-//  information. Colors sitting at zero stay on the card in orange, because
-//  being out of a color is the thing she most needs to see.
+//  The colors carry their own state and say it in their own chips, so the code
+//  no longer wears a badge summarising them: it repeated in words what the row
+//  underneath already says in colour. The total is coloured by the total
+//  alone, so one color at zero does not paint a full shelf as a problem, and
+//  colors sitting at zero stay on the card in orange, because being out of a
+//  color is the thing she most needs to see.
 //  Used by: StockView.
 //
 
@@ -22,21 +24,11 @@ struct StockModelCard: View {
                     .font(.system(size: 27, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
 
-                if model.state.isFlagged {
-                    Text(model.state.label.uppercased())
-                        .font(.system(size: 9, weight: .heavy, design: .monospaced))
-                        .tracking(1.2)
-                        .foregroundStyle(model.state.tint)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 3)
-                        .background(Capsule().fill(model.state.tint.opacity(0.16)))
-                }
-
                 Spacer(minLength: 8)
 
                 Text("\(model.totalPacks)")
                     .font(.system(size: 27, weight: .bold, design: .monospaced))
-                    .foregroundStyle(model.state.tint)
+                    .foregroundStyle(model.totalState.tint)
                     .contentTransition(.numericText())
                     .animation(AppAnimation.quick, value: model.totalPacks)
 

@@ -17,6 +17,10 @@
 //  SwiftData does not backfill a property's default onto rows that already
 //  exist: a non-optional enum would come back null on every older invoice and
 //  trap the moment anything read it.
+//  receiverContact is who the receiver was picked from in the address book,
+//  and is nil whenever the name was simply typed. The receiver string stays
+//  the record of what the document says; the link is only there so counting by
+//  customer is a relationship rather than a string match.
 //  Used by: NewInvoiceViewModel, MyInvoicesViewModel, InvoiceDetailViewModel,
 //  ShipmentPlanner, PDFGenerator, PDFStorage, MyInvoicesView,
 //  InvoiceDetailView, InvoiceRowItem.
@@ -38,6 +42,7 @@ final class Invoice {
     var shippedAt: Date? = nil
     @Relationship(deleteRule: .cascade)
     var shipmentLines: [ShipmentLine]? = nil
+    var receiverContact: Contact? = nil
 
     var status: InvoiceStatus {
         get { InvoiceStatus(rawValue: statusRaw ?? "") ?? .draft }

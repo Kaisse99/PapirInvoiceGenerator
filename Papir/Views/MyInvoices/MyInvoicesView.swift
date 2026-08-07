@@ -8,6 +8,9 @@
 //  deepLinkInvoice and opens itself. Searching or re-sorting animates the rows
 //  in and out because the stack animates on the identity of what it is showing,
 //  not on the individual filter values.
+//  The address book opens from here rather than from the home swipe, because
+//  it is a thing you consult while writing or checking an invoice rather than
+//  a destination of its own.
 //  Used by: HomeView.
 //
 
@@ -23,6 +26,7 @@ struct MyInvoicesView: View {
     @Binding var deepLinkInvoice: Invoice?
     
     @State private var navigationPath = NavigationPath()
+    @State private var showAddressBook = false
     
     @Query(sort: \Invoice.date, order: .reverse)
     private var allInvoices: [Invoice]
@@ -44,7 +48,7 @@ struct MyInvoicesView: View {
                             noResultsState
                                 .transition(.opacity)
                         } else {
-                            LazyVStack(spacing: 14) {
+                            LazyVStack(spacing: 22) {
                                 ForEach(invoices) { invoice in
                                     invoiceRow(for: invoice)
                                         .transition(.opacity.combined(with: .scale(scale: 0.94)))
@@ -126,6 +130,9 @@ struct MyInvoicesView: View {
             .navigationDestination(for: Invoice.self) { invoice in
                 InvoiceDetailView(invoice: invoice)
             }
+            .fullScreenCover(isPresented: $showAddressBook) {
+                AddressBookView()
+            }
             .tint(Color.primary)
         }
     }
@@ -156,7 +163,19 @@ struct MyInvoicesView: View {
                 .padding(.horizontal, 4)
         }
         
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            if !viewModel.isEditing {
+                Button {
+                    Haptics.light()
+                    showAddressBook = true
+                } label: {
+                    Image(systemName: "person.crop.circle")
+                        .toolbarIcon()
+                        .foregroundStyle(Color.primary)
+                }
+                .accessibilityLabel(L.t(.addressBook))
+            }
+
             if !allInvoices.isEmpty {
                 Button {
                     viewModel.toggleEditing()
@@ -245,7 +264,8 @@ struct MyInvoicesView: View {
                         .foregroundStyle(viewModel.selectedIDs.contains(invoice.id)
                                          ? Color.blue
                                          : Color.secondary.opacity(0.4))
-                    
+                        .padding(.bottom, 24)
+
                     InvoiceRowItem(invoice: invoice)
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)

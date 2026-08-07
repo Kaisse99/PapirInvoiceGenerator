@@ -7,8 +7,11 @@
 //  moved down and then sideways silently changed destination mid-drag, so once
 //  a direction is claimed the only way out is back to the middle. On the
 //  vertical axis there are two thresholds: past the first, letting go commits;
-//  past the second, it commits under the finger. Horizontal has one, and both
-//  directions lead to stock. isCommitting keeps a drag that is already
+//  past the second, it commits under the finger. Horizontal has one, and each
+//  direction carries the screen the arrow on that side points to: left opens
+//  stock, right is where statistics will go and until it exists that drag
+//  springs back with a warning rather than landing somewhere it did not
+//  promise. isCommitting keeps a drag that is already
 //  committing from firing a second time. Also holds deepLinkInvoice, the
 //  invoice a save wants the list to open once it appears.
 //  Used by: HomeView; the Screen case is passed around by NewInvoiceView,
@@ -96,12 +99,7 @@ final class HomeViewModel: ObservableObject {
         if lockedAxis != nil && distance > commitThreshold(for: translation, limits: limits) {
             commitScreen(for: translation)
         } else {
-            withAnimation(AppAnimation.smooth) {
-                dragOffset = .zero
-            }
-            lastHapticOffset = 0
-            passedThreshold = false
-            lockedAxis = nil
+            settle()
         }
     }
 
@@ -122,18 +120,34 @@ final class HomeViewModel: ObservableObject {
 
     private func commitScreen(for translation: CGSize) {
         guard !isCommitting, let axis = lockedAxis else { return }
-        isCommitting = true
 
-        let destination: Screen
+        let destination: Screen?
         switch axis {
         case .horizontal:
-            destination = .stock
+            destination = translation.width < 0 ? .stock : nil
         case .vertical:
             destination = translation.height < 0 ? .create : .menu
         }
 
+        guard let destination else {
+            Haptics.warning()
+            settle()
+            return
+        }
+
+        isCommitting = true
+
         withAnimation(AppAnimation.smooth) {
             currentScreen = destination
+            dragOffset = .zero
+        }
+        lastHapticOffset = 0
+        passedThreshold = false
+        lockedAxis = nil
+    }
+
+    private func settle() {
+        withAnimation(AppAnimation.smooth) {
             dragOffset = .zero
         }
         lastHapticOffset = 0

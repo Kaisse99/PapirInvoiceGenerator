@@ -7,6 +7,9 @@
 //  action rather than two. A withdrawal that goes past what is on hand still
 //  happens and reports its shortfall, which the view turns into a warning;
 //  refusing it would only teach her to stop recording.
+//  A model's price per piece is optional at creation and can be set or changed
+//  at any time from the detail screen, because the code goes on the shelf
+//  before anyone agrees what it sells for.
 //  Holds no models of its own, the view owns the @Query and hands them in.
 //  Used by: StockView, StockModelDetailView.
 //
@@ -20,6 +23,7 @@ final class StockViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var showAddModel: Bool = false
     @Published var newModelCode: String = ""
+    @Published var newModelPrice: String = ""
     @Published var addModelError: String? = nil
     @Published var modelToDelete: StockModel? = nil
     @Published var notice: StockNotice? = nil
@@ -46,14 +50,21 @@ final class StockViewModel: ObservableObject {
             return
         }
 
-        let model = StockModel(code: code)
+        let model = StockModel(code: code, pricePerPiece: max(0, Double(newModelPrice) ?? 0))
         context.insert(model)
         save(context)
 
         Haptics.success()
         newModelCode = ""
+        newModelPrice = ""
         addModelError = nil
         showAddModel = false
+    }
+
+    func setPrice(_ price: Double, on model: StockModel, context: ModelContext) {
+        model.pricePerPiece = max(0, price)
+        save(context)
+        Haptics.success()
     }
 
     func receive(packs: Int, color rawColor: String, into model: StockModel, context: ModelContext) {

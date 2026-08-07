@@ -6,6 +6,12 @@
 //  change wording, and saving updates that invoice instead of adding one. A
 //  finished save hands the invoice up through deepLinkInvoice and switches to
 //  the list, which opens it.
+//  The receiver offers matching contacts under it the way a row's name offers
+//  stock codes, and for the same reason: three at most, only once there is a
+//  letter to match on, so tapping into the field does not throw a list over
+//  the form. What is showing is held in state and swapped inside an animation,
+//  because the rows below have to move down to make room and a list that
+//  appears under a moving form reads as a glitch.
 //  Used by: HomeView, EditInvoiceSheet in InvoiceDetailView.
 //
 
@@ -20,10 +26,39 @@ struct NewInvoiceView: View {
     @Binding var currentScreen: HomeViewModel.Screen
     @Binding var deepLinkInvoice: Invoice?
     
-    @FocusState private var isAnyFieldFocused: Bool
+    enum HeaderField: Hashable {
+        case sender, receiver
+    }
+
+    @FocusState private var focusedHeaderField: HeaderField?
 
     @Query(sort: \StockModel.code)
     private var stockModels: [StockModel]
+
+    @Query(sort: [SortDescriptor(\Contact.lastName), SortDescriptor(\Contact.firstName)])
+    private var contacts: [Contact]
+
+    @State private var visibleContacts: [Contact] = []
+
+    private var contactSuggestions: [Contact] {
+        guard focusedHeaderField == .receiver, !contacts.isEmpty else { return [] }
+
+        let typed = viewModel.receiver.trimmingCharacters(in: .whitespaces)
+        guard !typed.isEmpty else { return [] }
+        guard !contacts.contains(where: { $0.displayName.caseInsensitiveCompare(typed) == .orderedSame }) else {
+            return []
+        }
+
+        return Array(contacts.filter { $0.matches(typed) }.prefix(3))
+    }
+
+    private func syncContactSuggestions() {
+        let next = contactSuggestions
+        guard next.map(\.persistentModelID) != visibleContacts.map(\.persistentModelID) else { return }
+        withAnimation(AppAnimation.fast) {
+            visibleContacts = next
+        }
+    }
     
     private static let totalFormatter: NumberFormatter = {
         let f = NumberFormatter()
@@ -54,6 +89,8 @@ struct NewInvoiceView: View {
             .background(AppBackground())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
+            .onChange(of: viewModel.receiver) { _, _ in syncContactSuggestions() }
+            .onChange(of: focusedHeaderField) { _, _ in syncContactSuggestions() }
         }
     }
     
@@ -109,8 +146,21 @@ struct NewInvoiceView: View {
                 VStack(spacing: 0) {
                     Divider()
                     VStack(spacing: 14) {
-                        senderReceiverField(label: L.t(.sender), text: $viewModel.sender)
-                        senderReceiverField(label: L.t(.receiver), text: $viewModel.receiver)
+                        senderReceiverField(
+                            label: L.t(.sender),
+                            text: $viewModel.sender,
+                            focus: .sender
+                        )
+
+                        senderReceiverField(
+                            label: L.t(.receiver),
+                            text: $viewModel.receiver,
+                            focus: .receiver
+                        )
+
+                        if !visibleContacts.isEmpty {
+                            contactSuggestionList
+                        }
                     }
                     .padding(.vertical, 14)
                     Divider()
@@ -122,12 +172,18 @@ struct NewInvoiceView: View {
         .padding(.top, 12)
     }
     
-    private func senderReceiverField(label: String, text: Binding<String>) -> some View {
+    private func senderReceiverField(
+        label: String,
+        text: Binding<String>,
+        focus: HeaderField
+    ) -> some View {
         HStack(spacing: 12) {
             TextField(label, text: text)
                 .font(.system(size: 16, weight: .medium, design: .monospaced))
+                .autocorrectionDisabled()
                 .multilineTextAlignment(.leading)
                 .limitInput(text, to: 40)
+                .focused($focusedHeaderField, equals: focus)
                 .frame(maxWidth: .infinity)
             
             if !text.wrappedValue.isEmpty {
@@ -154,6 +210,63 @@ struct NewInvoiceView: View {
         .contentShape(RoundedRectangle(cornerRadius: 16))
     }
     
+    private var contactSuggestionList: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(visibleContacts.enumerated()), id: \.element.persistentModelID) { index, contact in
+                Button {
+                    Haptics.light()
+                    viewModel.pick(contact)
+                    focusedHeaderField = nil
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "person.crop.circle")
+                            .font(.system(size: 13))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 18)
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(contact.displayName)
+                                .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                                .foregroundStyle(.primary)
+                                .lineLimit(1)
+
+                            if !contact.whereTo.isEmpty {
+                                Text(contact.whereTo)
+                                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                        }
+
+                        Spacer(minLength: 6)
+
+                        if !contact.phone.isEmpty {
+                            Text(contact.phone)
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    .padding(.vertical, 11)
+                    .padding(.horizontal, 14)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                if index < visibleContacts.count - 1 {
+                    Rectangle()
+                        .fill(Color.primary.opacity(0.10))
+                        .frame(height: 1)
+                        .padding(.leading, 42)
+                        .padding(.trailing, 14)
+                }
+            }
+        }
+        .background(RoundedRectangle(cornerRadius: 14).fill(Color(.systemBackground).opacity(0.5)))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.primary.opacity(0.15), lineWidth: 1))
+        .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
     private var rowsSection: some View {
         VStack(spacing: 16) {
             ForEach($viewModel.rows) { $row in
@@ -174,6 +287,7 @@ struct NewInvoiceView: View {
                         StockSuggestion(
                             code: model.code,
                             packs: model.totalPacks,
+                            pricePerPiece: model.pricePerPiece,
                             colorStock: model.orderedLines.map { ColorAllocation(color: $0.color, packs: $0.packs) }
                         )
                     },

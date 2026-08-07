@@ -1,11 +1,14 @@
 //
 //  StockEntrySheets.swift
-//  The three sheets that change a count, all of them asking for one number of
-//  packs. Taking stock in also takes a color, and offers the colors already
-//  under this model as taps so the same color never gets typed two ways.
-//  Taking stock out says how much is on hand up front, so a shortfall is a
-//  decision rather than a surprise. Recounting replaces the number outright,
-//  which is what she has after standing in front of the box.
+//  The sheets that change one number on a model. Three of them move packs and
+//  all ask for a count; the fourth sets the price per piece. Taking stock in
+//  also takes a color, and offers the colors already under this model as taps
+//  so the same color never gets typed two ways. Taking stock out says how much
+//  is on hand up front, so a shortfall is a decision rather than a surprise.
+//  Recounting replaces the number outright, which is what she has after
+//  standing in front of the box. The price sheet opens on the current price so
+//  a correction is an edit rather than a retype, and an emptied field means
+//  no price rather than free.
 //  Used by: StockModelDetailView.
 //
 
@@ -152,6 +155,43 @@ struct RecountStockSheet: View {
             guard !loaded else { return }
             loaded = true
             packs = "\(max(0, line.packs))"
+        }
+    }
+}
+
+struct SetPriceSheet: View {
+    let model: StockModel
+    let onCommit: (Double) -> Void
+
+    @State private var price: String = ""
+    @State private var loaded = false
+
+    private var value: Double {
+        max(0, Double(price) ?? 0)
+    }
+
+    var body: some View {
+        StockSheetFrame(title: L.t(.pricePerPiece), subtitle: model.code) {
+            VStack(spacing: 18) {
+                HStack(spacing: 10) {
+                    StockSheetField(placeholder: "0", text: $price, keyboard: .decimalPad)
+                        .decimalOnly($price)
+                        .limitInput($price, to: 7)
+
+                    Text(AppSettings.currencySymbol)
+                        .font(.system(size: 17, weight: .medium, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+
+                StockSheetButton(title: L.t(.setPrice), enabled: true) {
+                    onCommit(value)
+                }
+            }
+        }
+        .onAppear {
+            guard !loaded else { return }
+            loaded = true
+            price = model.hasPrice ? PriceText.editable(model.pricePerPiece) : ""
         }
     }
 }
