@@ -1,8 +1,12 @@
 //
 //  NewInvoiceView.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-13.
+//  The form for writing an invoice: an optional sender and receiver header, a
+//  stack of InvoiceRowCards, the running total, and save. Serves editing too:
+//  when its view model was handed an existing invoice the labels and the button
+//  change wording, and saving updates that invoice instead of adding one. A
+//  finished save hands the invoice up through deepLinkInvoice and switches to
+//  the list, which opens it.
+//  Used by: HomeView, EditInvoiceSheet in InvoiceDetailView.
 //
 
 import SwiftUI
@@ -17,6 +21,9 @@ struct NewInvoiceView: View {
     @Binding var deepLinkInvoice: Invoice?
     
     @FocusState private var isAnyFieldFocused: Bool
+
+    @Query(sort: \StockModel.code)
+    private var stockModels: [StockModel]
     
     private static let totalFormatter: NumberFormatter = {
         let f = NumberFormatter()
@@ -44,25 +51,12 @@ struct NewInvoiceView: View {
                 }
             }
             .dismissKeyboardOnTap()
-            .background(backgroundGradient.ignoresSafeArea())
+            .background(AppBackground())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
         }
     }
     
-    private var backgroundGradient: some View {
-        RadialGradient(
-            colors: [
-                Color(.systemBackground),
-                colorScheme == .dark
-                    ? Color.gray.opacity(0.38)
-                    : Color.gray.opacity(0.25)
-            ],
-            center: .center,
-            startRadius: 10,
-            endRadius: 800
-        )
-    }
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
@@ -73,28 +67,20 @@ struct NewInvoiceView: View {
                     currentScreen = .home
                 }
             } label: {
-                Image(systemName: "house.fill")
-                    .foregroundStyle(.secondary)
+                Image(systemName: "house")
+                    .toolbarIcon()
+                    .foregroundStyle(Color.primary)
             }
-            .padding(.horizontal, 10)
         }
         
         ToolbarItem(placement: .principal) {
-            Text(viewModel.isEditMode ? "Edit Invoice" : "Invoice +")
+            Text(L.t(viewModel.isEditMode ? .editInvoice : .newInvoice))
                 .font(.callout)
                 .fontDesign(.monospaced)
                 .fontWeight(.black)
                 .padding(.horizontal, 4)
         }
-        
-        ToolbarItem(placement: .topBarTrailing) {
-            Text(viewModel.editingInvoice?.date ?? Date.now, style: .date)
-                .font(.callout)
-                .fontDesign(.monospaced)
-                .fontWeight(.medium)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 10)
-        }
+
     }
     
     private var senderReceiverSection: some View {
@@ -109,7 +95,7 @@ struct NewInvoiceView: View {
                     Image(systemName: viewModel.showHeader ? "chevron.down" : "chevron.right")
                         .font(.caption)
                     Spacer()
-                    Text("Sender & Receiver")
+                    Text(L.t(.senderAndReceiver))
                         .font(.callout)
                         .fontDesign(.monospaced)
                     Spacer()
@@ -123,8 +109,8 @@ struct NewInvoiceView: View {
                 VStack(spacing: 0) {
                     Divider()
                     VStack(spacing: 14) {
-                        senderReceiverField(label: "Sender", text: $viewModel.sender)
-                        senderReceiverField(label: "Receiver", text: $viewModel.receiver)
+                        senderReceiverField(label: L.t(.sender), text: $viewModel.sender)
+                        senderReceiverField(label: L.t(.receiver), text: $viewModel.receiver)
                     }
                     .padding(.vertical, 14)
                     Divider()
@@ -178,11 +164,19 @@ struct NewInvoiceView: View {
                     itemsPerUnit: $row.itemsPerUnit,
                     price: $row.price,
                     colors: $row.colors,
+                    colorPacks: $row.colorPacks,
                     isLocked: $row.isLocked,
                     nameError: row.nameError,
                     unitsError: row.unitsError,
                     perUnitError: row.perUnitError,
                     priceError: row.priceError,
+                    stockSuggestions: stockModels.map { model in
+                        StockSuggestion(
+                            code: model.code,
+                            packs: model.totalPacks,
+                            colorStock: model.orderedLines.map { ColorAllocation(color: $0.color, packs: $0.packs) }
+                        )
+                    },
                     onClearError: { field in
                         viewModel.clearError(for: row.id, field: field)
                     },
@@ -205,7 +199,7 @@ struct NewInvoiceView: View {
             HStack(spacing: 10) {
                 Image(systemName: "plus.circle")
                     .font(.title2)
-                Text("Add new row")
+                Text(L.t(.addNewRow))
                     .fontDesign(.monospaced)
             }
             .foregroundStyle(.primary)
@@ -215,7 +209,7 @@ struct NewInvoiceView: View {
     
     private var totalSection: some View {
         VStack(spacing: 6) {
-            Text("TOTAL")
+            Text(L.t(.totalCaps))
                 .font(.caption)
                 .fontDesign(.monospaced)
                 .tracking(6)
@@ -228,7 +222,7 @@ struct NewInvoiceView: View {
                     .contentTransition(.numericText())
                     .animation(AppAnimation.quick, value: viewModel.liveTotal)
                 
-                Text("₴")
+                Text(AppSettings.currencySymbol)
                     .font(.system(size: 24, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
@@ -279,9 +273,9 @@ struct NewInvoiceView: View {
     
     private var saveButtonLabel: String {
         if viewModel.isSaving {
-            return viewModel.isEditMode ? "Updating..." : "Saving..."
+            return L.t(viewModel.isEditMode ? .updating : .saving)
         }
-        return viewModel.isEditMode ? "Update" : "Save Invoice"
+        return L.t(viewModel.isEditMode ? .update : .saveInvoice)
     }
     
     private func handleSave() {

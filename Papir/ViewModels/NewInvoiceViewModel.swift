@@ -1,8 +1,14 @@
 //
 //  NewInvoiceViewModel.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-19.
+//  Backs the create and edit screens off one draft list. Rows live as
+//  InvoiceRowDraft, which holds plain strings so a half-typed number is a valid
+//  state and starts on the defaults from Settings, and only become ItemRows on
+//  save, in the order they sit in the list.
+//  Passing an invoice to init switches the screen to edit mode: it loads that
+//  invoice's rows already locked, and saving overwrites it and drops its stale PDF
+//  instead of inserting a new invoice. Validation marks every empty field at
+//  once rather than stopping at the first.
+//  Used by: NewInvoiceView, HomeView, EditInvoiceSheet in InvoiceDetailView.
 //
 
 import SwiftUI
@@ -12,10 +18,11 @@ import Combine
 struct InvoiceRowDraft: Identifiable {
     let id = UUID()
     var name: String = ""
-    var unitCount: String = ""
-    var itemsPerUnit: String = ""
+    var unitCount: String = AppSettings.defaultUnitsText
+    var itemsPerUnit: String = AppSettings.defaultItemsPerUnitText
     var price: String = ""
     var colors: [String] = []
+    var colorPacks: [Int] = []
     var isLocked: Bool = false
     
     var nameError: Bool = false
@@ -45,13 +52,14 @@ final class NewInvoiceViewModel: ObservableObject {
             receiver = invoice.receiver
             showHeader = !invoice.sender.isEmpty || !invoice.receiver.isEmpty
             
-            let drafts = invoice.items.map { item in
+            let drafts = invoice.orderedItems.map { item in
                 InvoiceRowDraft(
                     name: item.name,
                     unitCount: "\(item.unitCount)",
                     itemsPerUnit: "\(item.itemsPerUnit)",
                     price: Self.formatPriceForEditing(item.price),
                     colors: item.colors,
+                    colorPacks: item.colorBreakdown.map(\.packs),
                     isLocked: true
                 )
             }
@@ -93,6 +101,7 @@ final class NewInvoiceViewModel: ObservableObject {
         guard let idx = rows.firstIndex(where: { $0.id == id }) else { return }
         withAnimation(AppAnimation.fast) {
             switch field {
+            case .name: rows[idx].nameError = false
             case .units: rows[idx].unitsError = false
             case .perUnit: rows[idx].perUnitError = false
             case .price: rows[idx].priceError = false
@@ -132,14 +141,16 @@ final class NewInvoiceViewModel: ObservableObject {
     }
     
     private func buildItems() -> [ItemRow] {
-        rows.map { draft in
-            ItemRow(
+        rows.map { draft -> ItemRow in
+            let row = ItemRow(
                 name: draft.name,
                 unitCount: UInt16(Double(draft.unitCount) ?? 0),
                 itemsPerUnit: UInt16(Double(draft.itemsPerUnit) ?? 0),
                 price: Double(draft.price) ?? 0,
                 colors: draft.colors
             )
+            row.colorPacks = draft.colorPacks
+            return row
         }
     }
     
@@ -152,13 +163,13 @@ final class NewInvoiceViewModel: ObservableObject {
         
         isSaving = true
         saveErrorMessage = nil
-        
+
         let items = buildItems()
-        
+
         let result: Invoice
         do {
             if let existing = editingInvoice {
-                existing.items = items
+                existing.replaceItems(with: items)
                 existing.sender = sender
                 existing.receiver = receiver
                 if let oldFileName = existing.pdfFileName {
@@ -180,23 +191,23 @@ final class NewInvoiceViewModel: ObservableObject {
             completion(nil)
             return
         }
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            let pdfData = PDFGenerator.generate(for: result, language: .ukrainian)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                do {
-                    let fileName = try PDFStorage.savePDF(pdfData, for: result, language: .ukrainian)
-                    result.pdfFileName = fileName
-                    try context.save()
-                    Haptics.success()
-                } catch {
-                    Haptics.error()
-                }
-                self.isSaving = false
-                completion(result)
+
+        let language = AppSettings.language.pdfLanguage
+        let currencySymbol = AppSettings.currencySymbol
+        let snapshot = result.snapshot
+
+        Task {
+            let pdfData = await PDFGenerator.render(snapshot, language: language, currencySymbol: currencySymbol)
+            do {
+                let fileName = try PDFStorage.savePDF(pdfData, for: snapshot, language: language)
+                result.pdfFileName = fileName
+                try context.save()
+                Haptics.success()
+            } catch {
+                Haptics.error()
             }
+            isSaving = false
+            completion(result)
         }
     }
 }

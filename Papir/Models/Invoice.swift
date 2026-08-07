@@ -1,8 +1,25 @@
 //
 //  Invoice.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-13.
+//  One saved invoice: its two parties, its date, its rows, and the name of the
+//  PDF rendered from it (nil until one exists). Owns the row numbering: every
+//  path that sets items runs through init or replaceItems, which stamp each row
+//  with its position, and every path that reads them for display reads
+//  orderedItems. Rows saved before sortIndex existed all carry 0 and fall back
+//  to a name tiebreak, so they keep one settled order instead of reshuffling.
+//  InvoiceSnapshot is the frozen, Sendable copy handed to PDF rendering, which
+//  runs off the main thread where touching the model itself would be unsafe.
+//  An invoice is a draft until it is marked shipped, and marking it shipped is
+//  the only thing that moves stock. What came off the shelf is written down as
+//  ShipmentLines on the invoice itself rather than inferred later, because the
+//  rows can be edited afterwards and the only honest way to put stock back is
+//  to put back exactly what was taken. Status and the shipment lines are both
+//  stored optional and read through accessors that supply the default, because
+//  SwiftData does not backfill a property's default onto rows that already
+//  exist: a non-optional enum would come back null on every older invoice and
+//  trap the moment anything read it.
+//  Used by: NewInvoiceViewModel, MyInvoicesViewModel, InvoiceDetailViewModel,
+//  ShipmentPlanner, PDFGenerator, PDFStorage, MyInvoicesView,
+//  InvoiceDetailView, InvoiceRowItem.
 //
 
 import Foundation
@@ -11,22 +28,130 @@ import SwiftData
 @Model
 final class Invoice {
     @Relationship(deleteRule: .cascade)
-    var items: [ItemRow]
+    var items: [ItemRow]? = nil
     var id: UUID = UUID()
     var date: Date = Date.now
-    var sender: String
-    var receiver: String
+    var sender: String = ""
+    var receiver: String = ""
     var pdfFileName: String? = nil
-    
+    var statusRaw: String? = nil
+    var shippedAt: Date? = nil
+    @Relationship(deleteRule: .cascade)
+    var shipmentLines: [ShipmentLine]? = nil
+
+    var status: InvoiceStatus {
+        get { InvoiceStatus(rawValue: statusRaw ?? "") ?? .draft }
+        set { statusRaw = newValue.rawValue }
+    }
+
+    var shipment: [ShipmentLine] {
+        shipmentLines ?? []
+    }
+
     init(items: [ItemRow], date: Date = .now, sender: String, receiver: String, pdfFileName: String? = nil) {
-        self.items = items
+        self.items = Invoice.numbered(items)
         self.date = date
         self.sender = sender
         self.receiver = receiver
         self.pdfFileName = pdfFileName
     }
-    
+
+    var allItems: [ItemRow] {
+        items ?? []
+    }
+
+    var orderedItems: [ItemRow] {
+        allItems.sorted { lhs, rhs in
+            if lhs.sortIndex != rhs.sortIndex {
+                return lhs.sortIndex < rhs.sortIndex
+            }
+            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+        }
+    }
+
     var totalInvoicePrice: Double {
+        allItems.reduce(0) { $0 + $1.totalForItem }
+    }
+
+    var snapshot: InvoiceSnapshot {
+        InvoiceSnapshot(
+            id: id,
+            date: date,
+            sender: sender,
+            receiver: receiver,
+            items: orderedItems.map {
+                InvoiceSnapshot.Item(
+                    name: $0.name,
+                    unitCount: $0.unitCount,
+                    itemsPerUnit: $0.itemsPerUnit,
+                    price: $0.price,
+                    colors: $0.colors,
+                    colorBreakdown: $0.colorBreakdown
+                )
+            }
+        )
+    }
+
+    func replaceItems(with newItems: [ItemRow]) {
+        items = Invoice.numbered(newItems)
+    }
+
+    func recordShipment(_ line: ShipmentLine) {
+        if shipmentLines == nil { shipmentLines = [] }
+        shipmentLines?.append(line)
+    }
+
+    func clearShipment() {
+        shipmentLines = []
+    }
+
+    private static func numbered(_ items: [ItemRow]) -> [ItemRow] {
+        for (index, item) in items.enumerated() {
+            item.sortIndex = index
+        }
+        return items
+    }
+}
+
+enum InvoiceStatus: String, Codable, CaseIterable {
+    case draft
+    case shipped
+}
+
+@Model
+final class ShipmentLine {
+    var modelCode: String = ""
+    var color: String = ""
+    var packs: Int = 0
+
+    init(modelCode: String, color: String, packs: Int) {
+        self.modelCode = modelCode
+        self.color = color
+        self.packs = packs
+    }
+}
+
+struct InvoiceSnapshot: Sendable {
+    struct Item: Sendable {
+        let name: String
+        let unitCount: UInt16
+        let itemsPerUnit: UInt16
+        let price: Double
+        let colors: [String]
+        let colorBreakdown: [ColorAllocation]
+
+        var totalForItem: Double {
+            Double(unitCount) * Double(itemsPerUnit) * price
+        }
+    }
+
+    let id: UUID
+    let date: Date
+    let sender: String
+    let receiver: String
+    let items: [Item]
+
+    var total: Double {
         items.reduce(0) { $0 + $1.totalForItem }
     }
 }

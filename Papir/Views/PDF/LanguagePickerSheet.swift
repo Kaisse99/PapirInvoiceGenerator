@@ -1,8 +1,8 @@
 //
 //  LanguagePickerSheet.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-19.
+//  The sheet asking which language to render a PDF in, one button per
+//  PDFLanguage case. Reports the choice and lets the caller dismiss it.
+//  Used by: InvoiceDetailView.
 //
 
 import SwiftUI
@@ -13,15 +13,11 @@ struct LanguagePickerSheet: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 4) {
-                Text("Generate PDF in")
+                Text(L.t(.generatePDFIn))
                     .font(.callout)
                     .fontDesign(.monospaced)
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
-                Text("Choose the language")
-                    .font(.caption)
-                    .fontDesign(.monospaced)
-                    .foregroundStyle(.secondary)
             }
             .padding(.top, 24)
             

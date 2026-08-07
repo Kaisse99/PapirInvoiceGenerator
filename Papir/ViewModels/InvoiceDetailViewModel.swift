@@ -1,8 +1,10 @@
 //
 //  InvoiceDetailViewModel.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-22.
+//  Opening and re-making the PDF for one invoice. Rendering takes a snapshot of
+//  the invoice, draws it off the main thread, then returns here to write the
+//  file, drop the previous one, and point the preview at the result. An invoice
+//  whose file is missing reports it instead of showing an empty viewer.
+//  Used by: InvoiceDetailView.
 //
 
 import SwiftUI
@@ -29,32 +31,29 @@ final class InvoiceDetailViewModel: ObservableObject {
     
     func generatePDF(for invoice: Invoice, language: PDFLanguage, context: ModelContext) {
         isGeneratingPDF = true
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            let pdfData = PDFGenerator.generate(for: invoice, language: language)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                do {
-                    if let old = invoice.pdfFileName {
-                        PDFStorage.deletePDF(fileName: old)
-                    }
-                    let fileName = try PDFStorage.savePDF(pdfData, for: invoice, language: language)
-                    invoice.pdfFileName = fileName
-                    try context.save()
-                    
-                    if let url = PDFStorage.pdfURL(fileName: fileName) {
-                        Haptics.success()
-                        self.pdfPreviewTitle = invoice.receiver.isEmpty ? "Invoice" : invoice.receiver
-                        self.pdfPreviewURL = url
-                    }
-                    self.isGeneratingPDF = false
-                } catch {
-                    self.generationError = error.localizedDescription
-                    Haptics.error()
-                    self.isGeneratingPDF = false
+        let snapshot = invoice.snapshot
+        let currencySymbol = AppSettings.currencySymbol
+
+        Task {
+            let pdfData = await PDFGenerator.render(snapshot, language: language, currencySymbol: currencySymbol)
+            do {
+                if let old = invoice.pdfFileName {
+                    PDFStorage.deletePDF(fileName: old)
                 }
+                let fileName = try PDFStorage.savePDF(pdfData, for: snapshot, language: language)
+                invoice.pdfFileName = fileName
+                try context.save()
+
+                if let url = PDFStorage.pdfURL(fileName: fileName) {
+                    Haptics.success()
+                    pdfPreviewTitle = invoice.receiver.isEmpty ? "Invoice" : invoice.receiver
+                    pdfPreviewURL = url
+                }
+            } catch {
+                generationError = error.localizedDescription
+                Haptics.error()
             }
+            isGeneratingPDF = false
         }
     }
 }

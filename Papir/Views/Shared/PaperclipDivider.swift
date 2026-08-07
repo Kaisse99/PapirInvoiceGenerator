@@ -1,9 +1,11 @@
 //
 //  PaperclipDivider.swift
-//  Papir
+//  A section rule with the paperclip mark set into the middle of it, glowing
+//  white on dark and gray on light. The same divider the home screen draws
+//  around its icon.
+//  Used by: NewInvoiceView, InvoiceDetailView.
 //
-//  Created by Mykyta Kaisenberg on 2026-05-20.
-//
+
 import SwiftUI
 
 struct PaperclipDivider: View {

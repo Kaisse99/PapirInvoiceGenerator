@@ -1,8 +1,13 @@
 //
 //  View+Extensions.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-15.
+//  The small shared pieces every screen reaches for: text-field modifiers that
+//  clamp length and strip non-digits as the user types, tap-anywhere keyboard
+//  dismissal, the Haptics vocabulary, and AppAnimation, the curves the whole
+//  app animates with, kept here so motion stays consistent. AppAnimation.list
+//  is the one collections re-flow with when their contents change, and
+//  toolbarIcon is the single size every bar glyph is drawn at, because they
+//  otherwise inherit whatever weight their symbol happens to carry.
+//  Used by: every view and view model in the app.
 //
 
 import SwiftUI
@@ -27,6 +32,19 @@ extension View {
 }
 
 extension View {
+    @ViewBuilder
+    func sharedFocus<Value: Hashable>(_ binding: FocusState<Value?>.Binding?, equals value: Value?) -> some View {
+        if let binding, let value {
+            self.focused(binding, equals: value)
+        } else {
+            self
+        }
+    }
+
+    func toolbarIcon() -> some View {
+        font(.system(size: 16, weight: .medium))
+    }
+
     func dismissKeyboardOnTap() -> some View {
         self.onTapGesture {
             UIApplication.shared.sendAction(
@@ -51,4 +69,5 @@ enum AppAnimation {
     static let smooth = Animation.spring(response: 0.38, dampingFraction: 0.85)
     static let fast = Animation.easeOut(duration: 0.15)
     static let snappy = Animation.easeInOut(duration: 0.18)
+    static let list = Animation.spring(response: 0.28, dampingFraction: 0.85)
 }

@@ -1,8 +1,9 @@
 //
 //  PDFPreviewView.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-19.
+//  Full-screen viewer for a rendered invoice, wrapping PDFKit's PDFView with a
+//  Done button and a share button. Swipe-to-dismiss is off so the only way out
+//  is Done, since the gesture fights the PDF's own scrolling.
+//  Used by: InvoiceDetailView, MyInvoicesView.
 //
 
 import SwiftUI
@@ -28,7 +29,7 @@ struct PDFPreviewView: View {
                             Haptics.light()
                             dismiss()
                         } label: {
-                            Text("Done")
+                            Text(L.t(.done))
                                 .fontDesign(.monospaced)
                                 .fontWeight(.medium)
                                 .foregroundStyle(.primary)

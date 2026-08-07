@@ -1,8 +1,14 @@
 //
 //  MyInvoicesView.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-13.
+//  The saved-invoice list: search and sort on top, a card per invoice, and a
+//  long-press menu for preview, share, duplicate, and delete. The checklist
+//  button turns the rows into checkboxes with a batch bar along the bottom.
+//  Owns the @Query and the navigation stack: tapping a card opens
+//  InvoiceDetailView, and a freshly saved invoice arrives through
+//  deepLinkInvoice and opens itself. Searching or re-sorting animates the rows
+//  in and out because the stack animates on the identity of what it is showing,
+//  not on the individual filter values.
+//  Used by: HomeView.
 //
 
 import SwiftUI
@@ -36,10 +42,12 @@ struct MyInvoicesView: View {
                         
                         if invoices.isEmpty {
                             noResultsState
+                                .transition(.opacity)
                         } else {
                             LazyVStack(spacing: 14) {
                                 ForEach(invoices) { invoice in
                                     invoiceRow(for: invoice)
+                                        .transition(.opacity.combined(with: .scale(scale: 0.94)))
                                 }
                             }
                             .padding(.horizontal, 20)
@@ -47,10 +55,11 @@ struct MyInvoicesView: View {
                         }
                     }
                     .padding(.top, 12)
+                    .animation(AppAnimation.list, value: invoices.map(\.id))
                 }
             }
             .dismissKeyboardOnTap()
-            .background(backgroundGradient.ignoresSafeArea())
+            .background(AppBackground())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
             .overlay(alignment: .bottom) {
@@ -60,32 +69,32 @@ struct MyInvoicesView: View {
                 }
             }
             .alert(
-                "Delete this invoice?",
+                L.t(.deleteInvoiceTitle),
                 isPresented: Binding(
                     get: { viewModel.invoiceToDelete != nil },
                     set: { if !$0 { viewModel.invoiceToDelete = nil } }
                 ),
                 presenting: viewModel.invoiceToDelete
             ) { invoice in
-                Button("Delete", role: .destructive) {
+                Button(L.t(.delete), role: .destructive) {
                     viewModel.delete(invoice, context: modelContext)
                 }
-                Button("Cancel", role: .cancel) {
+                Button(L.t(.cancel), role: .cancel) {
                     viewModel.invoiceToDelete = nil
                 }
             } message: { _ in
-                Text("This action cannot be undone.")
+                Text(L.t(.cannotBeUndone))
             }
             .alert(
                 "Delete \(viewModel.selectedIDs.count) invoice\(viewModel.selectedIDs.count == 1 ? "" : "s")?",
                 isPresented: $viewModel.showBatchDeleteAlert
             ) {
-                Button("Delete", role: .destructive) {
+                Button(L.t(.delete), role: .destructive) {
                     viewModel.deleteSelected(from: allInvoices, context: modelContext)
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(L.t(.cancel), role: .cancel) {}
             } message: {
-                Text("This action cannot be undone.")
+                Text(L.t(.cannotBeUndone))
             }
             .onChange(of: allInvoices.count) { _, newCount in
                 viewModel.exitEditingIfEmpty(invoiceCount: newCount)
@@ -102,13 +111,11 @@ struct MyInvoicesView: View {
             }
             .sheet(
                 isPresented: Binding(
-                    get: { viewModel.shareInvoiceURL != nil },
-                    set: { if !$0 { viewModel.shareInvoiceURL = nil } }
+                    get: { !viewModel.shareURLs.isEmpty },
+                    set: { if !$0 { viewModel.shareURLs = [] } }
                 )
             ) {
-                if let url = viewModel.shareInvoiceURL {
-                    ShareSheet(items: [url])
-                }
+                ShareSheet(items: viewModel.shareURLs)
             }
             .onChange(of: deepLinkInvoice) { _, newValue in
                 if let invoice = newValue {
@@ -119,22 +126,10 @@ struct MyInvoicesView: View {
             .navigationDestination(for: Invoice.self) { invoice in
                 InvoiceDetailView(invoice: invoice)
             }
+            .tint(Color.primary)
         }
     }
     
-    private var backgroundGradient: some View {
-        RadialGradient(
-            colors: [
-                Color(.systemBackground),
-                colorScheme == .dark
-                    ? Color.white.opacity(0.08)
-                    : Color.gray.opacity(0.25)
-            ],
-            center: .center,
-            startRadius: 100,
-            endRadius: 500
-        )
-    }
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
@@ -146,15 +141,15 @@ struct MyInvoicesView: View {
                         currentScreen = .home
                     }
                 } label: {
-                    Image(systemName: "house.fill")
-                        .foregroundStyle(.secondary)
+                    Image(systemName: "house")
+                        .toolbarIcon()
+                        .foregroundStyle(Color.primary)
                 }
-                .padding(.horizontal, 10)
             }
         }
         
         ToolbarItem(placement: .principal) {
-            Text(viewModel.isEditing ? viewModel.selectionTitle : "Invoices")
+            Text(viewModel.isEditing ? viewModel.selectionTitle : L.t(.invoices))
                 .font(.callout)
                 .fontDesign(.monospaced)
                 .fontWeight(.black)
@@ -166,13 +161,12 @@ struct MyInvoicesView: View {
                 Button {
                     viewModel.toggleEditing()
                 } label: {
-                    Text(viewModel.isEditing ? "Done" : "Select")
-                        .font(.callout)
-                        .fontDesign(.monospaced)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.primary)
+                    Image(systemName: viewModel.isEditing ? "checkmark.circle.fill" : "checklist")
+                        .toolbarIcon()
+                        .foregroundStyle(Color.primary)
+                        .contentTransition(.symbolEffect(.replace))
                 }
-                .padding(.horizontal, 10)
+                .accessibilityLabel(L.t(viewModel.isEditing ? .doneSelecting : .selectInvoices))
             }
         }
     }
@@ -184,17 +178,18 @@ struct MyInvoicesView: View {
                     .font(.callout)
                     .foregroundStyle(.secondary)
                 
-                TextField("Search invoices...", text: $viewModel.searchText)
+                TextField(L.t(.searchInvoices), text: $viewModel.searchText)
                     .font(.system(size: 15, weight: .medium, design: .monospaced))
                 
                 if !viewModel.searchText.isEmpty {
                     Button {
-                        viewModel.searchText = ""
+                        withAnimation(AppAnimation.list) { viewModel.searchText = "" }
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.callout)
                             .foregroundStyle(.secondary)
                     }
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
                 }
             }
             .padding(.horizontal, 16)
@@ -204,17 +199,18 @@ struct MyInvoicesView: View {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(.primary.opacity(0.40), lineWidth: 1)
             )
+            .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
             
             Menu {
                 ForEach(MyInvoicesViewModel.SortOption.allCases) { option in
                     Button {
                         Haptics.light()
-                        withAnimation(AppAnimation.fast) {
+                        withAnimation(AppAnimation.list) {
                             viewModel.sortOption = option
                         }
                     } label: {
                         Label(
-                            option.rawValue,
+                            option.title,
                             systemImage: viewModel.sortOption == option ? "checkmark" : option.systemImage
                         )
                     }
@@ -222,14 +218,15 @@ struct MyInvoicesView: View {
             } label: {
                 Image(systemName: "line.3.horizontal.decrease.circle")
                     .font(.title3)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.primary)
                     .frame(width: 52, height: 52)
                     .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)))
                     .overlay(
                         RoundedRectangle(cornerRadius: 18)
-                            .stroke(.primary.opacity(0.55), lineWidth: 1)
+                            .stroke(Color.primary.opacity(0.55), lineWidth: 1)
                     )
             }
+            .tint(Color.primary)
         }
         .padding(.horizontal, 20)
     }
@@ -273,33 +270,26 @@ struct MyInvoicesView: View {
         }
     }
     
-    private func selectionIndicator(isSelected: Bool) -> some View {
-        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-            .font(.system(size: 20))
-            .foregroundStyle(isSelected ? Color.blue : Color.secondary.opacity(0.5))
-            .background(Circle().fill(Color(.secondarySystemGroupedBackground)))
-    }
-    
     @ViewBuilder
     private func contextMenuButtons(for invoice: Invoice) -> some View {
         Button {
             viewModel.previewPDF(for: invoice)
         } label: {
-            Label("View PDF", systemImage: "doc.text.magnifyingglass")
+            Label(L.t(.viewPDF), systemImage: "doc.text.magnifyingglass")
         }
         .disabled(invoice.pdfFileName == nil)
         
         Button {
             viewModel.sharePDF(for: invoice)
         } label: {
-            Label("Share", systemImage: "square.and.arrow.up")
+            Label(L.t(.share), systemImage: "square.and.arrow.up")
         }
         .disabled(invoice.pdfFileName == nil)
         
         Button {
             viewModel.duplicate(invoice, context: modelContext)
         } label: {
-            Label("Duplicate", systemImage: "doc.on.doc")
+            Label(L.t(.duplicate), systemImage: "doc.on.doc")
         }
         
         Divider()
@@ -307,7 +297,7 @@ struct MyInvoicesView: View {
         Button(role: .destructive) {
             viewModel.invoiceToDelete = invoice
         } label: {
-            Label("Delete", systemImage: "trash")
+            Label(L.t(.delete), systemImage: "trash")
         }
     }
     
@@ -319,7 +309,7 @@ struct MyInvoicesView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "trash")
-                    Text("Delete (\(viewModel.selectedIDs.count))")
+                    Text("\(L.t(.delete)) (\(viewModel.selectedIDs.count))")
                         .fontDesign(.monospaced)
                         .fontWeight(.semibold)
                 }
@@ -330,12 +320,11 @@ struct MyInvoicesView: View {
             .buttonStyle(.plain)
             
             Button {
-                Haptics.medium()
-                shareSelected()
+                viewModel.shareSelected(from: allInvoices)
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "square.and.arrow.up")
-                    Text("Share (\(viewModel.selectedIDs.count))")
+                    Text("\(L.t(.share)) (\(viewModel.selectedIDs.count))")
                         .fontDesign(.monospaced)
                         .fontWeight(.semibold)
                 }
@@ -355,28 +344,18 @@ struct MyInvoicesView: View {
         )
     }
     
-    private func shareSelected() {
-        let selected = allInvoices.filter { viewModel.selectedIDs.contains($0.id) }
-        let urls = selected.compactMap { invoice -> URL? in
-            guard let fileName = invoice.pdfFileName else { return nil }
-            return PDFStorage.pdfURL(fileName: fileName)
-        }
-        guard !urls.isEmpty else { return }
-        viewModel.shareInvoiceURL = urls.first
-    }
-    
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "doc.text")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary.opacity(0.5))
             
-            Text("No invoices yet")
+            Text(L.t(.noInvoices))
                 .font(.callout)
                 .fontDesign(.monospaced)
                 .foregroundStyle(.secondary)
             
-            Text("Swipe down on home to create your first one")
+            Text(L.t(.noInvoicesHint))
                 .font(.caption)
                 .fontDesign(.monospaced)
                 .foregroundStyle(.secondary.opacity(0.7))
@@ -392,7 +371,7 @@ struct MyInvoicesView: View {
                 .font(.system(size: 44))
                 .foregroundStyle(.secondary.opacity(0.5))
             
-            Text("No matches")
+            Text(L.t(.noMatches))
                 .font(.callout)
                 .fontDesign(.monospaced)
                 .foregroundStyle(.secondary)

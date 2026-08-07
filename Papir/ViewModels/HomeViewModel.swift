@@ -1,8 +1,18 @@
 //
 //  HomeViewModel.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-22.
+//  Drives the swipe on the home screen: which of the four screens is showing,
+//  how far the drag has travelled, and the haptics along the way. The axis is
+//  decided once, the first time a drag passes a few points, and then held for
+//  the rest of that gesture. Recomputing it every frame meant a finger that
+//  moved down and then sideways silently changed destination mid-drag, so once
+//  a direction is claimed the only way out is back to the middle. On the
+//  vertical axis there are two thresholds: past the first, letting go commits;
+//  past the second, it commits under the finger. Horizontal has one, and both
+//  directions lead to stock. isCommitting keeps a drag that is already
+//  committing from firing a second time. Also holds deepLinkInvoice, the
+//  invoice a save wants the list to open once it appears.
+//  Used by: HomeView; the Screen case is passed around by NewInvoiceView,
+//  MyInvoicesView, StockView, and EditInvoiceSheet.
 //
 
 import SwiftUI
@@ -11,89 +21,131 @@ import Combine
 @MainActor
 final class HomeViewModel: ObservableObject {
     enum Screen {
-        case home, create, menu
+        case home, create, menu, stock
     }
-    
+
+    struct DragLimits {
+        let verticalCommit: CGFloat
+        let verticalInstant: CGFloat
+        let horizontalCommit: CGFloat
+    }
+
+    private enum Axis {
+        case vertical, horizontal
+    }
+
     @Published var currentScreen: Screen = .home
-    @Published var dragOffset: CGFloat = 0
+    @Published var dragOffset: CGSize = .zero
     @Published var shimmerOffset: CGFloat = -1
     @Published var deepLinkInvoice: Invoice? = nil
-    
+
     private var lastHapticOffset: CGFloat = 0
-    private var passedThreshold1 = false
+    private var passedThreshold = false
     private var isCommitting = false
-    private(set) var commitDirection: CGFloat = 0
-    
+    private var lockedAxis: Axis? = nil
+
+    private static let axisLockDistance: CGFloat = 8
+
+    var displayOffset: CGSize {
+        switch lockedAxis ?? .vertical {
+        case .vertical:   return CGSize(width: 0, height: rubberBand(dragOffset.height))
+        case .horizontal: return CGSize(width: rubberBand(dragOffset.width), height: 0)
+        }
+    }
+
     func rubberBand(_ value: CGFloat) -> CGFloat {
         value / 2.5
     }
-    
-    func handleDragChange(_ translationHeight: CGFloat, threshold1: CGFloat, threshold2: CGFloat) {
+
+    func handleDragChange(_ translation: CGSize, limits: DragLimits) {
         guard !isCommitting else { return }
-        dragOffset = translationHeight
-        
-        if abs(dragOffset - lastHapticOffset) > 30 {
+        dragOffset = translation
+
+        if lockedAxis == nil {
+            let reach = max(abs(translation.width), abs(translation.height))
+            guard reach >= Self.axisLockDistance else { return }
+            lockedAxis = abs(translation.width) > abs(translation.height) ? .horizontal : .vertical
+        }
+
+        let travelled = travel(of: translation)
+
+        if abs(travelled - lastHapticOffset) > 30 {
             UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: 0.4)
-            lastHapticOffset = dragOffset
+            lastHapticOffset = travelled
         }
-        
-        let absolute = abs(dragOffset)
-        
-        if absolute > threshold1 && !passedThreshold1 {
+
+        let distance = abs(travelled)
+        let commit = commitThreshold(for: translation, limits: limits)
+
+        if distance > commit && !passedThreshold {
             Haptics.medium()
-            passedThreshold1 = true
-        } else if absolute < threshold1 && passedThreshold1 {
-            passedThreshold1 = false
+            passedThreshold = true
+        } else if distance < commit && passedThreshold {
+            passedThreshold = false
         }
-        
-        if absolute > threshold2 {
+
+        if lockedAxis == .vertical && distance > limits.verticalInstant {
             UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-            commit()
+            commitScreen(for: translation)
         }
     }
-    
-    func handleDragEnd(_ translationHeight: CGFloat, threshold1: CGFloat) {
-        let absolute = abs(translationHeight)
-        if absolute > threshold1 {
-            commit()
+
+    func handleDragEnd(_ translation: CGSize, limits: DragLimits) {
+        let distance = abs(travel(of: translation))
+
+        if lockedAxis != nil && distance > commitThreshold(for: translation, limits: limits) {
+            commitScreen(for: translation)
         } else {
             withAnimation(AppAnimation.smooth) {
-                dragOffset = 0
+                dragOffset = .zero
             }
             lastHapticOffset = 0
-            passedThreshold1 = false
+            passedThreshold = false
+            lockedAxis = nil
         }
     }
-    
-    func commit() {
-        guard !isCommitting else { return }
-        isCommitting = true
-        commitDirection = dragOffset
-        
-        withAnimation(AppAnimation.smooth) {
-            if commitDirection < 0 {
-                currentScreen = .create
-            } else if commitDirection > 0 {
-                currentScreen = .menu
-            }
-            dragOffset = 0
-        }
-        lastHapticOffset = 0
-        passedThreshold1 = false
-    }
-    
+
     func resetOnReturnHome() {
-        dragOffset = 0
+        dragOffset = .zero
         lastHapticOffset = 0
-        passedThreshold1 = false
+        passedThreshold = false
         isCommitting = false
-        commitDirection = 0
+        lockedAxis = nil
     }
-    
+
     func goHome() {
         Haptics.light()
         withAnimation(AppAnimation.smooth) {
             currentScreen = .home
         }
+    }
+
+    private func commitScreen(for translation: CGSize) {
+        guard !isCommitting, let axis = lockedAxis else { return }
+        isCommitting = true
+
+        let destination: Screen
+        switch axis {
+        case .horizontal:
+            destination = .stock
+        case .vertical:
+            destination = translation.height < 0 ? .create : .menu
+        }
+
+        withAnimation(AppAnimation.smooth) {
+            currentScreen = destination
+            dragOffset = .zero
+        }
+        lastHapticOffset = 0
+        passedThreshold = false
+        lockedAxis = nil
+    }
+
+    private func travel(of translation: CGSize) -> CGFloat {
+        lockedAxis == .horizontal ? translation.width : translation.height
+    }
+
+    private func commitThreshold(for translation: CGSize, limits: DragLimits) -> CGFloat {
+        lockedAxis == .horizontal ? limits.horizontalCommit : limits.verticalCommit
     }
 }

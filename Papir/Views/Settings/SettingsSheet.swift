@@ -1,0 +1,329 @@
+//
+//  SettingsSheet.swift
+//  Preferences, reached from the gear on the home screen. Three things live
+//  here: the language the app speaks, the currency every amount is written in,
+//  and the two numbers a new invoice row is prefilled with, so a shop that
+//  always ships packs of six sets it once. Zero in either number means start
+//  that field empty. Everything writes straight to UserDefaults through
+//  @AppStorage, so a change is live the moment it is tapped.
+//  Set in the rounded face rather than the monospaced one the rest of the app
+//  uses: monospace earns its place where columns of numbers have to line up,
+//  and a settings list is prose with a control beside it.
+//  Used by: HomeView.
+//
+
+import SwiftUI
+import SwiftData
+
+struct SettingsSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    @AppStorage(AppSettings.languageKey)
+    private var languageRaw: String = AppLanguage.english.rawValue
+
+    @AppStorage(AppSettings.currencyKey)
+    private var currencyRaw: String = AppCurrency.hryvnia.rawValue
+
+    @AppStorage(AppSettings.unitsKey)
+    private var defaultUnits: Int = AppSettings.fallbackUnits
+
+    @AppStorage(AppSettings.itemsPerUnitKey)
+    private var defaultItemsPerUnit: Int = AppSettings.fallbackItemsPerUnit
+
+    @AppStorage(AppSettings.lowStockKey)
+    private var lowStockThreshold: Int = AppSettings.fallbackLowStock
+
+    @AppStorage(AppSettings.cloudSyncKey)
+    private var cloudSyncEnabled: Bool = false
+
+    @State private var showRestartNotice = false
+    @State private var showClearHistoryAlert = false
+    @State private var clearHistoryError: String? = nil
+
+    private var language: AppLanguage {
+        AppLanguage(rawValue: languageRaw) ?? .english
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 26) {
+                    languageSection
+                    currencySection
+                    defaultsSection
+                    stockSection
+                    syncSection
+                    historySection
+                    Spacer(minLength: 20)
+                }
+                .padding(.top, 16)
+            }
+            .dismissKeyboardOnTap()
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(L.t(.settings, language))
+                        .font(.callout)
+                        .fontDesign(.monospaced)
+                        .fontWeight(.black)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        Haptics.light()
+                        dismiss()
+                    } label: {
+                        Text(L.t(.done, language))
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color.primary)
+                    }
+                }
+            }
+            .alert(
+                L.t(.clearHistory, language),
+                isPresented: $showClearHistoryAlert
+            ) {
+                Button(L.t(.delete, language), role: .destructive) { clearHistory() }
+                Button(L.t(.cancel, language), role: .cancel) {}
+            } message: {
+                Text(L.t(.clearHistoryWarning, language))
+            }
+        }
+    }
+
+    private var languageSection: some View {
+        section(title: L.t(.language, language)) {
+            VStack(spacing: 8) {
+                ForEach(AppLanguage.allCases) { option in
+                    optionRow(
+                        leading: option.flag,
+                        title: option.displayName,
+                        isSelected: option == language
+                    ) {
+                        Haptics.light()
+                        withAnimation(AppAnimation.fast) {
+                            languageRaw = option.rawValue
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var currencySection: some View {
+        section(title: L.t(.currency, language)) {
+            VStack(spacing: 8) {
+                ForEach(AppCurrency.allCases) { option in
+                    optionRow(
+                        leading: option.symbol,
+                        title: option.code,
+                        isSelected: option.rawValue == currencyRaw
+                    ) {
+                        Haptics.light()
+                        withAnimation(AppAnimation.fast) {
+                            currencyRaw = option.rawValue
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var defaultsSection: some View {
+        section(title: L.t(.newRowDefaults, language)) {
+            VStack(spacing: 10) {
+                numberRow(
+                    label: L.t(.units, language),
+                    caption: L.t(.unitsSettingCaption, language),
+                    value: $defaultUnits
+                )
+                numberRow(
+                    label: L.t(.perUnit, language),
+                    caption: L.t(.perUnitSettingCaption, language),
+                    value: $defaultItemsPerUnit
+                )
+
+                Text(L.t(.zeroLeavesEmpty, language))
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 2)
+            }
+        }
+    }
+
+    private var historySection: some View {
+        section(title: L.t(.history, language)) {
+            VStack(spacing: 8) {
+                Button {
+                    Haptics.warning()
+                    showClearHistoryAlert = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "trash")
+                            .font(.system(size: 15, weight: .semibold))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L.t(.clearHistory, language))
+                                .font(.system(size: 17, weight: .medium, design: .rounded))
+                            Text(L.t(.clearHistoryCaption, language))
+                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .foregroundStyle(.red)
+                    .padding(.horizontal, 18)
+                    .frame(minHeight: 72)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.red.opacity(0.30), lineWidth: 0.8))
+                }
+                .buttonStyle(.plain)
+
+                if let clearHistoryError {
+                    noticeLine(clearHistoryError, tint: .red)
+                }
+            }
+        }
+    }
+
+    private func clearHistory() {
+        do {
+            try modelContext.delete(model: StockMovement.self)
+            try modelContext.save()
+            Haptics.success()
+            clearHistoryError = nil
+        } catch {
+            Haptics.error()
+            clearHistoryError = "\(L.t(.couldNotSave, language)): \(error.localizedDescription)"
+        }
+    }
+
+    private var syncSection: some View {
+        section(title: L.t(.iCloudSync, language)) {
+            VStack(spacing: 8) {
+                Toggle(isOn: Binding(
+                    get: { cloudSyncEnabled },
+                    set: { newValue in
+                        Haptics.light()
+                        cloudSyncEnabled = newValue
+                        showRestartNotice = true
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L.t(.iCloudSync, language))
+                            .font(.system(size: 17, weight: .medium, design: .rounded))
+                            .foregroundStyle(.primary)
+                        Text(L.t(.iCloudSyncCaption, language))
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .tint(InvoiceStatus.shipped.tint)
+                .padding(.horizontal, 18)
+                .frame(minHeight: 72)
+                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+
+                if cloudSyncEnabled && AppSettings.cloudSyncUnavailable {
+                    noticeLine(L.t(.iCloudUnavailable, language), tint: .orange)
+                } else if showRestartNotice {
+                    noticeLine(L.t(.restartToApply, language), tint: .secondary)
+                }
+            }
+        }
+    }
+
+    private func noticeLine(_ text: String, tint: Color) -> some View {
+        Text(text)
+            .font(.system(size: 12, weight: .medium, design: .rounded))
+            .foregroundStyle(tint)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 12)
+            .padding(.top, 2)
+    }
+
+    private var stockSection: some View {
+        section(title: L.t(.stockTitle, language)) {
+            numberRow(
+                label: L.t(.lowStockThreshold, language),
+                caption: L.t(.lowStockCaption, language),
+                value: $lowStockThreshold
+            )
+        }
+    }
+
+    private func section<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title.uppercased())
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .tracking(1.2)
+                .foregroundStyle(.secondary)
+                .padding(.leading, 8)
+
+            content()
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private func optionRow(leading: String, title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Text(leading)
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .frame(width: 34, alignment: .leading)
+
+                Text(title)
+                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .foregroundStyle(.primary)
+
+                Spacer()
+
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 20))
+                    .foregroundStyle(isSelected ? Color.primary : Color.secondary.opacity(0.35))
+            }
+            .padding(.horizontal, 18)
+            .frame(height: 60)
+            .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.primary.opacity(isSelected ? 0.45 : 0.12), lineWidth: isSelected ? 1.4 : 0.8)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func numberRow(label: String, caption: String, value: Binding<Int>) -> some View {
+        HStack(spacing: 14) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .foregroundStyle(.primary)
+                Text(caption)
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Text("\(value.wrappedValue)")
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
+                .frame(minWidth: 34, alignment: .trailing)
+                .contentTransition(.numericText())
+                .animation(AppAnimation.quick, value: value.wrappedValue)
+
+            Stepper("", value: value, in: 0...99)
+                .labelsHidden()
+                .fixedSize()
+        }
+        .padding(.horizontal, 18)
+        .frame(height: 72)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+    }
+}

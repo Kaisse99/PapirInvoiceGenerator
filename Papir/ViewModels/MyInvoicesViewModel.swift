@@ -1,8 +1,14 @@
 //
 //  MyInvoicesViewModel.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-19.
+//  Everything the invoice list does to itself: search across both parties and
+//  item names, the four sort orders, multi-select mode with batch delete, and
+//  the per-invoice preview, share, duplicate, and delete actions. Sharing
+//  collects every selected invoice that actually has a PDF on disk and hands
+//  the whole set to one share sheet. Deleting an invoice deletes its PDF from
+//  disk first, since nothing else would ever go looking for that orphaned file.
+//  Holds no invoices of its own: the view owns the @Query and hands the array
+//  in.
+//  Used by: MyInvoicesView.
 //
 
 import SwiftUI
@@ -19,6 +25,15 @@ final class MyInvoicesViewModel: ObservableObject {
         
         var id: String { rawValue }
         
+        var title: String {
+            switch self {
+            case .newest:  return L.t(.newest)
+            case .oldest:  return L.t(.oldest)
+            case .lowest:  return L.t(.lowestPrice)
+            case .highest: return L.t(.highestPrice)
+            }
+        }
+
         var systemImage: String {
             switch self {
             case .newest:  return "arrow.down"
@@ -37,7 +52,7 @@ final class MyInvoicesViewModel: ObservableObject {
     @Published var showBatchDeleteAlert: Bool = false
     @Published var previewURL: URL? = nil
     @Published var previewTitle: String = ""
-    @Published var shareInvoiceURL: URL? = nil
+    @Published var shareURLs: [URL] = []
     
     func filteredAndSorted(_ invoices: [Invoice]) -> [Invoice] {
         var result = invoices
@@ -47,7 +62,7 @@ final class MyInvoicesViewModel: ObservableObject {
             result = result.filter { invoice in
                 let receiver = invoice.receiver.lowercased()
                 let sender = invoice.sender.lowercased()
-                let itemMatch = invoice.items.contains { $0.name.lowercased().contains(query) }
+                let itemMatch = invoice.allItems.contains { $0.name.lowercased().contains(query) }
                 return receiver.contains(query) || sender.contains(query) || itemMatch
             }
         }
@@ -67,7 +82,7 @@ final class MyInvoicesViewModel: ObservableObject {
     }
     
     var selectionTitle: String {
-        selectedIDs.isEmpty ? "Select" : "\(selectedIDs.count) selected"
+        selectedIDs.isEmpty ? L.t(.selectInvoices) : "\(selectedIDs.count) \(L.t(.selected))"
     }
     
     func toggleEditing() {
@@ -104,14 +119,27 @@ final class MyInvoicesViewModel: ObservableObject {
     
     func sharePDF(for invoice: Invoice) {
         Haptics.light()
-        guard let fileName = invoice.pdfFileName,
-              let url = PDFStorage.pdfURL(fileName: fileName) else { return }
-        shareInvoiceURL = url
+        guard let url = pdfURL(for: invoice) else { return }
+        shareURLs = [url]
+    }
+
+    func shareSelected(from invoices: [Invoice]) {
+        Haptics.medium()
+        let urls = invoices
+            .filter { selectedIDs.contains($0.id) }
+            .compactMap(pdfURL(for:))
+        guard !urls.isEmpty else { return }
+        shareURLs = urls
+    }
+
+    private func pdfURL(for invoice: Invoice) -> URL? {
+        guard let fileName = invoice.pdfFileName else { return nil }
+        return PDFStorage.pdfURL(fileName: fileName)
     }
     
     func duplicate(_ invoice: Invoice, context: ModelContext) {
         Haptics.light()
-        let copiedItems = invoice.items.map { item in
+        let copiedItems = invoice.orderedItems.map { item in
             ItemRow(
                 name: item.name,
                 unitCount: item.unitCount,

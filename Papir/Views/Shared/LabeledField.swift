@@ -1,8 +1,14 @@
 //
 //  LabeledField.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-16.
+//  The app's text field: a rounded box with its label notched into the top
+//  border, tinting blue on focus and red with a message on error. The label
+//  paints its own background to punch the hole in the stroke, so callers pass
+//  the surface color they sit on. Generic over the caller's focus enum, with an
+//  Int-specialized init for the fields that don't take part in focus jumping.
+//  A caller that passes a focus binding gets it applied alongside the field's
+//  own, which is what lets the row card both move focus between fields and know
+//  which one is being typed in.
+//  Used by: InvoiceRowCard.
 //
 
 import SwiftUI
@@ -42,6 +48,7 @@ struct LabeledField<FocusValue: Hashable>: View {
                         .foregroundStyle(.primary)
                         .disabled(isDisabled)
                         .focused($isFocused)
+                        .sharedFocus(focusBinding, equals: focusValue)
                         .frame(maxWidth: .infinity, alignment: centerAlign ? .center : .leading)
                     
                     if showClearButton && !text.isEmpty && !isDisabled {

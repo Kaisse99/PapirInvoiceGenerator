@@ -1,8 +1,8 @@
 //
 //  ShareSheet.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-19.
+//  UIActivityViewController as a SwiftUI view, so a PDF can be handed to the
+//  system share sheet.
+//  Used by: MyInvoicesView, PDFPreviewView.
 //
 
 import SwiftUI

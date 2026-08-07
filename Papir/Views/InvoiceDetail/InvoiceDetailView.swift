@@ -1,8 +1,16 @@
 //
 //  InvoiceDetailView.swift
-//  Papir
-//
-//  Created by Mykyta Kaisenberg on 2026-05-19.
+//  One saved invoice as a paper receipt: parties, every row with its colors,
+//  and the total. Three actions sit on top: open the stored PDF, re-generate
+//  it in another language, or reopen the whole thing in NewInvoiceView through
+//  the EditInvoiceSheet at the bottom of this file, which is a full-screen
+//  cover that dismisses itself the moment that screen reports it is done.
+//  View PDF stays disabled until a PDF exists on disk, and editing is closed
+//  off entirely once the invoice is shipped: the packs it took are already
+//  written down, so changing the rows underneath that record would leave stock
+//  and invoice describing different shipments. Returning it to draft puts the
+//  packs back and reopens editing.
+//  Used by: MyInvoicesView, as its navigation destination for an Invoice.
 //
 
 import SwiftUI
@@ -16,6 +24,12 @@ struct InvoiceDetailView: View {
     
     @StateObject private var viewModel = InvoiceDetailViewModel()
     @State private var showEditSheet = false
+    @State private var showShipment = false
+    @State private var shipmentNotice: String? = nil
+    @State private var showStatusExplanation = false
+
+    @Query(sort: \StockModel.code)
+    private var stockModels: [StockModel]
     
     private static let totalFormatter: NumberFormatter = {
         let f = NumberFormatter()
@@ -50,16 +64,52 @@ struct InvoiceDetailView: View {
             .padding(.top, 12)
             .padding(.bottom, 40)
         }
-        .background(backgroundGradient.ignoresSafeArea())
+        .background(AppBackground())
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(invoice.receiver.isEmpty ? "Invoice" : invoice.receiver)
+                Text(invoice.receiver.isEmpty ? L.t(.invoice) : invoice.receiver)
                     .font(.callout)
                     .fontDesign(.monospaced)
                     .fontWeight(.black)
                     .padding(.horizontal, 4)
             }
+
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    Haptics.light()
+                    showStatusExplanation = true
+                } label: {
+                    Image(systemName: invoice.status.icon)
+                        .toolbarIcon()
+                        .foregroundStyle(invoice.status.tint)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .accessibilityLabel(invoice.status.label)
+
+                Button {
+                    Haptics.medium()
+                    if invoice.status == .shipped {
+                        revertShipment()
+                    } else {
+                        showShipment = true
+                    }
+                } label: {
+                    Image(systemName: invoice.status.actionIcon)
+                        .toolbarIcon()
+                        .foregroundStyle(Color.primary)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .accessibilityLabel(invoice.status.actionLabel)
+            }
+        }
+        .alert(
+            invoice.status.label,
+            isPresented: $showStatusExplanation
+        ) {
+            Button(L.t(.ok), role: .cancel) { showStatusExplanation = false }
+        } message: {
+            Text(invoice.status.explanation)
         }
         .sheet(isPresented: $viewModel.showLanguagePicker) {
             LanguagePickerSheet { language in
@@ -68,11 +118,29 @@ struct InvoiceDetailView: View {
                     viewModel.generatePDF(for: invoice, language: language, context: modelContext)
                 }
             }
-            .presentationDetents([.height(320)])
+            .presentationDetents([.height(338)])
             .presentationDragIndicator(.visible)
         }
         .fullScreenCover(isPresented: $showEditSheet) {
             EditInvoiceSheet(invoice: invoice)
+        }
+        .sheet(isPresented: $showShipment) {
+            ShipmentSheet(invoice: invoice, stock: stockModels) { shortfall in
+                shipmentNotice = shortfall > 0
+                    ? "\(L.t(.stockUpdated)). \(L.t(.shortfallOnShipment))"
+                    : L.t(.stockUpdated)
+            }
+        }
+        .alert(
+            L.t(.stockUpdated),
+            isPresented: Binding(
+                get: { shipmentNotice != nil },
+                set: { if !$0 { shipmentNotice = nil } }
+            )
+        ) {
+            Button(L.t(.ok), role: .cancel) { shipmentNotice = nil }
+        } message: {
+            Text(shipmentNotice ?? "")
         }
         .fullScreenCover(
             isPresented: Binding(
@@ -85,13 +153,13 @@ struct InvoiceDetailView: View {
             }
         }
         .alert(
-            "Couldn't generate PDF",
+            L.t(.couldNotGeneratePDF),
             isPresented: Binding(
                 get: { viewModel.generationError != nil },
                 set: { if !$0 { viewModel.generationError = nil } }
             )
         ) {
-            Button("OK", role: .cancel) {
+            Button(L.t(.ok), role: .cancel) {
                 viewModel.generationError = nil
             }
         } message: {
@@ -99,20 +167,18 @@ struct InvoiceDetailView: View {
         }
     }
     
-    private var backgroundGradient: some View {
-        RadialGradient(
-            colors: [
-                Color(.systemBackground),
-                colorScheme == .dark
-                    ? Color.white.opacity(0.08)
-                    : Color.gray.opacity(0.25)
-            ],
-            center: .center,
-            startRadius: 100,
-            endRadius: 500
-        )
-    }
     
+    private func revertShipment() {
+        do {
+            try ShipmentPlanner.revert(invoice, stock: stockModels, context: modelContext)
+            Haptics.success()
+            shipmentNotice = L.t(.stockReturned)
+        } catch {
+            Haptics.error()
+            shipmentNotice = "\(L.t(.couldNotSave)): \(error.localizedDescription)"
+        }
+    }
+
     private var actionButtons: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
@@ -123,7 +189,7 @@ struct InvoiceDetailView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "doc.text.magnifyingglass")
                             .font(.callout)
-                        Text("View PDF")
+                        Text(L.t(.viewPDF))
                             .fontDesign(.monospaced)
                             .fontWeight(.semibold)
                     }
@@ -147,7 +213,7 @@ struct InvoiceDetailView: View {
                             Image(systemName: "arrow.triangle.2.circlepath")
                                 .font(.callout)
                         }
-                        Text(viewModel.isGeneratingPDF ? "..." : "Re-generate")
+                        Text(viewModel.isGeneratingPDF ? "..." : L.t(.regenerate))
                             .fontDesign(.monospaced)
                             .fontWeight(.semibold)
                     }
@@ -159,22 +225,40 @@ struct InvoiceDetailView: View {
                 .disabled(viewModel.isGeneratingPDF)
             }
             
-            Button {
-                Haptics.medium()
-                showEditSheet = true
-            } label: {
+            if invoice.status == .shipped {
                 HStack(spacing: 8) {
-                    Image(systemName: "pencil")
-                        .font(.callout)
-                    Text("Make Changes")
+                    Image(systemName: "lock.fill")
+                        .font(.caption)
+                    Text(L.t(.lockedWhileShipped))
+                        .font(.caption)
                         .fontDesign(.monospaced)
-                        .fontWeight(.semibold)
+                        .multilineTextAlignment(.center)
                 }
+                .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, minHeight: 50)
-                .foregroundStyle(.primary)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(.secondary, lineWidth: 1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [4]))
+                        .foregroundStyle(.secondary.opacity(0.5))
+                )
+            } else {
+                Button {
+                    Haptics.medium()
+                    showEditSheet = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "pencil")
+                            .font(.callout)
+                        Text(L.t(.makeChanges))
+                            .fontDesign(.monospaced)
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .foregroundStyle(.primary)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(.secondary, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 20)
     }
@@ -182,13 +266,13 @@ struct InvoiceDetailView: View {
     private var receiptHeader: some View {
         VStack(spacing: 8) {
             if !invoice.sender.isEmpty {
-                receiptRow(label: "From", value: invoice.sender)
+                receiptRow(label: L.t(.from), value: invoice.sender)
             }
             if !invoice.receiver.isEmpty {
-                receiptRow(label: "To", value: invoice.receiver)
+                receiptRow(label: L.t(.to), value: invoice.receiver)
             }
-            receiptRow(label: "Date", value: Self.dateFormatter.string(from: invoice.date))
-            receiptRow(label: "Items", value: "\(invoice.items.count)")
+            receiptRow(label: L.t(.date), value: Self.dateFormatter.string(from: invoice.date))
+            receiptRow(label: L.t(.items), value: "\(invoice.allItems.count)")
         }
         .padding(.horizontal, 24)
     }
@@ -209,7 +293,7 @@ struct InvoiceDetailView: View {
     
     private var rowsSection: some View {
         VStack(spacing: 16) {
-            ForEach(Array(invoice.items.enumerated()), id: \.element.id) { index, item in
+            ForEach(Array(invoice.orderedItems.enumerated()), id: \.element.id) { index, item in
                 rowEntry(index: index + 1, item: item)
             }
         }
@@ -219,7 +303,7 @@ struct InvoiceDetailView: View {
     private func rowEntry(index: Int, item: ItemRow) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text("Entry #\(index):")
+                Text("\(L.t(.entry)) #\(index):")
                     .font(.callout)
                     .fontDesign(.monospaced)
                     .fontWeight(.semibold)
@@ -255,7 +339,7 @@ struct InvoiceDetailView: View {
                     .font(.footnote)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.primary.opacity(0.85))
-                Text("₴")
+                Text(AppSettings.currencySymbol)
                     .font(.caption2)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
@@ -267,7 +351,7 @@ struct InvoiceDetailView: View {
                     .fontDesign(.monospaced)
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
-                Text("₴")
+                Text(AppSettings.currencySymbol)
                     .font(.caption2)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
@@ -275,8 +359,8 @@ struct InvoiceDetailView: View {
             
             if !item.colors.isEmpty {
                 FlowLayout(spacing: 4) {
-                    ForEach(item.colors, id: \.self) { color in
-                        Text(color)
+                    ForEach(item.colorBreakdown, id: \.self) { allocation in
+                        Text("\(allocation.color) \(allocation.packs)")
                             .font(.caption2)
                             .fontDesign(.monospaced)
                             .padding(.horizontal, 8)
@@ -298,7 +382,7 @@ struct InvoiceDetailView: View {
     
     private var totalSection: some View {
         VStack(spacing: 6) {
-            Text("TOTAL")
+            Text(L.t(.totalCaps))
                 .font(.caption)
                 .fontDesign(.monospaced)
                 .tracking(6)
@@ -309,7 +393,7 @@ struct InvoiceDetailView: View {
                     .font(.system(size: 42, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                 
-                Text("₴")
+                Text(AppSettings.currencySymbol)
                     .font(.system(size: 24, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
