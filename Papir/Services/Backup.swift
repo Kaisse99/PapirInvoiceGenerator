@@ -11,7 +11,10 @@
 //  Restoring replaces everything. A merge would need rules for every way two
 //  stores can disagree and would get them wrong quietly; replace is the one
 //  behaviour whose outcome she can predict, and it sits behind a confirmation
-//  that says so. PDF file names are carried over even though the files stay
+//  that says so. The wipe names the rows and lines as well as the four things
+//  that own them: cascade would take them anyway, but a store carried over
+//  from a build that leaked rows still holds ones no invoice points at, and
+//  replace has to mean replace or those survive every restore she ever does. PDF file names are carried over even though the files stay
 //  on the old phone: the invoice then honestly reports no PDF and re-generate
 //  rebuilds it from the rows.
 //  Used by: SettingsSheet, BackupTests.
@@ -283,6 +286,15 @@ enum Backup {
         }
         for movement in try context.fetch(FetchDescriptor<StockMovement>()) {
             context.delete(movement)
+        }
+        for row in try context.fetch(FetchDescriptor<ItemRow>()) {
+            context.delete(row)
+        }
+        for line in try context.fetch(FetchDescriptor<ShipmentLine>()) {
+            context.delete(line)
+        }
+        for line in try context.fetch(FetchDescriptor<StockLine>()) {
+            context.delete(line)
         }
         try context.save()
     }

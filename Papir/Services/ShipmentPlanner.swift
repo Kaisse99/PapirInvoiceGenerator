@@ -17,6 +17,9 @@
 //  Applying is deliberate about order: stock is moved and the exact packs are
 //  written onto the invoice in the same pass, so reverting later replays that
 //  record rather than recomputing a plan that the rows may no longer produce.
+//  Reverting puts the packs back and then hands the shipment record to the
+//  invoice to clear, which deletes the lines itself, so the lifetime of a
+//  ShipmentLine lives in one place rather than half here and half there.
 //  Used by: ShipmentSheet, InvoiceDetailView.
 //
 
@@ -145,9 +148,6 @@ enum ShipmentPlanner {
             )
         }
 
-        for line in invoice.shipment {
-            context.delete(line)
-        }
         invoice.clearShipment()
         invoice.status = .draft
         invoice.shippedAt = nil

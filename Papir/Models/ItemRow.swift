@@ -11,6 +11,10 @@
 //  relationship is an unordered set and would otherwise hand the rows back in
 //  an arbitrary order on every fetch. Invoice owns the numbering, so nothing
 //  else should set sortIndex by hand.
+//  invoice is the back link to the invoice this row belongs to. Nothing reads
+//  it: it exists because CloudKit mirroring refuses to open a store holding a
+//  relationship with no inverse, and a row is worth nothing without the
+//  document it is a line of anyway. Invoice owns both ends.
 //  Used by: Invoice, NewInvoiceViewModel, MyInvoicesViewModel, PDFGenerator,
 //  InvoiceRowCard, InvoiceDetailView.
 //
@@ -27,6 +31,7 @@ final class ItemRow {
     var colors: [String] = []
     var colorPacks: [Int] = []
     var sortIndex: Int = 0
+    var invoice: Invoice? = nil
 
     init(name: String, unitCount: UInt16, itemsPerUnit: UInt16, price: Double, colors: [String]) {
         self.name = name

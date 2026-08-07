@@ -1,8 +1,8 @@
 //
 //  StockViewModel.swift
 //  Everything the stock screens do to the store: search across model codes and
-//  colors, create a model once its code passes the four-digit rule, take packs
-//  in, take packs out, and recount a color. Receiving into a color that has no
+//  colors, create a model once its code is non-blank and not already taken,
+//  take packs in, take packs out, and recount a color. Receiving into a color that has no
 //  line yet creates that line, so adding a color and adding stock are one
 //  action rather than two. A withdrawal that goes past what is on hand still
 //  happens and reports its shortfall, which the view turns into a warning;

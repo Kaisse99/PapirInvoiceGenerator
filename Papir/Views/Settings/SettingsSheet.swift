@@ -1,11 +1,14 @@
 //
 //  SettingsSheet.swift
-//  Preferences, reached from the gear on the home screen. Three things live
-//  here: the language the app speaks, the currency every amount is written in,
-//  and the two numbers a new invoice row is prefilled with, so a shop that
-//  always ships packs of six sets it once. Zero in either number means start
-//  that field empty. Everything writes straight to UserDefaults through
-//  @AppStorage, so a change is live the moment it is tapped.
+//  Preferences, reached from the gear on the home screen: the language the app
+//  speaks, the currency every amount is written in, the name that goes in the
+//  sender field, the two numbers a new invoice row is prefilled with, the count
+//  a colour is called low at, the export and backup buttons, the iCloud toggle,
+//  and clearing the movement log. Zero in either prefill number means start
+//  that field empty. Preferences write straight to UserDefaults through
+//  @AppStorage, so a change is live the moment it is tapped; the iCloud toggle
+//  is the exception and asks for a restart, because the store is built one way
+//  or the other once per launch.
 //  Set in the rounded face rather than the monospaced one the rest of the app
 //  uses: monospace earns its place where columns of numbers have to line up,
 //  and a settings list is prose with a control beside it.

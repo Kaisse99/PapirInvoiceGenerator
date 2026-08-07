@@ -34,6 +34,10 @@
 //  instead of asking for it again. Zero means it has never been set, which is
 //  also what every model held before the field existed, so nothing needs
 //  backfilling; a row only autofills when the price is above zero.
+//  StockLine.model is the back link to the model a colour sits under. Nothing
+//  reads it: it is there because CloudKit mirroring refuses to open a store
+//  holding a relationship with no inverse, and a colour with no model behind
+//  it is not a thing on the shelf.
 //  Used by: StockViewModel, StockView, StockModelCard, StockModelDetailView,
 //  InvoiceRowCard through StockSuggestion.
 //
@@ -46,7 +50,7 @@ final class StockModel {
     var code: String = ""
     var createdAt: Date = Date.now
     var pricePerPiece: Double = 0
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \StockLine.model)
     var lines: [StockLine]? = nil
 
     init(code: String, pricePerPiece: Double = 0, lines: [StockLine] = []) {
@@ -103,6 +107,7 @@ final class StockModel {
 final class StockLine {
     var color: String = ""
     var packs: Int = 0
+    var model: StockModel? = nil
 
     init(color: String, packs: Int = 0) {
         self.color = color

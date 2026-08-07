@@ -9,7 +9,10 @@
 //  is why turning the setting on asks for a restart rather than pretending to
 //  switch live. A CloudKit container that fails to open, which is what happens
 //  when nobody is signed into iCloud, falls back to the local store and leaves
-//  a flag behind so settings can say so instead of failing silently.
+//  a flag behind so settings can say so instead of failing silently. The
+//  reason it refused is logged rather than dropped: "nobody is signed in" and
+//  "the schema holds a relationship CloudKit will not mirror" look identical
+//  from the settings screen, and only the log tells them apart.
 //  A local store that also refuses to open used to be a fatalError, which
 //  died on her without a word. Now it is a screen: the error, a retry, and a
 //  start-empty behind a confirmation, because a frozen app with no way out is
@@ -36,16 +39,20 @@ enum StoreLoader {
                 isStoredInMemoryOnly: false,
                 cloudKitDatabase: .private(AppSettings.cloudContainerID)
             )
-            if let container = try? ModelContainer(
-                for: schema,
-                migrationPlan: PapirMigrationPlan.self,
-                configurations: [cloud]
-            ) {
+            do {
+                let container = try ModelContainer(
+                    for: schema,
+                    migrationPlan: PapirMigrationPlan.self,
+                    configurations: [cloud]
+                )
                 AppSettings.recordCloudSyncFailure(false)
                 return .ready(container)
+            } catch {
+                AppSettings.recordCloudSyncFailure(true)
+                AppLog.store.error(
+                    "CloudKit container failed to open, falling back to local: \(error.localizedDescription, privacy: .public)"
+                )
             }
-            AppSettings.recordCloudSyncFailure(true)
-            AppLog.store.error("CloudKit container failed to open, falling back to local")
         }
 
         let local = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)

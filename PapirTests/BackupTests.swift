@@ -93,4 +93,30 @@ struct BackupTests {
         #expect(models.map(\.code) == ["NEW"])
         #expect(try context.fetch(FetchDescriptor<Contact>()).isEmpty)
     }
+
+    @Test func restoreClearsRowsNoInvoiceOwns() throws {
+        let container = try makeContainer()
+        let context = container.mainContext
+
+        context.insert(ItemRow(name: "orphan", unitCount: 1, itemsPerUnit: 6, price: 10, colors: []))
+        context.insert(ShipmentLine(modelCode: "orphan", color: "Black", packs: 1))
+        context.insert(StockLine(color: "Black", packs: 1))
+        try context.save()
+
+        let empty = BackupFile(
+            version: 1,
+            exportedAt: .now,
+            contacts: [],
+            models: [],
+            invoices: [],
+            movements: []
+        )
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        _ = try Backup.restore(try encoder.encode(empty), context: context)
+
+        #expect(try context.fetch(FetchDescriptor<ItemRow>()).isEmpty)
+        #expect(try context.fetch(FetchDescriptor<ShipmentLine>()).isEmpty)
+        #expect(try context.fetch(FetchDescriptor<StockLine>()).isEmpty)
+    }
 }

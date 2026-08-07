@@ -8,6 +8,10 @@
 //  to a name tiebreak, so they keep one settled order instead of reshuffling.
 //  InvoiceSnapshot is the frozen, Sendable copy handed to PDF rendering, which
 //  runs off the main thread where touching the model itself would be unsafe.
+//  Both replaceItems and clearShipment delete what they drop rather than just
+//  unhooking it. A row cut from an edited invoice is reachable from nothing
+//  once the array no longer holds it, so leaving it behind would pile up dead
+//  rows in the store forever, and with iCloud on it would sync them too.
 //  An invoice is a draft until it is marked shipped, and marking it shipped is
 //  the only thing that moves stock. What came off the shelf is written down as
 //  ShipmentLines on the invoice itself rather than inferred later, because the
@@ -35,7 +39,7 @@ import SwiftData
 
 @Model
 final class Invoice {
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \ItemRow.invoice)
     var items: [ItemRow]? = nil
     var id: UUID = UUID()
     var date: Date = Date.now
@@ -44,7 +48,7 @@ final class Invoice {
     var pdfFileName: String? = nil
     var statusRaw: String? = nil
     var shippedAt: Date? = nil
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \ShipmentLine.invoice)
     var shipmentLines: [ShipmentLine]? = nil
     var receiverContact: Contact? = nil
 
@@ -103,7 +107,12 @@ final class Invoice {
     }
 
     func replaceItems(with newItems: [ItemRow]) {
+        let kept = Set(newItems.map(\.persistentModelID))
+        let discarded = allItems.filter { !kept.contains($0.persistentModelID) }
         items = Invoice.numbered(newItems)
+        for row in discarded {
+            modelContext?.delete(row)
+        }
     }
 
     func recordShipment(_ line: ShipmentLine) {
@@ -112,7 +121,11 @@ final class Invoice {
     }
 
     func clearShipment() {
+        let discarded = shipment
         shipmentLines = []
+        for line in discarded {
+            modelContext?.delete(line)
+        }
     }
 
     private static func numbered(_ items: [ItemRow]) -> [ItemRow] {
@@ -133,6 +146,7 @@ final class ShipmentLine {
     var modelCode: String = ""
     var color: String = ""
     var packs: Int = 0
+    var invoice: Invoice? = nil
 
     init(modelCode: String, color: String, packs: Int) {
         self.modelCode = modelCode

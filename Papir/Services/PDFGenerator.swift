@@ -11,6 +11,11 @@
 //  printed as a label over a dash, so an invoice with only a receiver puts that
 //  receiver where the sender would have been. Input is an InvoiceSnapshot
 //  rather than the model, because rendering happens off the main thread.
+//  The type is nonisolated for that reason. The project defaults every type to
+//  MainActor, which made render's Task.detached a main-actor method being run
+//  off the main actor: legal in Swift 5, an error in Swift 6, and a lie about
+//  where the work happens either way. Nothing here touches main-actor state,
+//  so saying so out loud costs nothing and keeps the detached hop honest.
 //  PDFLanguage carries every piece of on-page text, so adding a language means
 //  adding a case here and nothing else.
 //  Used by: NewInvoiceViewModel, InvoiceDetailViewModel; PDFLanguage also by
@@ -83,8 +88,8 @@ enum PDFLanguage: String, CaseIterable, Identifiable {
     }
 }
 
-struct PDFGenerator {
-    
+nonisolated struct PDFGenerator {
+
     static let a4Size = CGSize(width: 595.2, height: 841.8)
     static let margin: CGFloat = 40
     static let fontScale: CGFloat = 1.05
