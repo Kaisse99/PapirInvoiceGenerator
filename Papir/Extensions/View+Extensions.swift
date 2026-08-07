@@ -11,6 +11,10 @@
 //  is two layers because one cannot do both jobs: a black one that shows where
 //  a card overlaps something pale, and a faint primary one that reads as a
 //  glow on a dark screen and as a second soft shadow on a light one.
+//  It goes on the shape a card is filled with, never on the card as a whole. A
+//  shadow applied to a composed view is cast by everything drawn inside it, so
+//  hanging it on the card gave every field box and every notched label its own
+//  little halo, which read as grubby rather than as raised.
 //  readableWidth is what keeps the app from turning into a wall on an iPad:
 //  every screen is a single column of cards written for a phone, so past a
 //  point the column stops growing and centres instead of stretching a row of

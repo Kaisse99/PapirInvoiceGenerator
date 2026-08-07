@@ -137,8 +137,8 @@ struct InvoiceRowCard: View {
             RoundedRectangle(cornerRadius: 22)
                 .fill(cardBackground)
                 .stroke(.primary.opacity(0.30), lineWidth: 0.8)
+                .raisedShadow()
         )
-        .raisedShadow()
         .animation(AppAnimation.quick, value: isLocked)
         .onAppear { syncDerived(animated: false) }
         .onChange(of: name) { _, _ in

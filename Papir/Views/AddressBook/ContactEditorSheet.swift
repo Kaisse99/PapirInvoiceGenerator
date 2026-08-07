@@ -138,8 +138,8 @@ struct ContactEditorSheet: View {
             RoundedRectangle(cornerRadius: 22)
                 .fill(cardBackground)
                 .stroke(.primary.opacity(0.30), lineWidth: 0.8)
+                .raisedShadow()
         )
-        .raisedShadow()
     }
 
     private func field(

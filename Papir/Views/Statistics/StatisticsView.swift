@@ -112,9 +112,8 @@ struct StatisticsView: View {
             .foregroundStyle(Color.primary)
             .padding(.horizontal, 16)
             .frame(height: 44)
-            .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)))
+            .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)).raisedShadow())
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(.primary.opacity(0.40), lineWidth: 1))
-            .raisedShadow()
         }
         .padding(.horizontal, 20)
     }
@@ -221,9 +220,8 @@ struct StatisticsView: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 20).fill(Color(.secondarySystemGroupedBackground)))
+        .background(RoundedRectangle(cornerRadius: 20).fill(Color(.secondarySystemGroupedBackground)).raisedShadow())
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
-        .raisedShadow()
         .padding(.horizontal, 20)
     }
 
@@ -294,9 +292,8 @@ struct StatisticsView: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 20).fill(Color(.secondarySystemGroupedBackground)))
+        .background(RoundedRectangle(cornerRadius: 20).fill(Color(.secondarySystemGroupedBackground)).raisedShadow())
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
-        .raisedShadow()
         .padding(.horizontal, 20)
     }
 }

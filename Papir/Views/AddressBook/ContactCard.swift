@@ -70,12 +70,12 @@ struct ContactCard: View {
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(.secondarySystemGroupedBackground))
+                .raisedShadow()
         )
         .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.primary.opacity(0.12), lineWidth: 0.8)
         )
-        .raisedShadow()
     }
 
     private func chip(_ text: String, icon: String) -> some View {

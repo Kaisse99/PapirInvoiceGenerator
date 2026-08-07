@@ -167,13 +167,12 @@ struct AddressBookView: View {
         }
         .padding(.horizontal, 16)
         .frame(height: 52)
-        .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)))
+        .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)).raisedShadow())
         .overlay(
             RoundedRectangle(cornerRadius: 18)
                 .stroke(.primary.opacity(0.40), lineWidth: 1)
         )
         .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
-        .raisedShadow()
         .padding(.horizontal, 20)
     }
 
