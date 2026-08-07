@@ -46,7 +46,7 @@ struct ReceiveStockSheet: View {
                                     color = existing
                                 } label: {
                                     Text(existing)
-                                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                        .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 6)
                                         .background(
@@ -97,7 +97,7 @@ struct WithdrawStockSheet: View {
         StockSheetFrame(title: L.t(.takeStockOut), subtitle: "\(modelCode) \(line.color)") {
             VStack(spacing: 18) {
                 Text("\(L.t(.onHand)): \(line.packs)")
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
 
                 StockSheetField(placeholder: L.t(.packs), text: $packs, keyboard: .numberPad)
@@ -113,7 +113,7 @@ struct WithdrawStockSheet: View {
                         .padding(.horizontal, 8)
                 } else if packCount > 0 {
                     Text("\(line.packs - packCount) \(L.t(.left))")
-                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
 
@@ -139,7 +139,7 @@ struct RecountStockSheet: View {
         StockSheetFrame(title: L.t(.recount), subtitle: "\(modelCode) \(line.color)") {
             VStack(spacing: 18) {
                 Text("\(L.t(.recorded)): \(line.packs)")
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
 
                 StockSheetField(placeholder: L.t(.packsOnShelf), text: $packs, keyboard: .numberPad)
@@ -179,7 +179,7 @@ struct SetPriceSheet: View {
                         .limitInput($price, to: 7)
 
                     Text(AppSettings.currencySymbol)
-                        .font(.system(size: 17, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 17, weight: .medium, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
 
@@ -252,7 +252,7 @@ private struct StockSheetField: View {
 
     var body: some View {
         TextField(placeholder, text: $text)
-            .font(.system(size: 17, weight: .semibold, design: .monospaced))
+            .font(.scaled(size: 17, weight: .semibold, design: .monospaced))
             .keyboardType(keyboard)
             .autocorrectionDisabled()
             .padding(.horizontal, 16)

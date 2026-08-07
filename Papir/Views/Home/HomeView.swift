@@ -250,7 +250,7 @@ struct HomeView: View {
 
     private func chevron(pointsLeft: Bool, available: Bool) -> some View {
         let glyph = Image(systemName: pointsLeft ? "chevron.left" : "chevron.right")
-            .font(.system(size: 28, weight: .light))
+            .font(.scaled(size: 28, weight: .light))
 
         return Group {
             if available {

@@ -186,7 +186,7 @@ struct NewInvoiceView: View {
     ) -> some View {
         HStack(spacing: 12) {
             TextField(label, text: text)
-                .font(.system(size: 16, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 16, weight: .medium, design: .monospaced))
                 .autocorrectionDisabled()
                 .multilineTextAlignment(.leading)
                 .limitInput(text, to: 40)
@@ -232,19 +232,19 @@ struct NewInvoiceView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "person.crop.circle")
-                            .font(.system(size: 13))
+                            .font(.scaled(size: 13))
                             .foregroundStyle(.secondary)
                             .frame(width: 18)
 
                         VStack(alignment: .leading, spacing: 1) {
                             Text(contact.displayName)
-                                .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                                .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
 
                             if !contact.whereTo.isEmpty {
                                 Text(contact.whereTo)
-                                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                    .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                                     .foregroundStyle(.secondary)
                                     .lineLimit(1)
                             }
@@ -254,7 +254,7 @@ struct NewInvoiceView: View {
 
                         if !contact.phone.isEmpty {
                             Text(contact.phone)
-                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
@@ -343,13 +343,13 @@ struct NewInvoiceView: View {
             
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(formattedTotal(viewModel.liveTotal))
-                    .font(.system(size: 42, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 42, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary.opacity(0.9))
                     .contentTransition(.numericText())
                     .animation(AppAnimation.quick, value: viewModel.liveTotal)
                 
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 24, weight: .semibold, design: .monospaced))
+                    .font(.scaled(size: 24, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
         }

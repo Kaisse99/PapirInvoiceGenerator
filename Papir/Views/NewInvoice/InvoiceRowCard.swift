@@ -265,10 +265,10 @@ struct InvoiceRowCard: View {
             if priceOffStock, let stockPrice {
                 HStack(spacing: 5) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 9))
+                        .font(.scaled(size: 9))
 
                     Text("\(L.t(.differsFromStock)): \(PriceText.display(stockPrice)) \(AppSettings.currencySymbol)")
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                 }
                 .foregroundStyle(Color.orange)
                 .padding(.leading, 6)
@@ -277,7 +277,7 @@ struct InvoiceRowCard: View {
 
             if unitsFollowColors {
                 Text(L.t(.unitsFollowColors))
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .padding(.leading, 6)
                     .transition(.opacity)
@@ -429,18 +429,18 @@ struct InvoiceRowCard: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "shippingbox")
-                            .font(.system(size: 13))
+                            .font(.scaled(size: 13))
                             .foregroundStyle(.secondary)
                             .frame(width: 18)
 
                         Text(suggestion.code)
-                            .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                            .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
                             .foregroundStyle(.primary)
 
                         Spacer()
 
                         Text("\(suggestion.packs) \(L.t(.packsLower))")
-                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                            .font(.scaled(size: 12, weight: .medium, design: .monospaced))
                             .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 11)
@@ -571,7 +571,7 @@ struct InvoiceRowCard: View {
             HStack {
                 Spacer()
                 Text("#\(rowNumber)")
-                    .font(.system(size: 16, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 16, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
                 Spacer()
             }
@@ -628,7 +628,7 @@ struct InvoiceRowCard: View {
                 .opacity(isComplete ? 0 : 1)
 
             Image(systemName: needsAttention ? "exclamationmark" : "checkmark")
-                .font(.system(size: 11, weight: .heavy))
+                .font(.scaled(size: 11, weight: .heavy))
                 .foregroundStyle(Color(.systemBackground))
                 .contentTransition(.symbolEffect(.replace))
                 .opacity(isComplete ? 1 : 0)
@@ -652,7 +652,7 @@ struct InvoiceRowCard: View {
             if isLocked { focusedField = nil }
         } label: {
             Image(systemName: isLocked ? "lock.fill" : "lock")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.scaled(size: 11, weight: .semibold))
                 .foregroundStyle(isLocked ? Color(.systemBackground) : .primary)
                 .frame(width: 24, height: 24)
                 .background(Circle().fill(isLocked ? Color.primary : Color(.systemBackground)))
@@ -689,7 +689,7 @@ struct InvoiceRowCard: View {
 
             HStack(spacing: 10) {
                 TextField(L.t(.addColor), text: $newColorInput)
-                    .font(.system(size: 15, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                     .submitLabel(.done)
                     .limitInput($newColorInput, to: 12)
                     .onSubmit { commitColor() }
@@ -698,7 +698,7 @@ struct InvoiceRowCard: View {
                     commitColor()
                 } label: {
                     Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.scaled(size: 14, weight: .bold))
                         .frame(width: 28, height: 28)
                         .background(Circle().fill(Color.primary.opacity(0.12)))
                 }
@@ -722,21 +722,21 @@ struct InvoiceRowCard: View {
             VStack(alignment: .leading, spacing: 1) {
                 HStack(spacing: 6) {
                     Text(color)
-                        .font(.system(size: 15, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                         .foregroundStyle(known ? Color.primary : Color.orange)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
                     if !known {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 10))
+                            .font(.scaled(size: 10))
                             .foregroundStyle(Color.orange)
                     }
                 }
 
                 if let onHand {
                     Text("\(L.t(.inStock)): \(onHand)")
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                         .foregroundStyle(onHand < packs(at: index) ? Color.orange : .secondary)
                 }
             }
@@ -744,7 +744,7 @@ struct InvoiceRowCard: View {
             Spacer(minLength: 6)
 
             Text("\(packs(at: index))")
-                .font(.system(size: 17, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 17, weight: .bold, design: .monospaced))
                 .foregroundStyle(Color.primary)
                 .frame(minWidth: 22, alignment: .trailing)
                 .contentTransition(.numericText())
@@ -764,7 +764,7 @@ struct InvoiceRowCard: View {
                 }
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.scaled(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
@@ -781,11 +781,11 @@ struct InvoiceRowCard: View {
     private var reconciliationLine: some View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.circle.fill")
-                .font(.system(size: 11))
+                .font(.scaled(size: 11))
                 .foregroundStyle(Color.orange)
 
             Text("\(assignedPacks) / \(unitsValue) \(L.t(.assignedToColors))")
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 12, weight: .medium, design: .monospaced))
                 .foregroundStyle(Color.orange)
 
             Spacer()
@@ -805,9 +805,9 @@ struct InvoiceRowCard: View {
                 } label: {
                     HStack(spacing: 5) {
                         Image(systemName: "plus")
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.scaled(size: 9, weight: .bold))
                         Text(option)
-                            .font(.system(size: 13, weight: .medium, design: .monospaced))
+                            .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                     }
                     .padding(.horizontal, 10)
                     .frame(height: 30)

@@ -65,7 +65,7 @@ struct LabeledField<FocusValue: Hashable>: View {
             ZStack(alignment: .topLeading) {
                 HStack(spacing: 10) {
                     TextField(placeholder, text: $text)
-                        .font(.system(size: 16, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 16, weight: .medium, design: .monospaced))
                         .keyboardType(keyboardType)
                         .autocorrectionDisabled()
                         .multilineTextAlignment(centerAlign ? .center : .leading)

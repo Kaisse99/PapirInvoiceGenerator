@@ -33,7 +33,7 @@ struct KeyboardStepBar: ToolbarContent {
                 onBack()
             } label: {
                 Image(systemName: "chevron.up")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.scaled(size: 16, weight: .semibold))
             }
             .disabled(!canGoBack)
 
@@ -42,7 +42,7 @@ struct KeyboardStepBar: ToolbarContent {
                 onForward()
             } label: {
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.scaled(size: 16, weight: .semibold))
             }
             .disabled(!canGoForward)
 
@@ -53,7 +53,7 @@ struct KeyboardStepBar: ToolbarContent {
                 onDone()
             } label: {
                 Image(systemName: "keyboard.chevron.compact.down")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.scaled(size: 16, weight: .semibold))
             }
             .accessibilityLabel(L.t(.done))
         }

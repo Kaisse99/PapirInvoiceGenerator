@@ -57,13 +57,13 @@ struct InvoiceRowItem: View {
             HStack(alignment: .center, spacing: 8) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text(formattedTotal)
-                        .font(.system(size: 30, weight: .bold, design: .monospaced))
+                        .font(.scaled(size: 30, weight: .bold, design: .monospaced))
                         .foregroundStyle(.primary)
                         .minimumScaleFactor(0.6)
                         .lineLimit(1)
 
                     Text(AppSettings.currencySymbol)
-                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                        .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
 
@@ -71,9 +71,9 @@ struct InvoiceRowItem: View {
 
                 HStack(spacing: 5) {
                     Image(systemName: "list.bullet.rectangle")
-                        .font(.system(size: 10))
+                        .font(.scaled(size: 10))
                     Text("\(invoice.allItems.count)")
-                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .font(.scaled(size: 12, weight: .semibold, design: .monospaced))
                 }
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 9)
@@ -84,13 +84,13 @@ struct InvoiceRowItem: View {
 
             HStack(spacing: 8) {
                 Text(receiverName)
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 14, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
 
                 if invoice.pdfFileName == nil {
                     Text(L.t(.noPDF).uppercased())
-                        .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                        .font(.scaled(size: 9, weight: .heavy, design: .monospaced))
                         .tracking(1)
                         .foregroundStyle(Color.orange)
                         .padding(.horizontal, 6)
@@ -101,7 +101,7 @@ struct InvoiceRowItem: View {
                 Spacer(minLength: 6)
 
                 Text(Self.dateFormatter.string(from: invoice.date))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
         }
@@ -131,7 +131,7 @@ struct InvoiceRowItem: View {
             .fill(invoice.status.plateTint)
             .overlay(alignment: .bottomLeading) {
                 Text(invoice.status.label.uppercased())
-                    .font(.system(size: 10, weight: .heavy, design: .monospaced))
+                    .font(.scaled(size: 10, weight: .heavy, design: .monospaced))
                     .tracking(1.5)
                     .foregroundStyle(invoice.status.plateText)
                     .padding(.leading, 18)

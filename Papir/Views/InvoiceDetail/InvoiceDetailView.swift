@@ -304,11 +304,11 @@ struct InvoiceDetailView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("#\(index)")
-                    .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                    .font(.scaled(size: 18, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
 
                 Text(item.name)
-                    .font(.system(size: 18, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 18, weight: .medium, design: .monospaced))
                     .foregroundStyle(.primary)
 
                 Spacer()
@@ -386,11 +386,11 @@ struct InvoiceDetailView: View {
             
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(formatted(invoice.totalInvoicePrice))
-                    .font(.system(size: 42, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 42, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                 
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 24, weight: .semibold, design: .monospaced))
+                    .font(.scaled(size: 24, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
         }

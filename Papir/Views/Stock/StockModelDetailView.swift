@@ -136,7 +136,7 @@ struct StockModelDetailView: View {
                 .foregroundStyle(.secondary)
 
             Text("\(model.totalPacks)")
-                .font(.system(size: 64, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 64, weight: .bold, design: .monospaced))
                 .foregroundStyle(model.totalState.tint)
                 .contentTransition(.numericText())
                 .animation(AppAnimation.quick, value: model.totalPacks)
@@ -167,22 +167,22 @@ struct StockModelDetailView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 5) {
                     if model.hasPrice {
                         Text(PriceText.display(model.pricePerPiece))
-                            .font(.system(size: 30, weight: .bold, design: .monospaced))
+                            .font(.scaled(size: 30, weight: .bold, design: .monospaced))
                             .foregroundStyle(.primary)
                             .contentTransition(.numericText())
                             .animation(AppAnimation.quick, value: model.pricePerPiece)
 
                         Text(AppSettings.currencySymbol)
-                            .font(.system(size: 16, weight: .medium, design: .monospaced))
+                            .font(.scaled(size: 16, weight: .medium, design: .monospaced))
                             .foregroundStyle(.secondary)
                     } else {
                         Text(L.t(.noPriceYet))
-                            .font(.system(size: 17, weight: .medium, design: .monospaced))
+                            .font(.scaled(size: 17, weight: .medium, design: .monospaced))
                             .foregroundStyle(.secondary.opacity(0.8))
                     }
 
                     Image(systemName: "pencil")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.scaled(size: 12, weight: .semibold))
                         .foregroundStyle(.secondary.opacity(0.7))
                         .padding(.leading, 2)
                 }
@@ -205,7 +205,7 @@ struct StockModelDetailView: View {
 
             if lines.isEmpty {
                 Text(L.t(.noColorsYet))
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 14, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary.opacity(0.7))
             } else {
                 FlowLayout(spacing: 7) {
@@ -221,11 +221,11 @@ struct StockModelDetailView: View {
     private func overviewChip(_ line: StockLine) -> some View {
         HStack(spacing: 6) {
             Text(line.color)
-                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 14, weight: .medium, design: .monospaced))
                 .foregroundStyle(line.state == .stocked ? .primary : line.state.tint)
 
             Text("\(line.packs)")
-                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 14, weight: .bold, design: .monospaced))
                 .foregroundStyle(line.state.tint)
         }
         .padding(.horizontal, 11)
@@ -239,14 +239,14 @@ struct StockModelDetailView: View {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(line.color)
-                        .font(.system(size: 27, weight: .bold, design: .rounded))
+                        .font(.scaled(size: 27, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
 
                     if line.state.isFlagged {
                         Text(line.state.label.uppercased())
-                            .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                            .font(.scaled(size: 9, weight: .heavy, design: .monospaced))
                             .tracking(1.2)
                             .foregroundStyle(line.state.tint)
                             .padding(.horizontal, 7)
@@ -259,13 +259,13 @@ struct StockModelDetailView: View {
 
                 VStack(alignment: .trailing, spacing: -2) {
                     Text("\(line.packs)")
-                        .font(.system(size: 40, weight: .bold, design: .monospaced))
+                        .font(.scaled(size: 40, weight: .bold, design: .monospaced))
                         .foregroundStyle(line.state.tint)
                         .contentTransition(.numericText())
                         .animation(AppAnimation.quick, value: line.packs)
 
                     Text(L.t(line.packs == 1 ? .pack : .packsLower))
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -309,9 +309,9 @@ struct StockModelDetailView: View {
         } label: {
             HStack(spacing: 7) {
                 Image(systemName: "shippingbox.and.arrow.backward")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.scaled(size: 13, weight: .medium))
                 Text(L.t(.takeOut))
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 14, weight: .bold, design: .monospaced))
             }
             .frame(maxWidth: .infinity, minHeight: 46)
             .foregroundStyle(Color(.systemBackground))
@@ -327,9 +327,9 @@ struct StockModelDetailView: View {
         } label: {
             HStack(spacing: 7) {
                 Image(systemName: "arrow.counterclockwise")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.scaled(size: 12, weight: .medium))
                 Text(L.t(.recount))
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 13, weight: .medium, design: .monospaced))
             }
             .frame(maxWidth: .infinity, minHeight: 46)
             .foregroundStyle(.secondary)
@@ -360,7 +360,7 @@ struct StockModelDetailView: View {
     private var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "tray")
-                .font(.system(size: 44))
+                .font(.scaled(size: 44))
                 .foregroundStyle(.secondary.opacity(0.5))
 
             Text(L.t(.nothingCounted))

@@ -151,7 +151,7 @@ struct AddressBookView: View {
                 .foregroundStyle(.secondary)
 
             TextField(L.t(.searchContacts), text: $viewModel.searchText)
-                .font(.system(size: 15, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                 .autocorrectionDisabled()
 
             if !viewModel.searchText.isEmpty {
@@ -179,7 +179,7 @@ struct AddressBookView: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "person.crop.circle")
-                .font(.system(size: 60))
+                .font(.scaled(size: 60))
                 .foregroundStyle(.secondary.opacity(0.5))
 
             Text(L.t(.noContacts))
@@ -214,7 +214,7 @@ struct AddressBookView: View {
     private var noResultsState: some View {
         VStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 44))
+                .font(.scaled(size: 44))
                 .foregroundStyle(.secondary.opacity(0.5))
 
             Text(L.t(.noMatches))

@@ -127,11 +127,11 @@ struct StatisticsView: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "calendar")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.scaled(size: 13, weight: .medium))
                 Text(viewModel.period.title)
-                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                    .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.scaled(size: 11, weight: .semibold))
             }
             .foregroundStyle(Color.primary)
             .padding(.horizontal, 16)
@@ -166,14 +166,14 @@ struct StatisticsView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(PriceText.display(viewModel.revenue(shipped)))
-                    .font(.system(size: 52, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 52, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                     .minimumScaleFactor(0.4)
                     .lineLimit(1)
                     .contentTransition(.numericText())
 
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 20, weight: .semibold, design: .monospaced))
+                    .font(.scaled(size: 20, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
 
@@ -191,12 +191,12 @@ struct StatisticsView: View {
     private func footnote(_ value: String, _ label: String) -> some View {
         VStack(spacing: 1) {
             Text(value)
-                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 15, weight: .bold, design: .monospaced))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
             Text(label.uppercased())
-                .font(.system(size: 8, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 8, weight: .bold, design: .monospaced))
                 .tracking(1)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -216,7 +216,7 @@ struct StatisticsView: View {
 
                 if hasSales && bucketCount > 0 {
                     Text("≈\(compactMoney(viewModel.revenue(shipped) / Double(bucketCount))) \(L.t(viewModel.period.bucketsByMonth ? .perMonthLower : .perDayLower))")
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -225,7 +225,7 @@ struct StatisticsView: View {
                 chart(points)
             } else {
                 Text(L.t(.noSalesInPeriod))
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 14, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary.opacity(0.7))
                     .frame(maxWidth: .infinity, minHeight: 140)
             }
@@ -302,7 +302,7 @@ struct StatisticsView: View {
                 AxisValueLabel {
                     if let amount = value.as(Double.self) {
                         Text(compactMoney(amount))
-                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -311,7 +311,7 @@ struct StatisticsView: View {
         .chartXAxis {
             AxisMarks(values: xAxisValues(points)) { _ in
                 AxisValueLabel(format: xAxisFormat(points))
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
         }
@@ -327,15 +327,15 @@ struct StatisticsView: View {
         VStack(spacing: 2) {
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(PriceText.display(point.amount))
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 14, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
 
             Text(chipDate(point.date))
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 11)
@@ -418,7 +418,7 @@ struct StatisticsView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(stat.name)
-                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                        .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
@@ -428,19 +428,19 @@ struct StatisticsView: View {
                     if byPacks {
                         HStack(alignment: .firstTextBaseline, spacing: 3) {
                             Text("\(stat.packs)")
-                                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                                .font(.scaled(size: 15, weight: .bold, design: .monospaced))
                                 .foregroundStyle(.primary)
                             Text(L.t(.packsLower))
-                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                                 .foregroundStyle(.secondary)
                         }
                     } else {
                         HStack(alignment: .firstTextBaseline, spacing: 3) {
                             Text(PriceText.display(stat.money))
-                                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                                .font(.scaled(size: 15, weight: .bold, design: .monospaced))
                                 .foregroundStyle(.primary)
                             Text(AppSettings.currencySymbol)
-                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -451,7 +451,7 @@ struct StatisticsView: View {
                         ? "\(PriceText.display(stat.money)) \(AppSettings.currencySymbol)"
                         : "\(stat.packs) \(L.t(.packsLower))"
                 )
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(.secondary)
 
                 if !stat.colors.isEmpty {
@@ -474,7 +474,7 @@ struct StatisticsView: View {
 
     private func chip(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .font(.scaled(size: 11, weight: .medium, design: .monospaced))
             .foregroundStyle(.primary.opacity(0.85))
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
@@ -510,16 +510,16 @@ struct StatisticsView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(buyer.name)
-                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                    .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
                 HStack(spacing: 4) {
                     Image(systemName: "doc.text")
-                        .font(.system(size: 9))
+                        .font(.scaled(size: 9))
                     Text("\(buyer.invoices)" + (buyer.detail.map { " · \($0)" } ?? ""))
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                         .lineLimit(1)
                 }
                 .foregroundStyle(.secondary)
@@ -529,12 +529,12 @@ struct StatisticsView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(PriceText.display(buyer.money))
-                    .font(.system(size: 15, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 15, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
         }
@@ -548,19 +548,19 @@ struct StatisticsView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text(PriceText.display(shelf.value))
-                    .font(.system(size: 30, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 30, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
 
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 15, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
 
             if shelf.unpriced > 0 {
                 Text("\(shelf.unpriced) \(L.t(.modelsWithoutPrice))")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color.orange)
             }
         }
@@ -572,7 +572,7 @@ struct StatisticsView: View {
 
     private func rankBadge(_ rank: Int) -> some View {
         Text("\(rank)")
-            .font(.system(size: 11, weight: .bold, design: .monospaced))
+            .font(.scaled(size: 11, weight: .bold, design: .monospaced))
             .foregroundStyle(.secondary)
             .frame(width: 20, height: 20)
             .background(Circle().fill(Color.primary.opacity(0.06)))
@@ -590,7 +590,7 @@ struct StatisticsView: View {
 
     private var emptyLine: some View {
         Text(L.t(.nothingHereYet))
-            .font(.system(size: 14, weight: .medium, design: .monospaced))
+            .font(.scaled(size: 14, weight: .medium, design: .monospaced))
             .foregroundStyle(.secondary.opacity(0.7))
             .frame(maxWidth: .infinity, alignment: .leading)
     }

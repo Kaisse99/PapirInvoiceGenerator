@@ -15,6 +15,11 @@
 //  shadow applied to a composed view is cast by everything drawn inside it, so
 //  hanging it on the card gave every field box and every notched label its own
 //  little halo, which read as grubby rather than as raised.
+//  Font.scaled is how every fixed-size font in the app honours the system
+//  text size: the point size the design was tuned at, run through
+//  UIFontMetrics so a user who set larger text actually gets it. The
+//  semantic styles scale on their own; this exists for the sizes chosen by
+//  eye, and at the default setting it returns them untouched.
 //  readableWidth is what keeps the app from turning into a wall on an iPad:
 //  every screen is a single column of cards written for a phone, so past a
 //  point the column stops growing and centres instead of stretching a row of
@@ -71,7 +76,7 @@ extension View {
     }
 
     func toolbarIcon() -> some View {
-        font(.system(size: 16, weight: .medium))
+        font(.scaled(size: 16, weight: .medium))
     }
 
     func raisedShadow() -> some View {
@@ -92,6 +97,12 @@ extension View {
                 to: nil, from: nil, for: nil
             )
         }
+    }
+}
+
+extension Font {
+    static func scaled(size: CGFloat, weight: Font.Weight = .regular, design: Font.Design = .default) -> Font {
+        .system(size: UIFontMetrics(forTextStyle: .body).scaledValue(for: size), weight: weight, design: design)
     }
 }
 

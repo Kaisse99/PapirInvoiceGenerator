@@ -105,7 +105,7 @@ struct ShipmentSheet: View {
                         dismiss()
                     } label: {
                         Text(L.t(.cancel))
-                            .font(.system(size: 17, weight: .medium, design: .rounded))
+                            .font(.scaled(size: 17, weight: .medium, design: .rounded))
                             .foregroundStyle(Color.primary)
                     }
                 }
@@ -122,16 +122,16 @@ struct ShipmentSheet: View {
     private var header: some View {
         VStack(spacing: 4) {
             Text(L.t(.packsLeavingStock).uppercased())
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .font(.scaled(size: 12, weight: .bold, design: .rounded))
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
 
             Text("\(totalPacks)")
-                .font(.system(size: 56, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 56, weight: .bold, design: .monospaced))
                 .foregroundStyle(.primary)
 
             Text(L.t(.shipmentHint))
-                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .font(.scaled(size: 13, weight: .regular, design: .rounded))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 36)
@@ -143,13 +143,13 @@ struct ShipmentSheet: View {
         VStack(spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(code)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.scaled(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
 
                 Spacer(minLength: 8)
 
                 Text("\(entries.reduce(0) { $0 + $1.packs }) \(L.t(.packsLower))")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .font(.scaled(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 16)
@@ -185,12 +185,12 @@ struct ShipmentSheet: View {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(draft.color)
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .font(.scaled(size: 16, weight: .semibold, design: .rounded))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
 
                     Text("\(L.t(.inStock)): \(onHand)")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.scaled(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(short > 0 ? Color.orange : .secondary)
                 }
 
@@ -198,11 +198,11 @@ struct ShipmentSheet: View {
 
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("−\(draft.packs)")
-                        .font(.system(size: 20, weight: .bold, design: .monospaced))
+                        .font(.scaled(size: 20, weight: .bold, design: .monospaced))
                         .foregroundStyle(short > 0 ? Color.orange : .primary)
 
                     Text(L.t(draft.packs == 1 ? .pack : .packsLower))
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(.scaled(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -210,11 +210,11 @@ struct ShipmentSheet: View {
             if short > 0 {
                 HStack(alignment: .top, spacing: 7) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 11))
+                        .font(.scaled(size: 11))
                         .foregroundStyle(Color.orange)
 
                     Text("+\(short) \(L.t(.moreThanOnHand))")
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
+                        .font(.scaled(size: 12, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.orange)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -231,7 +231,7 @@ struct ShipmentSheet: View {
     private var skippedSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(L.t(.notDeducted).uppercased())
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .font(.scaled(size: 12, weight: .bold, design: .rounded))
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
                 .padding(.leading, 8)
@@ -240,17 +240,17 @@ struct ShipmentSheet: View {
                 ForEach(skipped) { draft in
                     HStack(spacing: 12) {
                         Image(systemName: "minus.circle")
-                            .font(.system(size: 14))
+                            .font(.scaled(size: 14))
                             .foregroundStyle(.secondary)
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(draft.modelCode ?? draft.itemName)
-                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .font(.scaled(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
 
                             Text(draft.isMatched ? L.t(.noColorOnRow) : L.t(.notInStockHint))
-                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .font(.scaled(size: 12, weight: .regular, design: .rounded))
                                 .foregroundStyle(.secondary)
                         }
 
@@ -273,7 +273,7 @@ struct ShipmentSheet: View {
             confirm()
         } label: {
             Text(L.t(.confirmShipment))
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .font(.scaled(size: 17, weight: .semibold, design: .rounded))
                 .frame(maxWidth: .infinity, minHeight: 52)
                 .foregroundStyle(Color(.systemBackground))
                 .background(

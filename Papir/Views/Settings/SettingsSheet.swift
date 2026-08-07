@@ -88,7 +88,7 @@ struct SettingsSheet: View {
                         dismiss()
                     } label: {
                         Text(L.t(.done, language))
-                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            .font(.scaled(size: 17, weight: .semibold, design: .rounded))
                             .foregroundStyle(Color.primary)
                     }
                 }
@@ -156,7 +156,7 @@ struct SettingsSheet: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 12) {
                     TextField(L.t(.defaultSenderPlaceholder, language), text: $defaultSender)
-                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .font(.scaled(size: 17, weight: .medium, design: .rounded))
                         .autocorrectionDisabled()
                         .limitInput($defaultSender, to: 40)
 
@@ -176,7 +176,7 @@ struct SettingsSheet: View {
                 .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
 
                 Text(L.t(.defaultSenderCaption, language))
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .font(.scaled(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 12)
             }
@@ -198,7 +198,7 @@ struct SettingsSheet: View {
                 )
 
                 Text(L.t(.zeroLeavesEmpty, language))
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .font(.scaled(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 12)
@@ -216,13 +216,13 @@ struct SettingsSheet: View {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.scaled(size: 15, weight: .semibold))
                         VStack(alignment: .leading, spacing: 2) {
                             Text(L.t(.exportEverything, language))
-                                .font(.system(size: 17, weight: .medium, design: .rounded))
+                                .font(.scaled(size: 17, weight: .medium, design: .rounded))
                                 .foregroundStyle(.primary)
                             Text(L.t(.exportCaption, language))
-                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .font(.scaled(size: 12, weight: .regular, design: .rounded))
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -268,12 +268,12 @@ struct SettingsSheet: View {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "trash")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.scaled(size: 15, weight: .semibold))
                         VStack(alignment: .leading, spacing: 2) {
                             Text(L.t(.clearHistory, language))
-                                .font(.system(size: 17, weight: .medium, design: .rounded))
+                                .font(.scaled(size: 17, weight: .medium, design: .rounded))
                             Text(L.t(.clearHistoryCaption, language))
-                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .font(.scaled(size: 12, weight: .regular, design: .rounded))
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -319,10 +319,10 @@ struct SettingsSheet: View {
                 )) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(L.t(.iCloudSync, language))
-                            .font(.system(size: 17, weight: .medium, design: .rounded))
+                            .font(.scaled(size: 17, weight: .medium, design: .rounded))
                             .foregroundStyle(.primary)
                         Text(L.t(.iCloudSyncCaption, language))
-                            .font(.system(size: 12, weight: .regular, design: .rounded))
+                            .font(.scaled(size: 12, weight: .regular, design: .rounded))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -343,7 +343,7 @@ struct SettingsSheet: View {
 
     private func noticeLine(_ text: String, tint: Color) -> some View {
         Text(text)
-            .font(.system(size: 12, weight: .medium, design: .rounded))
+            .font(.scaled(size: 12, weight: .medium, design: .rounded))
             .foregroundStyle(tint)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
@@ -364,7 +364,7 @@ struct SettingsSheet: View {
     private func section<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title.uppercased())
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .font(.scaled(size: 12, weight: .bold, design: .rounded))
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
                 .padding(.leading, 8)
@@ -378,17 +378,17 @@ struct SettingsSheet: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Text(leading)
-                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .font(.scaled(size: 20, weight: .semibold, design: .rounded))
                     .frame(width: 34, alignment: .leading)
 
                 Text(title)
-                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .font(.scaled(size: 17, weight: .medium, design: .rounded))
                     .foregroundStyle(.primary)
 
                 Spacer()
 
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 20))
+                    .font(.scaled(size: 20))
                     .foregroundStyle(isSelected ? Color.primary : Color.secondary.opacity(0.35))
             }
             .padding(.horizontal, 18)
@@ -406,17 +406,17 @@ struct SettingsSheet: View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
-                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .font(.scaled(size: 17, weight: .medium, design: .rounded))
                     .foregroundStyle(.primary)
                 Text(caption)
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .font(.scaled(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
             Text("\(value.wrappedValue)")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(.scaled(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(.primary)
                 .frame(minWidth: 34, alignment: .trailing)
                 .contentTransition(.numericText())

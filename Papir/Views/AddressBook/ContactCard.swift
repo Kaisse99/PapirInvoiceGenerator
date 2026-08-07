@@ -18,7 +18,7 @@ struct ContactCard: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(contact.displayName)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.scaled(size: 22, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -28,9 +28,9 @@ struct ContactCard: View {
                 if contact.invoiceCount > 0 {
                     HStack(spacing: 4) {
                         Image(systemName: "doc.text")
-                            .font(.system(size: 11))
+                            .font(.scaled(size: 11))
                         Text("\(contact.invoiceCount)")
-                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .font(.scaled(size: 13, weight: .bold, design: .monospaced))
                     }
                     .foregroundStyle(.secondary)
                 }
@@ -40,7 +40,7 @@ struct ContactCard: View {
 
             if !contact.phone.isEmpty {
                 Text(contact.phone)
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 14, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 18)
                     .padding(.top, 3)
@@ -81,11 +81,11 @@ struct ContactCard: View {
     private func chip(_ text: String, icon: String) -> some View {
         HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 10))
+                .font(.scaled(size: 10))
                 .foregroundStyle(.secondary)
 
             Text(text)
-                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
         }

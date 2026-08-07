@@ -175,12 +175,12 @@ struct MovementLogView: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.scaled(size: 11, weight: .semibold))
                 Text(title)
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                     .lineLimit(1)
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.scaled(size: 9, weight: .bold))
             }
             .foregroundStyle(Color.primary)
             .padding(.horizontal, 12)
@@ -205,7 +205,7 @@ struct MovementLogView: View {
                 .frame(height: 1)
 
             Text(Self.dayFormatter(AppSettings.language).string(from: date))
-                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 10, weight: .bold, design: .monospaced))
                 .tracking(1)
                 .foregroundStyle(.secondary)
                 .fixedSize()
@@ -222,29 +222,29 @@ struct MovementLogView: View {
     private func entryRow(_ movement: StockMovement) -> some View {
         HStack(spacing: 12) {
             Image(systemName: movement.kind.icon)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.scaled(size: 14, weight: .semibold))
                 .foregroundStyle(movement.kind.tint)
                 .frame(width: 22)
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(movement.modelCode)
-                        .font(.system(size: 15, weight: .bold, design: .monospaced))
+                        .font(.scaled(size: 15, weight: .bold, design: .monospaced))
                         .foregroundStyle(.primary)
 
                     Text(movement.color)
-                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 14, weight: .medium, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
 
                 HStack(spacing: 5) {
                     Text(movement.kind.label)
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                         .foregroundStyle(.secondary)
 
                     if let context = movement.context {
                         Text("· \(context)")
-                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                            .font(.scaled(size: 11, weight: .medium, design: .monospaced))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
@@ -254,7 +254,7 @@ struct MovementLogView: View {
             Spacer(minLength: 8)
 
             Text(movement.packs > 0 ? "+\(movement.packs)" : "\(movement.packs)")
-                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 18, weight: .bold, design: .monospaced))
                 .foregroundStyle(movement.packs >= 0 ? Color.primary : Color.orange)
         }
         .padding(.horizontal, 24)
@@ -264,7 +264,7 @@ struct MovementLogView: View {
     private var emptyState: some View {
         VStack(spacing: 14) {
             Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 48))
+                .font(.scaled(size: 48))
                 .foregroundStyle(.secondary.opacity(0.5))
 
             Text(L.t(allMovements.isEmpty ? .noMovements : .noMatches))

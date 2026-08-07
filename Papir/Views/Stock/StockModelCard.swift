@@ -21,19 +21,19 @@ struct StockModelCard: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(model.code)
-                    .font(.system(size: 27, weight: .bold, design: .rounded))
+                    .font(.scaled(size: 27, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
 
                 Spacer(minLength: 8)
 
                 Text("\(model.totalPacks)")
-                    .font(.system(size: 27, weight: .bold, design: .monospaced))
+                    .font(.scaled(size: 27, weight: .bold, design: .monospaced))
                     .foregroundStyle(model.totalState.tint)
                     .contentTransition(.numericText())
                     .animation(AppAnimation.quick, value: model.totalPacks)
 
                 Text(L.t(.packsLower))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 18)
@@ -47,7 +47,7 @@ struct StockModelCard: View {
             Group {
                 if model.allLines.isEmpty {
                     Text(L.t(.noColorsYet))
-                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                         .foregroundStyle(.secondary.opacity(0.7))
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
@@ -76,11 +76,11 @@ struct StockModelCard: View {
     private func colorChip(_ line: StockLine) -> some View {
         HStack(spacing: 6) {
             Text(line.color)
-                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                 .foregroundStyle(line.state == .stocked ? .primary : line.state.tint)
 
             Text("\(line.packs)")
-                .font(.system(size: 13, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 13, weight: .bold, design: .monospaced))
                 .foregroundStyle(line.state.tint)
         }
         .padding(.horizontal, 10)

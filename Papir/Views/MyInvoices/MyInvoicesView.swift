@@ -215,7 +215,7 @@ struct MyInvoicesView: View {
                     .foregroundStyle(.secondary)
                 
                 TextField(L.t(.searchInvoices), text: $viewModel.searchText)
-                    .font(.system(size: 15, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                 
                 if !viewModel.searchText.isEmpty {
                     Button {
@@ -281,7 +281,7 @@ struct MyInvoicesView: View {
             HStack(spacing: 12) {
                 if viewModel.isEditing {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 22))
+                        .font(.scaled(size: 22))
                         .foregroundStyle(isSelected ? Color.blue : Color.secondary.opacity(0.4))
                         .contentTransition(.symbolEffect(.replace))
                         .padding(.bottom, 24)
@@ -379,7 +379,7 @@ struct MyInvoicesView: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "doc.text")
-                .font(.system(size: 60))
+                .font(.scaled(size: 60))
                 .foregroundStyle(.secondary.opacity(0.5))
             
             Text(L.t(.noInvoices))
@@ -400,7 +400,7 @@ struct MyInvoicesView: View {
     private var noResultsState: some View {
         VStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 44))
+                .font(.scaled(size: 44))
                 .foregroundStyle(.secondary.opacity(0.5))
             
             Text(L.t(.noMatches))

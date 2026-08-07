@@ -23,21 +23,21 @@ struct StoreFailureView: View {
             Spacer()
 
             Image(systemName: "externaldrive.badge.exclamationmark")
-                .font(.system(size: 52))
+                .font(.scaled(size: 52))
                 .foregroundStyle(.secondary)
 
             Text(L.t(.storeFailedTitle))
-                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 20, weight: .bold, design: .monospaced))
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)
 
             Text(L.t(.storeFailedHint))
-                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 13, weight: .medium, design: .monospaced))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
             Text(message)
-                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                .font(.scaled(size: 11, weight: .regular, design: .monospaced))
                 .foregroundStyle(.secondary.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 8)

@@ -170,7 +170,7 @@ struct StockView: View {
                 .foregroundStyle(.secondary)
 
             TextField(L.t(.searchStock), text: $viewModel.searchText)
-                .font(.system(size: 15, weight: .medium, design: .monospaced))
+                .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
 
@@ -211,7 +211,7 @@ struct StockView: View {
             .padding(.top, 24)
 
             TextField(L.t(.modelCode), text: $viewModel.newModelCode)
-                .font(.system(size: 28, weight: .bold, design: .monospaced))
+                .font(.scaled(size: 28, weight: .bold, design: .monospaced))
                 .multilineTextAlignment(.center)
                 .autocorrectionDisabled()
                 .limitInput($viewModel.newModelCode, to: 30)
@@ -229,13 +229,13 @@ struct StockView: View {
 
             HStack(spacing: 10) {
                 TextField(L.t(.pricePerPiece), text: $viewModel.newModelPrice)
-                    .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                    .font(.scaled(size: 17, weight: .semibold, design: .monospaced))
                     .keyboardType(.decimalPad)
                     .decimalOnly($viewModel.newModelPrice)
                     .limitInput($viewModel.newModelPrice, to: 7)
 
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 15, weight: .medium, design: .monospaced))
+                    .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 16)
@@ -276,7 +276,7 @@ struct StockView: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "shippingbox")
-                .font(.system(size: 60))
+                .font(.scaled(size: 60))
                 .foregroundStyle(.secondary.opacity(0.5))
 
             Text(L.t(.noModels))
@@ -297,7 +297,7 @@ struct StockView: View {
     private var noResultsState: some View {
         VStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 44))
+                .font(.scaled(size: 44))
                 .foregroundStyle(.secondary.opacity(0.5))
 
             Text(L.t(.noMatches))
