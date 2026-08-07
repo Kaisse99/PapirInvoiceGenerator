@@ -224,6 +224,12 @@ enum LKey: String, CaseIterable {
     case notInStockYet = "This code is not in stock yet."
     case lowStock = "Low"
     case dataCaps = "DATA"
+    case backup = "Back up"
+    case backupCaption = "One file with everything, for a safe place"
+    case restore = "Restore from backup"
+    case restoreCaption = "Replaces everything on this phone with the file's contents"
+    case restoreConfirmTitle = "Replace everything on this phone?"
+    case restored = "Restored"
     case exportEverything = "Export everything"
     case exportCaption = "One Excel workbook: invoices, stock, contacts, history"
     case iCloudSync = "iCloud"
@@ -312,6 +318,12 @@ enum L {
         .notInStockYet: "Цього коду ще немає на складі.",
         .lowStock: "Мало",
         .dataCaps: "ДАНІ", .exportEverything: "Експортувати все",
+        .backup: "Резервна копія",
+        .backupCaption: "Один файл з усім, для надійного місця",
+        .restore: "Відновити з копії",
+        .restoreCaption: "Замінює все на цьому телефоні вмістом файлу",
+        .restoreConfirmTitle: "Замінити все на цьому телефоні?",
+        .restored: "Відновлено",
         .exportCaption: "Одна книга Excel: накладні, склад, контакти, історія",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладні та склад на всіх пристроях",
         .allModels: "Усі моделі", .lockedWhileShipped: "Поверніть у чернетку, щоб змінити", .allDays: "Усі дні",
@@ -434,6 +446,12 @@ enum L {
         .notInStockYet: "Этого кода ещё нет на складе.",
         .lowStock: "Мало",
         .dataCaps: "ДАННЫЕ", .exportEverything: "Экспортировать всё",
+        .backup: "Резервная копия",
+        .backupCaption: "Один файл со всем, для надёжного места",
+        .restore: "Восстановить из копии",
+        .restoreCaption: "Заменяет всё на этом телефоне содержимым файла",
+        .restoreConfirmTitle: "Заменить всё на этом телефоне?",
+        .restored: "Восстановлено",
         .exportCaption: "Одна книга Excel: накладные, склад, контакты, история",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладные и склад на всех устройствах",
         .allModels: "Все модели", .lockedWhileShipped: "Верните в черновик, чтобы изменить", .allDays: "Все дни",
@@ -556,6 +574,12 @@ enum L {
         .notInStockYet: "Tego kodu nie ma jeszcze w magazynie.",
         .lowStock: "Mało", .lowStockThreshold: "Niski stan",
         .dataCaps: "DANE", .exportEverything: "Eksportuj wszystko",
+        .backup: "Kopia zapasowa",
+        .backupCaption: "Jeden plik ze wszystkim, do bezpiecznego miejsca",
+        .restore: "Przywróć z kopii",
+        .restoreCaption: "Zastępuje wszystko na tym telefonie zawartością pliku",
+        .restoreConfirmTitle: "Zastąpić wszystko na tym telefonie?",
+        .restored: "Przywrócono",
         .exportCaption: "Jeden skoroszyt Excel: faktury, magazyn, kontakty, historia",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Faktury i magazyn na wszystkich urządzeniach",
         .allModels: "Wszystkie modele", .lockedWhileShipped: "Wróć do szkicu, aby edytować", .allDays: "Wszystkie dni",

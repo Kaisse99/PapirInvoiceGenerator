@@ -15,6 +15,7 @@
 import SwiftUI
 import os
 import SwiftData
+import UniformTypeIdentifiers
 
 struct SettingsSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -46,6 +47,9 @@ struct SettingsSheet: View {
     @State private var clearHistoryError: String? = nil
     @State private var exportURLs: [URL] = []
     @State private var exportError: String? = nil
+    @State private var showRestoreImporter = false
+    @State private var pendingRestore: Data? = nil
+    @State private var restoreResult: String? = nil
 
     @Query private var allInvoices: [Invoice]
     @Query private var allStock: [StockModel]
@@ -109,6 +113,39 @@ struct SettingsSheet: View {
                 )
             ) {
                 ShareSheet(items: exportURLs)
+            }
+            .fileImporter(
+                isPresented: $showRestoreImporter,
+                allowedContentTypes: [.json]
+            ) { result in
+                receiveRestoreFile(result)
+            }
+            .alert(
+                L.t(.restoreConfirmTitle, language),
+                isPresented: Binding(
+                    get: { pendingRestore != nil },
+                    set: { if !$0 { pendingRestore = nil } }
+                )
+            ) {
+                Button(L.t(.restore, language), role: .destructive) {
+                    if let pendingRestore {
+                        performRestore(pendingRestore)
+                    }
+                }
+                Button(L.t(.cancel, language), role: .cancel) { pendingRestore = nil }
+            } message: {
+                Text(L.t(.cannotBeUndone, language))
+            }
+            .alert(
+                L.t(.restored, language),
+                isPresented: Binding(
+                    get: { restoreResult != nil },
+                    set: { if !$0 { restoreResult = nil } }
+                )
+            ) {
+                Button(L.t(.ok, language), role: .cancel) { restoreResult = nil }
+            } message: {
+                Text(restoreResult ?? "")
             }
         }
     }
@@ -234,11 +271,102 @@ struct SettingsSheet: View {
                 }
                 .buttonStyle(.plain)
 
+                dataRow(
+                    icon: "arrow.down.document",
+                    title: L.t(.backup, language),
+                    caption: L.t(.backupCaption, language),
+                    tint: .primary
+                ) {
+                    Haptics.medium()
+                    backupEverything()
+                }
+
+                dataRow(
+                    icon: "arrow.counterclockwise",
+                    title: L.t(.restore, language),
+                    caption: L.t(.restoreCaption, language),
+                    tint: .red
+                ) {
+                    Haptics.warning()
+                    showRestoreImporter = true
+                }
+
                 if let exportError {
                     noticeLine(exportError, tint: .red)
                 }
             }
         }
+    }
+
+    private func dataRow(
+        icon: String,
+        title: String,
+        caption: String,
+        tint: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.scaled(size: 15, weight: .semibold))
+                    .foregroundStyle(tint)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.scaled(size: 17, weight: .medium, design: .rounded))
+                        .foregroundStyle(tint)
+                    Text(caption)
+                        .font(.scaled(size: 12, weight: .regular, design: .rounded))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 18)
+            .frame(minHeight: 72)
+            .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func backupEverything() {
+        do {
+            exportURLs = [try Backup.write(context: modelContext)]
+            exportError = nil
+            Haptics.success()
+        } catch {
+            Haptics.error()
+            AppLog.export.error("Backup failed: \(error.localizedDescription, privacy: .public)")
+            exportError = "\(L.t(.couldNotSave, language)): \(error.localizedDescription)"
+        }
+    }
+
+    private func receiveRestoreFile(_ result: Result<URL, Error>) {
+        do {
+            let url = try result.get()
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer {
+                if scoped { url.stopAccessingSecurityScopedResource() }
+            }
+            pendingRestore = try Data(contentsOf: url)
+            exportError = nil
+        } catch {
+            Haptics.error()
+            AppLog.export.error("Restore file read failed: \(error.localizedDescription, privacy: .public)")
+            exportError = "\(L.t(.couldNotSave, language)): \(error.localizedDescription)"
+        }
+    }
+
+    private func performRestore(_ data: Data) {
+        do {
+            let counts = try Backup.restore(data, context: modelContext)
+            restoreResult = "\(L.t(.invoices, language)): \(counts.invoices) · \(L.t(.stockTitle, language)): \(counts.models) · \(L.t(.addressBook, language)): \(counts.contacts)"
+            Haptics.success()
+        } catch {
+            Haptics.error()
+            AppLog.export.error("Restore failed: \(error.localizedDescription, privacy: .public)")
+            exportError = "\(L.t(.couldNotSave, language)): \(error.localizedDescription)"
+        }
+        pendingRestore = nil
     }
 
     private func exportEverything() {
