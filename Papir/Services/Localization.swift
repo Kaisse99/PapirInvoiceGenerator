@@ -66,14 +66,17 @@ enum LKey: String {
     case stock = "stock"
     case statistics = "statistics"
     case statisticsTitle = "Statistics"
-    case thisMonth = "This month"
-    case lastMonth = "Last month"
     case thisYear = "This year"
     case everything = "Everything"
     case earnedCaps = "EARNED"
     case averageInvoice = "average"
-    case topCustomersCaps = "WHO BUYS"
-    case topModelsCaps = "WHAT SELLS"
+    case salesOverTimeCaps = "SALES OVER TIME"
+    case mostProfitableCaps = "MOST PROFITABLE"
+    case mostSoldCaps = "MOST SOLD"
+    case topBuyersCaps = "TOP BUYERS"
+    case noSalesInPeriod = "No sales in this period"
+    case perDayLower = "a day"
+    case perMonthLower = "a month"
     case shelfWorthCaps = "THE SHELF IS WORTH"
     case modelsWithoutPrice = "models have no price yet"
     case nothingHereYet = "Nothing here yet"
@@ -292,10 +295,15 @@ enum L {
         .movementRecounted: "Перераховано", .assignedToColors: "по кольорах", .draftExplained: "Зі складу ще нічого не списано.", .shippedExplained: "Пачки вже списані зі складу.",
         .menu: "меню", .create: "створити", .stock: "склад",
         .statistics: "статистика",
-        .statisticsTitle: "Статистика", .thisMonth: "Цей місяць",
-        .lastMonth: "Минулий місяць", .thisYear: "Цей рік", .everything: "Увесь час",
+        .statisticsTitle: "Статистика",
+        .thisYear: "Цей рік", .everything: "Увесь час",
         .earnedCaps: "ЗАРОБЛЕНО", .averageInvoice: "середня",
-        .topCustomersCaps: "ХТО КУПУЄ", .topModelsCaps: "ЩО ПРОДАЄТЬСЯ",
+        .salesOverTimeCaps: "ДИНАМІКА ПРОДАЖІВ",
+        .mostProfitableCaps: "НАЙПРИБУТКОВІШІ",
+        .mostSoldCaps: "НАЙПРОДАВАНІШІ",
+        .topBuyersCaps: "ТОП ПОКУПЦІВ",
+        .noSalesInPeriod: "У цьому періоді продажів не було",
+        .perDayLower: "на день", .perMonthLower: "на місяць",
         .shelfWorthCaps: "СКЛАД КОШТУЄ", .modelsWithoutPrice: "моделей без ціни",
         .nothingHereYet: "Тут поки порожньо",
         .pricePerPiece: "Ціна за штуку", .setPrice: "Вказати ціну",
@@ -400,10 +408,15 @@ enum L {
         .movementRecounted: "Пересчитано", .assignedToColors: "по цветам", .draftExplained: "Со склада ещё ничего не списано.", .shippedExplained: "Пачки уже списаны со склада.",
         .menu: "меню", .create: "создать", .stock: "склад",
         .statistics: "статистика",
-        .statisticsTitle: "Статистика", .thisMonth: "Этот месяц",
-        .lastMonth: "Прошлый месяц", .thisYear: "Этот год", .everything: "Всё время",
+        .statisticsTitle: "Статистика",
+        .thisYear: "Этот год", .everything: "Всё время",
         .earnedCaps: "ЗАРАБОТАНО", .averageInvoice: "средняя",
-        .topCustomersCaps: "КТО ПОКУПАЕТ", .topModelsCaps: "ЧТО ПРОДАЁТСЯ",
+        .salesOverTimeCaps: "ДИНАМИКА ПРОДАЖ",
+        .mostProfitableCaps: "САМЫЕ ПРИБЫЛЬНЫЕ",
+        .mostSoldCaps: "САМЫЕ ПРОДАВАЕМЫЕ",
+        .topBuyersCaps: "ТОП ПОКУПАТЕЛЕЙ",
+        .noSalesInPeriod: "В этом периоде продаж не было",
+        .perDayLower: "в день", .perMonthLower: "в месяц",
         .shelfWorthCaps: "СКЛАД СТОИТ", .modelsWithoutPrice: "моделей без цены",
         .nothingHereYet: "Пока пусто",
         .pricePerPiece: "Цена за штуку", .setPrice: "Указать цену",
@@ -508,10 +521,15 @@ enum L {
         .movementRecounted: "Przeliczono", .assignedToColors: "przypisano", .draftExplained: "Nic jeszcze nie zeszło z magazynu dla tej faktury.", .shippedExplained: "Paczki z tej faktury zostały odjęte od stanu.",
         .menu: "menu", .create: "nowa", .stock: "magazyn",
         .statistics: "statystyka",
-        .statisticsTitle: "Statystyka", .thisMonth: "Ten miesiąc",
-        .lastMonth: "Poprzedni miesiąc", .thisYear: "Ten rok", .everything: "Cały czas",
+        .statisticsTitle: "Statystyka",
+        .thisYear: "Ten rok", .everything: "Cały czas",
         .earnedCaps: "ZAROBIONE", .averageInvoice: "średnia",
-        .topCustomersCaps: "KTO KUPUJE", .topModelsCaps: "CO SIĘ SPRZEDAJE",
+        .salesOverTimeCaps: "SPRZEDAŻ W CZASIE",
+        .mostProfitableCaps: "NAJBARDZIEJ DOCHODOWE",
+        .mostSoldCaps: "NAJCZĘŚCIEJ SPRZEDAWANE",
+        .topBuyersCaps: "NAJLEPSI KUPUJĄCY",
+        .noSalesInPeriod: "Brak sprzedaży w tym okresie",
+        .perDayLower: "dziennie", .perMonthLower: "miesięcznie",
         .shelfWorthCaps: "MAGAZYN WART", .modelsWithoutPrice: "modeli bez ceny",
         .nothingHereYet: "Na razie pusto",
         .pricePerPiece: "Cena za sztukę", .setPrice: "Ustal cenę",

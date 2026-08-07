@@ -1,31 +1,37 @@
 //
 //  StatisticsView.swift
-//  What the invoices add up to. Swipe right from home, the direction the home
-//  screen has been advertising since the arrows were named.
-//  The money leads in the same oversized monospaced treatment the stock total
-//  and the invoice total use, because it is the one number worth reading from
-//  across the room, with the shipped and draft split beneath it so a large
-//  figure cannot hide the fact that most of it has not left the shelf. Below
-//  that, who buys and what sells, five each, ranked by money rather than by
-//  count: a customer taking two expensive orders matters more than one taking
-//  six small ones. Last, what the shelf itself is worth, which is the only
-//  figure here that comes from stock rather than from invoices, and which says
-//  out loud how many models it had to leave out for want of a price.
-//  Every list says so plainly when it has nothing to show, since a business
-//  in its first week should see empty cards rather than an empty screen.
-//  Counts under a name are a glyph and a number rather than a number and a
-//  noun, because the noun would have to decline: one invoice, two invoices,
-//  five invoices are three different words in Ukrainian and Russian, and this
-//  app has no machinery for that.
+//  What the shipped invoices add up to. Swipe right from home, the direction
+//  the home screen has been advertising since the arrows were named.
+//  Only shipped money is shown anywhere on this screen: a draft is a promise,
+//  and a screen that added promises to takings taught the reader to distrust
+//  every number on it. The period is a real month picked from the months that
+//  hold invoices, or the year, or everything, so a question like what did
+//  March do has a one-tap answer.
+//  Under the money sits the same line chart the author's other app uses, on
+//  Swift Charts: an area wash under an ink-blue line, zero-filled buckets so
+//  empty days read as flat rather than skipped, and touch to inspect a single
+//  day or month with the value on a chip. Blue because shipped has been blue
+//  everywhere in the app since the invoice list, so the line reads as the
+//  same fact drawn over time.
+//  Then the breakdowns, each a ranked card of five: models by money, models by
+//  packs, and buyers, since the most profitable model, the most moved model
+//  and the best customer are three different questions with three different
+//  answers. Model rows carry their colour chips so what sells and in which
+//  colour is one glance, and buyers group by contact when the invoice was
+//  addressed to one, by typed name when not. The shelf card stays last: it is
+//  the one figure that comes from stock rather than from invoices.
 //  Used by: HomeView.
 //
 
 import SwiftUI
 import SwiftData
+import Charts
 
 struct StatisticsView: View {
     @StateObject private var viewModel = StatisticsViewModel()
     @Binding var currentScreen: HomeViewModel.Screen
+
+    @State private var selectedDate: Date? = nil
 
     @Query(sort: \Invoice.date, order: .reverse)
     private var allInvoices: [Invoice]
@@ -33,8 +39,8 @@ struct StatisticsView: View {
     @Query(sort: \StockModel.code)
     private var stockModels: [StockModel]
 
-    private var invoices: [Invoice] {
-        viewModel.invoices(allInvoices)
+    private var shipped: [Invoice] {
+        viewModel.shipped(allInvoices)
     }
 
     var body: some View {
@@ -43,9 +49,19 @@ struct StatisticsView: View {
                 VStack(spacing: 18) {
                     periodBar
                     revenueHeader
+                    chartCard
                     PaperclipDivider(iconSize: 36)
-                    customersCard
-                    modelsCard
+                    modelsCard(
+                        L.t(.mostProfitableCaps),
+                        stats: viewModel.mostProfitable(shipped),
+                        byPacks: false
+                    )
+                    modelsCard(
+                        L.t(.mostSoldCaps),
+                        stats: viewModel.mostSold(shipped),
+                        byPacks: true
+                    )
+                    buyersCard
                     shelfCard
                 }
                 .padding(.top, 12)
@@ -57,6 +73,9 @@ struct StatisticsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
             .tint(Color.primary)
+            .onChange(of: viewModel.period) { _, _ in
+                selectedDate = nil
+            }
         }
     }
 
@@ -87,19 +106,24 @@ struct StatisticsView: View {
 
     private var periodBar: some View {
         Menu {
-            ForEach(StatsPeriod.allCases) { option in
+            ForEach(viewModel.availableMonths(allInvoices), id: \.self) { month in
                 Button {
                     Haptics.light()
                     withAnimation(AppAnimation.list) {
-                        viewModel.period = option
+                        viewModel.period = .month(month)
                     }
                 } label: {
                     Label(
-                        option.title,
-                        systemImage: viewModel.period == option ? "checkmark" : "calendar"
+                        StatsPeriod.monthTitle(month),
+                        systemImage: viewModel.period == .month(month) ? "checkmark" : "calendar"
                     )
                 }
             }
+
+            Divider()
+
+            periodButton(.thisYear)
+            periodButton(.everything)
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "calendar")
@@ -118,6 +142,20 @@ struct StatisticsView: View {
         .padding(.horizontal, 20)
     }
 
+    private func periodButton(_ period: StatsPeriod) -> some View {
+        Button {
+            Haptics.light()
+            withAnimation(AppAnimation.list) {
+                viewModel.period = period
+            }
+        } label: {
+            Label(
+                period.title,
+                systemImage: viewModel.period == period ? "checkmark" : "calendar"
+            )
+        }
+    }
+
     private var revenueHeader: some View {
         VStack(spacing: 4) {
             Text(L.t(.earnedCaps))
@@ -127,7 +165,7 @@ struct StatisticsView: View {
                 .foregroundStyle(.secondary)
 
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(PriceText.display(viewModel.revenue(invoices)))
+                Text(PriceText.display(viewModel.revenue(shipped)))
                     .font(.system(size: 52, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                     .minimumScaleFactor(0.4)
@@ -139,38 +177,15 @@ struct StatisticsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            HStack(spacing: 8) {
-                statusPill(.shipped, amount: viewModel.revenue(invoices, status: .shipped))
-                statusPill(.draft, amount: viewModel.revenue(invoices, status: .draft))
-            }
-            .padding(.top, 8)
-
             HStack(spacing: 14) {
-                footnote("\(invoices.count)", L.t(.invoices))
-                footnote(PriceText.display(viewModel.averageInvoice(invoices).rounded()), L.t(.averageInvoice))
-                footnote("\(viewModel.packsShipped(invoices))", L.t(.packsLower))
+                footnote("\(shipped.count)", L.t(.invoices))
+                footnote(PriceText.display(viewModel.averageInvoice(shipped).rounded()), L.t(.averageInvoice))
+                footnote("\(viewModel.packsSold(shipped))", L.t(.packsLower))
             }
             .padding(.top, 10)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
-    }
-
-    private func statusPill(_ status: InvoiceStatus, amount: Double) -> some View {
-        HStack(spacing: 6) {
-            Text(status.label.uppercased())
-                .font(.system(size: 9, weight: .heavy, design: .monospaced))
-                .tracking(1.2)
-                .foregroundStyle(.secondary)
-
-            Text(PriceText.display(amount))
-                .font(.system(size: 13, weight: .bold, design: .monospaced))
-                .foregroundStyle(status.tint)
-        }
-        .padding(.horizontal, 11)
-        .padding(.vertical, 6)
-        .background(Capsule().fill(Color(.secondarySystemGroupedBackground)))
-        .overlay(Capsule().stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
     }
 
     private func footnote(_ value: String, _ label: String) -> some View {
@@ -188,57 +203,322 @@ struct StatisticsView: View {
         }
     }
 
-    private var customersCard: some View {
-        card(L.t(.topCustomersCaps), entries: viewModel.topCustomers(invoices), icon: "doc.text")
-    }
+    private var chartCard: some View {
+        let points = viewModel.series(shipped)
+        let hasSales = points.contains { $0.amount > 0 }
+        let bucketCount = points.filter { $0.amount > 0 }.count
 
-    private var modelsCard: some View {
-        card(L.t(.topModelsCaps), entries: viewModel.topModels(invoices), icon: "shippingbox")
-    }
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .firstTextBaseline) {
+                caps(L.t(.salesOverTimeCaps))
 
-    private func card(_ title: String, entries: [StatsEntry], icon: String) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text(title)
-                .font(.caption2)
-                .fontDesign(.monospaced)
-                .fontWeight(.bold)
-                .tracking(2)
-                .foregroundStyle(.secondary)
+                Spacer()
 
-            if entries.isEmpty {
-                Text(L.t(.nothingHereYet))
+                if hasSales && bucketCount > 0 {
+                    Text("≈\(compactMoney(viewModel.revenue(shipped) / Double(bucketCount))) \(L.t(viewModel.period.bucketsByMonth ? .perMonthLower : .perDayLower))")
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if hasSales {
+                chart(points)
+            } else {
+                Text(L.t(.noSalesInPeriod))
                     .font(.system(size: 14, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary.opacity(0.7))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, minHeight: 140)
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardSurface()
+        .padding(.horizontal, 20)
+    }
+
+    private func chart(_ points: [StatsPoint]) -> some View {
+        let lineColor = InvoiceStatus.shipped.tint
+        let maxAmount = points.map(\.amount).max() ?? 0
+        let selected = selectedPoint(points)
+
+        return Chart {
+            ForEach(points) { point in
+                AreaMark(
+                    x: .value("date", point.date),
+                    y: .value("amount", point.amount)
+                )
+                .interpolationMethod(.linear)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [lineColor.opacity(0.22), lineColor.opacity(0.01)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+                LineMark(
+                    x: .value("date", point.date),
+                    y: .value("amount", point.amount)
+                )
+                .interpolationMethod(.linear)
+                .lineStyle(StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
+                .foregroundStyle(lineColor)
+            }
+
+            if let selected {
+                RuleMark(x: .value("selected", selected.date))
+                    .foregroundStyle(Color.primary.opacity(0.2))
+                    .zIndex(-1)
+                    .annotation(
+                        position: .top,
+                        spacing: 6,
+                        overflowResolution: .init(x: .fit(to: .chart), y: .disabled)
+                    ) {
+                        selectionChip(selected)
+                    }
+
+                PointMark(
+                    x: .value("selected", selected.date),
+                    y: .value("amount", selected.amount)
+                )
+                .symbolSize(80)
+                .foregroundStyle(Color(.secondarySystemGroupedBackground))
+
+                PointMark(
+                    x: .value("selected", selected.date),
+                    y: .value("amount", selected.amount)
+                )
+                .symbol(.circle.strokeBorder(lineWidth: 2.2))
+                .symbolSize(80)
+                .foregroundStyle(lineColor)
+            }
+        }
+        .chartXSelection(value: $selectedDate)
+        .chartYScale(domain: 0...(maxAmount > 0 ? maxAmount * 1.15 : 1))
+        .chartYAxis {
+            AxisMarks(position: .trailing, values: .automatic(desiredCount: 4)) { value in
+                AxisGridLine()
+                    .foregroundStyle(Color.primary.opacity(0.08))
+                AxisValueLabel {
+                    if let amount = value.as(Double.self) {
+                        Text(compactMoney(amount))
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .chartXAxis {
+            AxisMarks(values: xAxisValues(points)) { _ in
+                AxisValueLabel(format: xAxisFormat(points))
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(height: 190)
+    }
+
+    private func selectedPoint(_ points: [StatsPoint]) -> StatsPoint? {
+        guard let selectedDate else { return nil }
+        return points.last { $0.date <= selectedDate }
+    }
+
+    private func selectionChip(_ point: StatsPoint) -> some View {
+        VStack(spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(PriceText.display(point.amount))
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.primary)
+                Text(AppSettings.currencySymbol)
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
+            }
+
+            Text(chipDate(point.date))
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 11)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(.secondarySystemGroupedBackground))
+                .raisedShadow()
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.primary.opacity(0.15), lineWidth: 0.8)
+        )
+    }
+
+    private func chipDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = AppSettings.language.locale
+        formatter.dateFormat = viewModel.period.bucketsByMonth ? "LLLL yyyy" : "d MMMM"
+        return formatter.string(from: date).capitalized
+    }
+
+    private func xAxisValues(_ points: [StatsPoint]) -> AxisMarkValues {
+        if viewModel.period.bucketsByMonth {
+            return .stride(by: .month, count: max(1, points.count / 6))
+        }
+        return .stride(by: .day, count: max(1, points.count / 5))
+    }
+
+    private func xAxisFormat(_ points: [StatsPoint]) -> Date.FormatStyle {
+        guard viewModel.period.bucketsByMonth else {
+            return .dateTime.day()
+        }
+        if points.count > 12 {
+            return .dateTime.month(.abbreviated).year(.twoDigits)
+        }
+        return .dateTime.month(.abbreviated)
+    }
+
+    private func compactMoney(_ value: Double) -> String {
+        if value >= 1_000_000 {
+            return "\(shortNumber(value / 1_000_000))M"
+        }
+        if value >= 1_000 {
+            return "\(shortNumber(value / 1_000))K"
+        }
+        return "\(Int(value.rounded()))"
+    }
+
+    private func shortNumber(_ value: Double) -> String {
+        value >= 100
+            ? "\(Int(value.rounded()))"
+            : String(format: "%.1f", value).replacingOccurrences(of: ".0", with: "")
+    }
+
+    private func modelsCard(_ title: String, stats: [ModelStat], byPacks: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            caps(title)
+
+            if stats.isEmpty {
+                emptyLine
             } else {
-                VStack(spacing: 12) {
-                    ForEach(entries) { entry in
-                        entryRow(entry, icon: icon)
+                VStack(spacing: 16) {
+                    ForEach(Array(stats.enumerated()), id: \.element.id) { index, stat in
+                        modelRow(rank: index + 1, stat: stat, byPacks: byPacks)
                     }
                 }
             }
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 20).fill(Color(.secondarySystemGroupedBackground)).raisedShadow())
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+        .cardSurface()
         .padding(.horizontal, 20)
     }
 
-    private func entryRow(_ entry: StatsEntry, icon: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
+    private func modelRow(rank: Int, stat: ModelStat, byPacks: Bool) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            rankBadge(rank)
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(stat.name)
+                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+
+                    Spacer(minLength: 8)
+
+                    if byPacks {
+                        HStack(alignment: .firstTextBaseline, spacing: 3) {
+                            Text("\(stat.packs)")
+                                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                                .foregroundStyle(.primary)
+                            Text(L.t(.packsLower))
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        HStack(alignment: .firstTextBaseline, spacing: 3) {
+                            Text(PriceText.display(stat.money))
+                                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                                .foregroundStyle(.primary)
+                            Text(AppSettings.currencySymbol)
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+
+                Text(
+                    byPacks
+                        ? "\(PriceText.display(stat.money)) \(AppSettings.currencySymbol)"
+                        : "\(stat.packs) \(L.t(.packsLower))"
+                )
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(.secondary)
+
+                if !stat.colors.isEmpty {
+                    colorChips(stat.colors)
+                }
+            }
+        }
+    }
+
+    private func colorChips(_ colors: [ColorAllocation], limit: Int = 4) -> some View {
+        FlowLayout(spacing: 5) {
+            ForEach(colors.prefix(limit), id: \.color) { allocation in
+                chip("\(allocation.color) \(allocation.packs)")
+            }
+            if colors.count > limit {
+                chip("+\(colors.count - limit)")
+            }
+        }
+    }
+
+    private func chip(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .foregroundStyle(.primary.opacity(0.85))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(Color.primary.opacity(0.05)))
+            .overlay(Capsule().stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+    }
+
+    private var buyersCard: some View {
+        let buyers = viewModel.topBuyers(shipped)
+
+        return VStack(alignment: .leading, spacing: 14) {
+            caps(L.t(.topBuyersCaps))
+
+            if buyers.isEmpty {
+                emptyLine
+            } else {
+                VStack(spacing: 14) {
+                    ForEach(Array(buyers.enumerated()), id: \.element.id) { index, buyer in
+                        buyerRow(rank: index + 1, buyer: buyer)
+                    }
+                }
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardSurface()
+        .padding(.horizontal, 20)
+    }
+
+    private func buyerRow(rank: Int, buyer: BuyerStat) -> some View {
+        HStack(alignment: .center, spacing: 10) {
+            rankBadge(rank)
+
             VStack(alignment: .leading, spacing: 2) {
-                Text(entry.name)
-                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                Text(buyer.name)
+                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
                 HStack(spacing: 4) {
-                    Image(systemName: icon)
+                    Image(systemName: "doc.text")
                         .font(.system(size: 9))
-
-                    Text("\(entry.count)" + (entry.detail.map { " · \($0)" } ?? ""))
+                    Text("\(buyer.invoices)" + (buyer.detail.map { " · \($0)" } ?? ""))
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
                         .lineLimit(1)
                 }
@@ -248,14 +528,13 @@ struct StatisticsView: View {
             Spacer(minLength: 8)
 
             HStack(alignment: .firstTextBaseline, spacing: 3) {
-                Text(PriceText.display(entry.amount))
-                    .font(.system(size: 16, weight: .bold, design: .monospaced))
+                Text(PriceText.display(buyer.money))
+                    .font(.system(size: 15, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-
                 Text(AppSettings.currencySymbol)
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
         }
@@ -265,12 +544,7 @@ struct StatisticsView: View {
         let shelf = viewModel.stockValue(stockModels)
 
         return VStack(alignment: .leading, spacing: 10) {
-            Text(L.t(.shelfWorthCaps))
-                .font(.caption2)
-                .fontDesign(.monospaced)
-                .fontWeight(.bold)
-                .tracking(2)
-                .foregroundStyle(.secondary)
+            caps(L.t(.shelfWorthCaps))
 
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text(PriceText.display(shelf.value))
@@ -292,8 +566,47 @@ struct StatisticsView: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 20).fill(Color(.secondarySystemGroupedBackground)).raisedShadow())
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+        .cardSurface()
         .padding(.horizontal, 20)
+    }
+
+    private func rankBadge(_ rank: Int) -> some View {
+        Text("\(rank)")
+            .font(.system(size: 11, weight: .bold, design: .monospaced))
+            .foregroundStyle(.secondary)
+            .frame(width: 20, height: 20)
+            .background(Circle().fill(Color.primary.opacity(0.06)))
+            .overlay(Circle().stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+    }
+
+    private func caps(_ title: String) -> some View {
+        Text(title)
+            .font(.caption2)
+            .fontDesign(.monospaced)
+            .fontWeight(.bold)
+            .tracking(2)
+            .foregroundStyle(.secondary)
+    }
+
+    private var emptyLine: some View {
+        Text(L.t(.nothingHereYet))
+            .font(.system(size: 14, weight: .medium, design: .monospaced))
+            .foregroundStyle(.secondary.opacity(0.7))
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private extension View {
+    func cardSurface() -> some View {
+        self
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.secondarySystemGroupedBackground))
+                    .raisedShadow()
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.primary.opacity(0.12), lineWidth: 0.8)
+            )
     }
 }
