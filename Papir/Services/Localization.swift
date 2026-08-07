@@ -60,7 +60,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 }
 
-enum LKey: String {
+enum LKey: String, CaseIterable {
     case menu = "menu"
     case create = "create"
     case stock = "stock"
@@ -267,7 +267,7 @@ enum L {
         .polish: polish
     ]
 
-    private static let ukrainian: [LKey: String] = [
+    static let ukrainian: [LKey: String] = [
         .draft: "Чернетка", .shipped: "Відвантажено",
         .markShipped: "Відвантажити", .returnToDraft: "У чернетку",
         .shipment: "Відвантаження",
@@ -380,7 +380,7 @@ enum L {
         .remove: "Прибрати", .home: "Головна"
     ]
 
-    private static let russian: [LKey: String] = [
+    static let russian: [LKey: String] = [
         .draft: "Черновик", .shipped: "Отгружено",
         .markShipped: "Отгрузить", .returnToDraft: "В черновик",
         .shipment: "Отгрузка",
@@ -493,7 +493,7 @@ enum L {
         .remove: "Убрать", .home: "Главная"
     ]
 
-    private static let polish: [LKey: String] = [
+    static let polish: [LKey: String] = [
         .draft: "Szkic", .shipped: "Wysłano",
         .markShipped: "Oznacz jako wysłane", .returnToDraft: "Wróć do szkicu",
         .shipment: "Wysyłka",
