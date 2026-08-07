@@ -108,7 +108,7 @@ struct WithdrawStockSheet: View {
                     Text("+\(shortfall) \(L.t(.moreThanOnHand))")
                         .font(.caption)
                         .fontDesign(.monospaced)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(AppWarning.tint)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 8)
                 } else if packCount > 0 {
@@ -118,6 +118,40 @@ struct WithdrawStockSheet: View {
                 }
 
                 StockSheetButton(title: L.t(shortfall > 0 ? .takeOutAnyway : .takeOut), enabled: packCount > 0) {
+                    onCommit(packCount)
+                }
+            }
+        }
+    }
+}
+
+struct AddUpStockSheet: View {
+    let modelCode: String
+    let line: StockLine
+    let onCommit: (Int) -> Void
+
+    @State private var packs: String = ""
+
+    private var packCount: Int { Int(packs) ?? 0 }
+
+    var body: some View {
+        StockSheetFrame(title: L.t(.addUp), subtitle: "\(modelCode) \(line.color)") {
+            VStack(spacing: 18) {
+                Text("\(L.t(.onHand)): \(line.packs)")
+                    .font(.scaled(size: 13, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
+
+                StockSheetField(placeholder: L.t(.packs), text: $packs, keyboard: .numberPad)
+                    .digitsOnly($packs)
+                    .limitInput($packs, to: 4)
+
+                if packCount > 0 {
+                    Text("\(line.packs + packCount) \(L.t(.left))")
+                        .font(.scaled(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+
+                StockSheetButton(title: L.t(.addUp), enabled: packCount > 0) {
                     onCommit(packCount)
                 }
             }

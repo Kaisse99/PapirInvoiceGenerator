@@ -1,7 +1,7 @@
 //
 //  AddressBookViewModel.swift
 //  Everything the address book does to the store: search across name, phone,
-//  city and both branches, then write a contact or delete one. Editing runs
+//  city and shipment address, then write a contact or delete one. Editing runs
 //  through ContactDraft, a plain-string copy of a contact that the sheet owns
 //  while it is open, so a half-typed phone number is never a half-written
 //  model; committing a draft either updates the contact it came from or
@@ -24,8 +24,7 @@ struct ContactDraft: Identifiable {
     var lastName: String = ""
     var phone: String = ""
     var city: String = ""
-    var branchOne: String = ""
-    var branchTwo: String = ""
+    var shipmentAddress: String = ""
 
     var isEditing: Bool { contact != nil }
 
@@ -40,8 +39,7 @@ struct ContactDraft: Identifiable {
         lastName = contact.lastName
         phone = contact.phone
         city = contact.city
-        branchOne = contact.branchOne
-        branchTwo = contact.branchTwo
+        shipmentAddress = contact.shipmentAddress
     }
 }
 
@@ -76,8 +74,7 @@ final class AddressBookViewModel: ObservableObject {
         target.lastName = draft.lastName.trimmingCharacters(in: .whitespaces)
         target.phone = draft.phone.trimmingCharacters(in: .whitespaces)
         target.city = draft.city.trimmingCharacters(in: .whitespaces)
-        target.branchOne = draft.branchOne.trimmingCharacters(in: .whitespaces)
-        target.branchTwo = draft.branchTwo.trimmingCharacters(in: .whitespaces)
+        target.shipmentAddress = draft.shipmentAddress.trimmingCharacters(in: .whitespaces)
 
         if draft.contact == nil {
             context.insert(target)

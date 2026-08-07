@@ -317,11 +317,11 @@ struct SettingsSheet: View {
             if let last = AppSettings.lastBackupAt {
                 noticeLine("\(L.t(.backedUpOn, language)): \(backupDate(last))", tint: .secondary)
             } else {
-                noticeLine(L.t(.backedUpNever, language), tint: .orange)
+                noticeLine(L.t(.backedUpNever, language), tint: AppWarning.tint)
             }
 
             if !cloudSyncEnabled {
-                noticeLine(L.t(.onThisPhoneOnly, language), tint: .orange)
+                noticeLine(L.t(.onThisPhoneOnly, language), tint: AppWarning.tint)
             }
         }
     }
@@ -538,7 +538,7 @@ struct SettingsSheet: View {
                 .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
 
                 if cloudSyncEnabled && AppSettings.cloudSyncUnavailable {
-                    noticeLine(L.t(.iCloudUnavailable, language), tint: .orange)
+                    noticeLine(L.t(.iCloudUnavailable, language), tint: AppWarning.tint)
                 } else if showRestartNotice {
                     noticeLine(L.t(.restartToApply, language), tint: .secondary)
                 }

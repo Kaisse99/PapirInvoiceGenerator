@@ -17,18 +17,26 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="smallIcon" translatesAutoresizingMaskIntoConstraints="NO" id="mrk-01-log">
-                                <rect key="frame" x="148.5" y="378" width="96" height="96"/>
+                                <rect key="frame" x="148.5" y="360" width="96" height="96"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="96" id="mrk-wd-001"/>
                                     <constraint firstAttribute="height" constant="96" id="mrk-ht-001"/>
                                 </constraints>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Papir" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mrk-02-nam">
+                                <rect key="frame" x="156" y="472" width="81" height="26"/>
+                                <fontDescription key="fontDescription" name="Menlo-Bold" family="Menlo" pointSize="22"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="LaunchBackground"/>
                         <constraints>
                             <constraint firstItem="mrk-01-log" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="mrk-cx-001"/>
-                            <constraint firstItem="mrk-01-log" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="mrk-cy-001"/>
+                            <constraint firstItem="mrk-01-log" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-18" id="mrk-cy-001"/>
+                            <constraint firstItem="mrk-02-nam" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="nam-cx-001"/>
+                            <constraint firstItem="mrk-02-nam" firstAttribute="top" secondItem="mrk-01-log" secondAttribute="bottom" constant="16" id="nam-tp-001"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -42,5 +50,8 @@
         <namedColor name="LaunchBackground">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <systemColor name="labelColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>

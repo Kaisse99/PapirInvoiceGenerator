@@ -6,7 +6,9 @@
 //  spelled out beneath. Below that, a card per color carrying a state stripe
 //  down its edge: ink when stocked, amber at zero, red when the count has gone
 //  negative. Taking stock out is the everyday action so it is the filled
-//  button; recounting is the correction, so it is the quiet outlined one.
+//  button; add up is its blue opposite for a delivery that arrives against a
+//  colour already on the shelf, so she never has to recount to add five;
+//  recounting is the correction, so it is the quiet outlined one.
 //  Taking stock in is also how a new color appears, so there is no separate
 //  add-color step. The price per piece sits under the pack total in the same
 //  shape as it, a spaced label over a big monospaced number, because they are
@@ -32,6 +34,7 @@ struct StockModelDetailView: View {
 
     @State private var showReceive = false
     @State private var withdrawTarget: StockLine? = nil
+    @State private var addUpTarget: StockLine? = nil
     @State private var recountTarget: StockLine? = nil
     @State private var showHistory = false
     @State private var showPrice = false
@@ -114,6 +117,14 @@ struct StockModelDetailView: View {
                 showPrice = false
             }
             .presentationDetents([.height(320)])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(item: $addUpTarget) { line in
+            AddUpStockSheet(modelCode: model.code, line: line) { packs in
+                viewModel.receive(packs: packs, color: line.color, into: model, context: modelContext)
+                addUpTarget = nil
+            }
+            .presentationDetents([.height(360)])
             .presentationDragIndicator(.visible)
         }
         .sheet(item: $recountTarget) { line in
@@ -277,8 +288,9 @@ struct StockModelDetailView: View {
                 .fill(Color.primary.opacity(0.08))
                 .frame(height: 1)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 takeOutButton(line)
+                addUpButton(line)
                 recountButton(line)
             }
             .padding(.horizontal, 18)
@@ -316,6 +328,25 @@ struct StockModelDetailView: View {
             .frame(maxWidth: .infinity, minHeight: 46)
             .foregroundStyle(Color(.systemBackground))
             .background(RoundedRectangle(cornerRadius: 13).fill(Color.primary.opacity(0.88)))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func addUpButton(_ line: StockLine) -> some View {
+        Button {
+            Haptics.light()
+            addUpTarget = line
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: "shippingbox.and.arrow.backward")
+                    .font(.scaled(size: 13, weight: .medium))
+                    .scaleEffect(x: -1, y: 1)
+                Text(L.t(.addUp))
+                    .font(.scaled(size: 14, weight: .bold, design: .monospaced))
+            }
+            .frame(maxWidth: .infinity, minHeight: 46)
+            .foregroundStyle(Color(.systemBackground))
+            .background(RoundedRectangle(cornerRadius: 13).fill(InvoiceStatus.shipped.tint))
         }
         .buttonStyle(.plain)
     }

@@ -48,14 +48,14 @@ struct LabeledField<FocusValue: Hashable>: View {
 
     private var borderColor: Color {
         if isError { return .red }
-        if isWarning { return .orange }
+        if isWarning { return AppWarning.tint }
         if isFocused { return .blue.opacity(0.9) }
         return .primary.opacity(0.55)
     }
 
     private var labelColor: Color {
         if isError { return .red }
-        if isWarning { return .orange }
+        if isWarning { return AppWarning.tint }
         if isFocused { return .blue.opacity(0.9) }
         return .secondary
     }

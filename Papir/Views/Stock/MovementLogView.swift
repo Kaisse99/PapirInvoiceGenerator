@@ -255,7 +255,7 @@ struct MovementLogView: View {
 
             Text(movement.packs > 0 ? "+\(movement.packs)" : "\(movement.packs)")
                 .font(.scaled(size: 18, weight: .bold, design: .monospaced))
-                .foregroundStyle(movement.packs >= 0 ? Color.primary : Color.orange)
+                .foregroundStyle(movement.packs >= 0 ? Color.primary : AppWarning.tint)
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 10)
@@ -291,7 +291,7 @@ extension StockMovementKind {
     var tint: Color {
         switch self {
         case .received:   return Color(red: 0.13, green: 0.50, blue: 0.29)
-        case .removed:    return .orange
+        case .removed:    return AppWarning.tint
         case .shipped:    return Color(red: 0.20, green: 0.48, blue: 0.90)
         case .returned:   return .secondary
         case .recounted:  return .secondary

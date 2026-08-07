@@ -9,6 +9,7 @@
 //
 
 import Foundation
+import SwiftData
 import Testing
 @testable import Papir
 
@@ -78,5 +79,37 @@ struct StockTests {
         let line = StockLine(color: "Black", packs: -4)
         line.recount(to: 7)
         #expect(line.packs == 7)
+    }
+}
+
+struct DuplicateModelTests {
+    @Test func aCodeAlreadyOnTheShelfCannotBeAddedAgain() throws {
+        let container = try makeContainer()
+        let context = container.mainContext
+
+        context.insert(StockModel(code: "1987"))
+        try context.save()
+
+        let viewModel = StockViewModel()
+        viewModel.newModelCode = "1987"
+        viewModel.addModel(existing: [], context: context)
+
+        #expect(viewModel.addModelError != nil)
+        #expect(try context.fetch(FetchDescriptor<StockModel>()).count == 1)
+    }
+
+    @Test func caseAndSpacingDoNotSlipADuplicateThrough() throws {
+        let container = try makeContainer()
+        let context = container.mainContext
+
+        context.insert(StockModel(code: "6395C"))
+        try context.save()
+
+        let viewModel = StockViewModel()
+        viewModel.newModelCode = "  6395c  "
+        viewModel.addModel(existing: [], context: context)
+
+        #expect(viewModel.addModelError != nil)
+        #expect(try context.fetch(FetchDescriptor<StockModel>()).count == 1)
     }
 }

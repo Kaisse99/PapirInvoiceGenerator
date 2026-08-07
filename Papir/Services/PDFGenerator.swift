@@ -147,7 +147,7 @@ nonisolated struct PDFGenerator {
             }
             cursorY = drawTotal(total: invoice.total, language: language, currencySymbol: currencySymbol, startY: cursorY, pageWidth: pageRect.width)
 
-            drawFooter(language: language, pageRect: pageRect)
+            drawFooter(invoice: invoice, language: language, pageRect: pageRect)
         }
     }
     
@@ -159,18 +159,6 @@ nonisolated struct PDFGenerator {
         ]
         
         language.title.draw(at: CGPoint(x: margin, y: startY), withAttributes: titleAttrs)
-
-        let titleWidth = (language.title as NSString).size(withAttributes: titleAttrs).width
-        if invoice.number > 0 {
-            let numberAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.monospacedSystemFont(ofSize: 18 * fontScale, weight: .bold),
-                .foregroundColor: UIColor.darkGray
-            ]
-            "\(language.numberPrefix)\(invoice.number)".draw(
-                at: CGPoint(x: margin + titleWidth + 10, y: startY + 7),
-                withAttributes: numberAttrs
-            )
-        }
 
         let dateFormatter = DateFormatter()
         dateFormatter.locale = language.dateLocale
@@ -450,18 +438,25 @@ nonisolated struct PDFGenerator {
         return startY + 50
     }
     
-    private static func drawFooter(language: PDFLanguage, pageRect: CGRect) {
+    private static func drawFooter(invoice: InvoiceSnapshot, language: PDFLanguage, pageRect: CGRect) {
         let footerAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.monospacedSystemFont(ofSize: 7, weight: .regular),
             .foregroundColor: UIColor.lightGray,
             .kern: 2
         ]
+        let baseline = pageRect.height - margin / 2
+
         let footerSize = (language.footerText as NSString).size(withAttributes: footerAttrs)
         language.footerText.draw(
-            at: CGPoint(
-                x: (pageRect.width - footerSize.width) / 2,
-                y: pageRect.height - margin / 2
-            ),
+            at: CGPoint(x: (pageRect.width - footerSize.width) / 2, y: baseline),
+            withAttributes: footerAttrs
+        )
+
+        guard invoice.number > 0 else { return }
+        let numberText = "\(language.numberPrefix)\(invoice.number)"
+        let numberSize = (numberText as NSString).size(withAttributes: footerAttrs)
+        numberText.draw(
+            at: CGPoint(x: (pageRect.width - numberSize.width) / 2, y: baseline - numberSize.height - 3),
             withAttributes: footerAttrs
         )
     }

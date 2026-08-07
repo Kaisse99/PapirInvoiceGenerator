@@ -29,8 +29,9 @@ struct BackupFile: Codable {
         var lastName: String
         var phone: String
         var city: String
-        var branchOne: String
-        var branchTwo: String
+        var shipmentAddress: String?
+        var branchOne: String?
+        var branchTwo: String?
     }
 
     struct StockLineRecord: Codable {
@@ -139,8 +140,9 @@ enum Backup {
                     lastName: $0.lastName,
                     phone: $0.phone,
                     city: $0.city,
-                    branchOne: $0.branchOne,
-                    branchTwo: $0.branchTwo
+                    shipmentAddress: $0.shipmentAddress,
+                    branchOne: nil,
+                    branchTwo: nil
                 )
             },
             models: models.map { model in
@@ -207,8 +209,11 @@ enum Backup {
                 lastName: record.lastName,
                 phone: record.phone,
                 city: record.city,
-                branchOne: record.branchOne,
-                branchTwo: record.branchTwo
+                shipmentAddress: record.shipmentAddress
+                    ?? [record.branchOne, record.branchTwo]
+                        .compactMap { $0 }
+                        .first { !$0.isEmpty }
+                    ?? ""
             )
             context.insert(contact)
             contacts.append(contact)

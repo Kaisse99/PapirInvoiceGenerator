@@ -7,6 +7,10 @@
 //  action rather than two. A withdrawal that goes past what is on hand still
 //  happens and reports its shortfall, which the view turns into a warning;
 //  refusing it would only teach her to stop recording.
+//  A code already on the shelf cannot be added again, matched without regard
+//  to case. The check asks the store rather than only the array the view hands
+//  in, because a filtered or stale list would let a duplicate through and
+//  CloudKit cannot enforce uniqueness for us.
 //  A model's price per piece is optional at creation and can be set or changed
 //  at any time from the detail screen, because the code goes on the shelf
 //  before anyone agrees what it sells for.
@@ -45,7 +49,8 @@ final class StockViewModel: ObservableObject {
             return
         }
 
-        if existing.contains(where: { $0.code.caseInsensitiveCompare(code) == .orderedSame }) {
+        let onShelf = existing + ((try? context.fetch(FetchDescriptor<StockModel>())) ?? [])
+        if onShelf.contains(where: { $0.code.caseInsensitiveCompare(code) == .orderedSame }) {
             Haptics.warning()
             addModelError = "\(L.t(.modelExists)): \(code)"
             return

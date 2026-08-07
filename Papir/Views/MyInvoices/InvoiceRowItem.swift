@@ -92,10 +92,10 @@ struct InvoiceRowItem: View {
                     Text(L.t(.noPDF).uppercased())
                         .font(.scaled(size: 9, weight: .heavy, design: .monospaced))
                         .tracking(1)
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(AppWarning.tint)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Capsule().fill(Color.orange.opacity(0.18)))
+                        .background(Capsule().fill(AppWarning.fill))
                 }
 
                 Spacer(minLength: 6)

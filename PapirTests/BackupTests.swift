@@ -17,7 +17,7 @@ struct BackupTests {
         let source = try makeContainer()
         let sourceContext = source.mainContext
 
-        let contact = Contact(firstName: "Olena", lastName: "Shevchenko", phone: "067", city: "Odesa", branchOne: "NP 12")
+        let contact = Contact(firstName: "Olena", lastName: "Shevchenko", phone: "067", city: "Odesa", shipmentAddress: "NP 12")
         sourceContext.insert(contact)
 
         let model = StockModel(code: "1987", pricePerPiece: 150, lines: [

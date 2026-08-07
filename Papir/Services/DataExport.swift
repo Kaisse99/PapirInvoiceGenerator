@@ -84,7 +84,7 @@ enum DataExport {
                     .text(invoice.sender),
                     .text(invoice.receiver),
                     .text(contact?.city ?? ""),
-                    .text(contact?.branches.joined(separator: " / ") ?? ""),
+                    .text(contact?.address ?? ""),
                     .text(contact?.phone ?? ""),
                     .text(item.name),
                     .whole(Int(item.unitCount)),
@@ -143,8 +143,7 @@ enum DataExport {
                     .text(contact.lastName),
                     .text(contact.phone),
                     .text(contact.city),
-                    .text(contact.branchOne),
-                    .text(contact.branchTwo),
+                    .text(contact.shipmentAddress),
                     .whole(contact.invoiceCount)
                 ]
             }

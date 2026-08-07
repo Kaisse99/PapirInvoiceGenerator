@@ -21,7 +21,7 @@ struct ContactEditorSheet: View {
     @FocusState private var focused: Field?
 
     private enum Field: Hashable, CaseIterable {
-        case firstName, lastName, phone, city, branchOne, branchTwo
+        case firstName, lastName, phone, city, shipmentAddress
     }
 
     private var canGoBack: Bool {
@@ -67,8 +67,7 @@ struct ContactEditorSheet: View {
 
                     section(L.t(.whereToCaps)) {
                         field(L.t(.city), text: $form.city, focus: .city, limit: 30)
-                        field(L.t(.novaPoshtaOne), text: $form.branchOne, focus: .branchOne, limit: 40)
-                        field(L.t(.novaPoshtaTwo), text: $form.branchTwo, focus: .branchTwo, limit: 40)
+                        field(L.t(.shipmentAddress), text: $form.shipmentAddress, focus: .shipmentAddress, limit: 60)
                     }
 
                     saveButton

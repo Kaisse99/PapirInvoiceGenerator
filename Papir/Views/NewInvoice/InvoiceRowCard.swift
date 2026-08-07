@@ -270,7 +270,7 @@ struct InvoiceRowCard: View {
                     Text("\(L.t(.differsFromStock)): \(PriceText.display(stockPrice)) \(AppSettings.currencySymbol)")
                         .font(.scaled(size: 10, weight: .medium, design: .monospaced))
                 }
-                .foregroundStyle(Color.orange)
+                .foregroundStyle(AppWarning.tint)
                 .padding(.leading, 6)
                 .transition(.opacity)
             }
@@ -607,7 +607,7 @@ struct InvoiceRowCard: View {
     }
 
     private var statusTint: Color {
-        needsAttention ? .orange : .primary
+        needsAttention ? AppWarning.tint : .primary
     }
 
     private var statusBadge: some View {
@@ -725,21 +725,21 @@ struct InvoiceRowCard: View {
                 HStack(spacing: 6) {
                     Text(color)
                         .font(.scaled(size: 15, weight: .medium, design: .monospaced))
-                        .foregroundStyle(known ? Color.primary : Color.orange)
+                        .foregroundStyle(known ? Color.primary : AppWarning.tint)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
                     if !known {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.scaled(size: 10))
-                            .foregroundStyle(Color.orange)
+                            .foregroundStyle(AppWarning.tint)
                     }
                 }
 
                 if let onHand {
                     Text("\(L.t(.inStock)): \(onHand)")
                         .font(.scaled(size: 10, weight: .medium, design: .monospaced))
-                        .foregroundStyle(onHand < packs(at: index) ? Color.orange : .secondary)
+                        .foregroundStyle(onHand < packs(at: index) ? AppWarning.tint : .secondary)
                 }
             }
 
@@ -773,10 +773,10 @@ struct InvoiceRowCard: View {
         }
         .padding(.horizontal, 12)
         .frame(minHeight: 50)
-        .background(RoundedRectangle(cornerRadius: 12).fill(known ? Color.primary.opacity(0.06) : Color.orange.opacity(0.12)))
+        .background(RoundedRectangle(cornerRadius: 12).fill(known ? Color.primary.opacity(0.06) : AppWarning.fill))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(known ? Color.primary.opacity(0.12) : Color.orange.opacity(0.5), lineWidth: 1)
+                .stroke(known ? Color.primary.opacity(0.12) : AppWarning.border, lineWidth: 1)
         )
     }
 
@@ -784,11 +784,11 @@ struct InvoiceRowCard: View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.circle.fill")
                 .font(.scaled(size: 11))
-                .foregroundStyle(Color.orange)
+                .foregroundStyle(AppWarning.tint)
 
             Text("\(assignedPacks) / \(unitsValue) \(L.t(.assignedToColors))")
                 .font(.scaled(size: 12, weight: .medium, design: .monospaced))
-                .foregroundStyle(Color.orange)
+                .foregroundStyle(AppWarning.tint)
 
             Spacer()
         }

@@ -49,8 +49,39 @@ final class MyInvoicesViewModel: ObservableObject {
         }
     }
     
+    enum StatusFilter: String, CaseIterable, Identifiable {
+        case all, drafts, shipped
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .all:     return L.t(.allInvoices)
+            case .drafts:  return L.t(.draftsOnly)
+            case .shipped: return L.t(.shippedOnly)
+            }
+        }
+
+        var systemImage: String {
+            switch self {
+            case .all:     return "tray.full"
+            case .drafts:  return "pencil.line"
+            case .shipped: return "shippingbox"
+            }
+        }
+
+        func matches(_ invoice: Invoice) -> Bool {
+            switch self {
+            case .all:     return true
+            case .drafts:  return invoice.status == .draft
+            case .shipped: return invoice.status == .shipped
+            }
+        }
+    }
+
     @Published var searchText: String = ""
     @Published var sortOption: SortOption = .newest
+    @Published var statusFilter: StatusFilter = .all
     @Published var isEditing: Bool = false
     @Published var selectedIDs: Set<UUID> = []
     @Published var invoiceToDelete: Invoice? = nil
@@ -61,7 +92,7 @@ final class MyInvoicesViewModel: ObservableObject {
     @Published var saveError: String? = nil
     
     func filteredAndSorted(_ invoices: [Invoice]) -> [Invoice] {
-        var result = invoices
+        var result = invoices.filter { statusFilter.matches($0) }
         
         let query = searchText.trimmingCharacters(in: .whitespaces).lowercased()
         if !query.isEmpty {

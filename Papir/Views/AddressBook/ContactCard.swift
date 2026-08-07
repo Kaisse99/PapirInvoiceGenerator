@@ -2,7 +2,7 @@
 //  ContactCard.swift
 //  One contact in the address book. The name leads in the same rounded weight
 //  the stock code uses, the phone sits under it in monospaced because it is a
-//  number to read digit by digit, and the city and branches run along the
+//  number to read digit by digit, and the city and address run along the
 //  bottom as chips the way colors do on a stock card. How many invoices the
 //  contact is on sits opposite the name, quietly, since it is the one thing
 //  about a customer that is worth seeing without opening anything.
@@ -46,7 +46,7 @@ struct ContactCard: View {
                     .padding(.top, 3)
             }
 
-            if !contact.city.isEmpty || !contact.branches.isEmpty {
+            if !contact.whereTo.isEmpty {
                 Rectangle()
                     .fill(Color.primary.opacity(0.08))
                     .frame(height: 1)
@@ -56,7 +56,7 @@ struct ContactCard: View {
                     if !contact.city.isEmpty {
                         chip(contact.city, icon: "mappin")
                     }
-                    ForEach(contact.branches, id: \.self) { branch in
+                    ForEach(contact.address.isEmpty ? [] : [contact.address], id: \.self) { branch in
                         chip(branch, icon: "shippingbox")
                     }
                 }

@@ -238,6 +238,22 @@ struct MyInvoicesView: View {
             .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
             
             Menu {
+                ForEach(MyInvoicesViewModel.StatusFilter.allCases) { option in
+                    Button {
+                        Haptics.light()
+                        withAnimation(AppAnimation.list) {
+                            viewModel.statusFilter = option
+                        }
+                    } label: {
+                        Label(
+                            option.title,
+                            systemImage: viewModel.statusFilter == option ? "checkmark" : option.systemImage
+                        )
+                    }
+                }
+
+                Divider()
+
                 ForEach(MyInvoicesViewModel.SortOption.allCases) { option in
                     Button {
                         Haptics.light()
@@ -252,7 +268,9 @@ struct MyInvoicesView: View {
                     }
                 }
             } label: {
-                Image(systemName: "line.3.horizontal.decrease.circle")
+                Image(systemName: viewModel.statusFilter == .all
+                      ? "line.3.horizontal.decrease.circle"
+                      : "line.3.horizontal.decrease.circle.fill")
                     .font(.title3)
                     .foregroundStyle(Color.primary)
                     .frame(width: 52, height: 52)
@@ -304,28 +322,6 @@ struct MyInvoicesView: View {
     
     @ViewBuilder
     private func contextMenuButtons(for invoice: Invoice) -> some View {
-        Button {
-            viewModel.previewPDF(for: invoice)
-        } label: {
-            Label(L.t(.viewPDF), systemImage: "doc.text.magnifyingglass")
-        }
-        .disabled(invoice.pdfFileName == nil)
-        
-        Button {
-            viewModel.sharePDF(for: invoice)
-        } label: {
-            Label(L.t(.share), systemImage: "square.and.arrow.up")
-        }
-        .disabled(invoice.pdfFileName == nil)
-        
-        Button {
-            viewModel.duplicate(invoice, context: modelContext)
-        } label: {
-            Label(L.t(.duplicate), systemImage: "doc.on.doc")
-        }
-        
-        Divider()
-        
         Button(role: .destructive) {
             viewModel.invoiceToDelete = invoice
         } label: {

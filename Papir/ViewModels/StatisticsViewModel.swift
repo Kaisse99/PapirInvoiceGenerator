@@ -301,6 +301,11 @@ final class StatisticsViewModel: ObservableObject {
         return (value, priced, unpriced)
     }
 
+    func unitsInStock(_ models: [StockModel]) -> Int {
+        let piecesPerPack = max(1, AppSettings.defaultItemsPerUnit)
+        return models.reduce(0) { $0 + $1.totalPacks * piecesPerPack }
+    }
+
     private func bucketDomain(_ shipped: [Invoice], calendar: Calendar) -> ClosedRange<Date>? {
         let today = calendar.startOfDay(for: .now)
         let currentMonth = StatsPeriod.startOfMonth(today, calendar: calendar)

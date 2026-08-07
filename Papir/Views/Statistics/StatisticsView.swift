@@ -499,13 +499,10 @@ struct StatisticsView: View {
         }
     }
 
-    private func colorChips(_ colors: [ColorAllocation], limit: Int = 4) -> some View {
+    private func colorChips(_ colors: [ColorAllocation]) -> some View {
         FlowLayout(spacing: 5) {
-            ForEach(colors.prefix(limit), id: \.color) { allocation in
+            ForEach(colors, id: \.color) { allocation in
                 chip("\(allocation.color) \(allocation.packs)")
-            }
-            if colors.count > limit {
-                chip("+\(colors.count - limit)")
             }
         }
     }
@@ -598,12 +595,27 @@ struct StatisticsView: View {
                 Text(AppSettings.currencySymbol)
                     .font(.scaled(size: 15, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
+
+                Spacer(minLength: 10)
+
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text("\(viewModel.unitsInStock(stockModels))")
+                        .font(.scaled(size: 17, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                    Text(L.t(.unitsInStock).uppercased())
+                        .font(.scaled(size: 8, weight: .bold, design: .monospaced))
+                        .tracking(1)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
 
             if shelf.unpriced > 0 {
                 Text("\(shelf.unpriced) \(L.t(.modelsWithoutPrice))")
                     .font(.scaled(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.orange)
+                    .foregroundStyle(AppWarning.tint)
             }
         }
         .padding(18)

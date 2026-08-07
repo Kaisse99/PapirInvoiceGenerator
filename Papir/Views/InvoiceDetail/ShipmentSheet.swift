@@ -191,7 +191,7 @@ struct ShipmentSheet: View {
 
                     Text("\(L.t(.inStock)): \(onHand)")
                         .font(.scaled(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(short > 0 ? Color.orange : .secondary)
+                        .foregroundStyle(short > 0 ? AppWarning.tint : .secondary)
                 }
 
                 Spacer(minLength: 8)
@@ -199,7 +199,7 @@ struct ShipmentSheet: View {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("−\(draft.packs)")
                         .font(.scaled(size: 20, weight: .bold, design: .monospaced))
-                        .foregroundStyle(short > 0 ? Color.orange : .primary)
+                        .foregroundStyle(short > 0 ? AppWarning.tint : .primary)
 
                     Text(L.t(draft.packs == 1 ? .pack : .packsLower))
                         .font(.scaled(size: 11, weight: .medium, design: .rounded))
@@ -211,17 +211,17 @@ struct ShipmentSheet: View {
                 HStack(alignment: .top, spacing: 7) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.scaled(size: 11))
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(AppWarning.tint)
 
                     Text("+\(short) \(L.t(.moreThanOnHand))")
                         .font(.scaled(size: 12, weight: .regular, design: .rounded))
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(AppWarning.tint)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.orange.opacity(0.12)))
+                .background(RoundedRectangle(cornerRadius: 10).fill(AppWarning.fill))
             }
         }
         .padding(.horizontal, 16)

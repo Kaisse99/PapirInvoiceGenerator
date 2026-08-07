@@ -17,6 +17,10 @@
 //  The invented data itself is Ukrainian, since that is what the app is for
 //  and English test rows would say nothing about how the real thing wraps.
 //
+//  Filling twice must not double the shelf: a code already on it is reused
+//  rather than added again, because two models with one code is exactly the
+//  state the stock screen refuses to let anyone create by hand.
+//
 //  Shipped invoices are shipped properly: stock is deducted, ShipmentLines are
 //  written and a movement is logged, the same three things ShipmentPlanner
 //  does. Faking the status alone would produce a store that cannot happen, and
@@ -68,16 +72,22 @@ enum DebugData {
                 lastName: lastNames[index],
                 phone: "0\(Int.random(in: 50...99, using: &rng))\(Int.random(in: 1000000...9999999, using: &rng))",
                 city: cities[index],
-                branchOne: "НП №\(Int.random(in: 1...48, using: &rng))",
-                branchTwo: Bool.random(using: &rng) ? "НП №\(Int.random(in: 1...48, using: &rng))" : ""
+                shipmentAddress: "Відділення №\(Int.random(in: 1...48, using: &rng))"
             )
             context.insert(contact)
             contacts.append(contact)
         }
 
+        let existing = (try? context.fetch(FetchDescriptor<StockModel>())) ?? []
         var models: [StockModel] = []
         for code in codes {
             let palette = colors.shuffled(using: &rng).prefix(Int.random(in: 2...5, using: &rng))
+
+            if let already = existing.first(where: { $0.code.caseInsensitiveCompare(code) == .orderedSame }) {
+                models.append(already)
+                continue
+            }
+
             let model = StockModel(
                 code: code,
                 pricePerPiece: Double(Int.random(in: 8...45, using: &rng)) * 10,

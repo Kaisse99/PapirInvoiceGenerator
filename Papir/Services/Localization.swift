@@ -295,6 +295,12 @@ nonisolated enum LKey: String, CaseIterable {
     case versionLabel = "Version"
     case itemsSoldLower = "items sold"
     case itemsSoldLabel = "Items sold"
+    case shipmentAddress = "Shipment address"
+    case unitsInStock = "units in stock"
+    case allInvoices = "All invoices"
+    case draftsOnly = "Drafts only"
+    case shippedOnly = "Shipped only"
+    case addUp = "Add up"
 }
 
 nonisolated enum L {
@@ -314,6 +320,9 @@ nonisolated enum L {
     ]
 
     static let ukrainian: [LKey: String] = [
+        .addUp: "Додати",
+        .allInvoices: "Усі накладні", .draftsOnly: "Лише чернетки", .shippedOnly: "Лише відвантажені",
+        .shipmentAddress: "Адреса доставки", .unitsInStock: "штук на складі",
         .itemsSoldLower: "штук продано", .itemsSoldLabel: "Штук продано",
         .invoicesShipped: "накладних", .packsSoldLower: "пачок продано",
         .profitabilityCaps: "ПРИБУТКОВІСТЬ", .packsSoldLabel: "Пачок продано",
@@ -454,6 +463,9 @@ nonisolated enum L {
     ]
 
     static let russian: [LKey: String] = [
+        .addUp: "Добавить",
+        .allInvoices: "Все накладные", .draftsOnly: "Только черновики", .shippedOnly: "Только отгруженные",
+        .shipmentAddress: "Адрес доставки", .unitsInStock: "штук на складе",
         .itemsSoldLower: "штук продано", .itemsSoldLabel: "Штук продано",
         .invoicesShipped: "накладных", .packsSoldLower: "пачек продано",
         .profitabilityCaps: "ПРИБЫЛЬНОСТЬ", .packsSoldLabel: "Пачек продано",
@@ -594,6 +606,9 @@ nonisolated enum L {
     ]
 
     static let polish: [LKey: String] = [
+        .addUp: "Dodaj",
+        .allInvoices: "Wszystkie faktury", .draftsOnly: "Tylko szkice", .shippedOnly: "Tylko wysłane",
+        .shipmentAddress: "Adres dostawy", .unitsInStock: "sztuk w magazynie",
         .itemsSoldLower: "sztuk sprzedanych", .itemsSoldLabel: "Sztuk sprzedanych",
         .invoicesShipped: "faktur wysłanych", .packsSoldLower: "paczek sprzedanych",
         .profitabilityCaps: "RENTOWNOŚĆ", .packsSoldLabel: "Paczek sprzedanych",
