@@ -54,6 +54,11 @@ struct SettingsSheet: View {
     @State private var pendingRestore: Data? = nil
     @State private var restoreResult: String? = nil
 
+#if DEBUG
+    @State private var showDebugWipeAlert = false
+    @State private var debugResult: String? = nil
+#endif
+
     @Query private var allInvoices: [Invoice]
     @Query private var allStock: [StockModel]
     @Query private var allContacts: [Contact]
@@ -75,6 +80,9 @@ struct SettingsSheet: View {
                     exportSection
                     syncSection
                     historySection
+#if DEBUG
+                    debugSection
+#endif
                     Spacer(minLength: 20)
                 }
                 .padding(.top, 16)
@@ -471,6 +479,59 @@ struct SettingsSheet: View {
             }
         }
     }
+
+#if DEBUG
+    private var debugSection: some View {
+        section(title: "Debug") {
+            VStack(spacing: 8) {
+                dataRow(
+                    icon: "wand.and.stars",
+                    title: "Fill with sample data",
+                    caption: "A shelf and eight months of trade, so every screen has something in it",
+                    tint: .primary
+                ) {
+                    Haptics.medium()
+                    runDebug { try DebugData.populate(context: modelContext) }
+                }
+
+                dataRow(
+                    icon: "trash.slash",
+                    title: "Delete everything",
+                    caption: "Invoices, stock, contacts, history and the PDFs on disk",
+                    tint: .red
+                ) {
+                    Haptics.warning()
+                    showDebugWipeAlert = true
+                }
+
+                if let debugResult {
+                    noticeLine(debugResult, tint: .secondary)
+                }
+
+                noticeLine("Debug builds only. This section is not compiled into a release.", tint: .secondary)
+            }
+        }
+        .alert("Delete everything?", isPresented: $showDebugWipeAlert) {
+            Button("Delete", role: .destructive) {
+                runDebug { try DebugData.wipe(context: modelContext) }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Every invoice, model, contact and PDF goes. This cannot be undone.")
+        }
+    }
+
+    private func runDebug(_ work: () throws -> String) {
+        do {
+            debugResult = try work()
+            Haptics.success()
+        } catch {
+            Haptics.error()
+            AppLog.data.error("Debug action failed: \(error.localizedDescription, privacy: .public)")
+            debugResult = error.localizedDescription
+        }
+    }
+#endif
 
     private func noticeLine(_ text: String, tint: Color) -> some View {
         Text(text)

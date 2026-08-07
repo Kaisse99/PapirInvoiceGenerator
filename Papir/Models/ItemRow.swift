@@ -68,7 +68,7 @@ final class ItemRow {
     }
 }
 
-struct ColorAllocation: Hashable, Sendable {
+nonisolated struct ColorAllocation: Hashable, Sendable {
     let color: String
     let packs: Int
 }

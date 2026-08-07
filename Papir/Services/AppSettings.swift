@@ -18,7 +18,7 @@
 
 import Foundation
 
-enum AppSettings {
+nonisolated enum AppSettings {
     static let unitsKey = "defaultUnitCount"
     static let itemsPerUnitKey = "defaultItemsPerUnit"
     static let languageKey = "appLanguage"

@@ -17,7 +17,7 @@
 
 import Foundation
 
-enum AppLanguage: String, CaseIterable, Identifiable {
+nonisolated enum AppLanguage: String, CaseIterable, Identifiable {
     case english
     case ukrainian
     case russian
@@ -62,7 +62,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 }
 
-enum LKey: String, CaseIterable {
+nonisolated enum LKey: String, CaseIterable {
     case menu = "menu"
     case create = "create"
     case stock = "stock"
@@ -279,7 +279,7 @@ enum LKey: String, CaseIterable {
     case shippedExplained = "The packs on this invoice have been deducted from stock."
 }
 
-enum L {
+nonisolated enum L {
     static func t(_ key: LKey, _ language: AppLanguage = AppSettings.language) -> String {
         guard language != .english else { return englishOverrides[key] ?? key.rawValue }
         return table[language]?[key] ?? englishOverrides[key] ?? key.rawValue

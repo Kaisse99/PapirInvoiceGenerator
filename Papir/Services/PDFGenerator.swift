@@ -17,7 +17,9 @@
 //  where the work happens either way. Nothing here touches main-actor state,
 //  so saying so out loud costs nothing and keeps the detached hop honest.
 //  PDFLanguage carries every piece of on-page text, so adding a language means
-//  adding a case here and nothing else.
+//  adding a case here and nothing else. It is nonisolated for the same reason
+//  the renderer is: it is read while drawing, which happens off the main
+//  actor, and a page of static strings never needed the main actor anyway.
 //  Used by: NewInvoiceViewModel, InvoiceDetailViewModel; PDFLanguage also by
 //  LanguagePickerSheet and PDFStorage.
 //
@@ -25,7 +27,7 @@
 import UIKit
 import PDFKit
 
-enum PDFLanguage: String, CaseIterable, Identifiable {
+nonisolated enum PDFLanguage: String, CaseIterable, Identifiable {
     case english
     case ukrainian
     case russian

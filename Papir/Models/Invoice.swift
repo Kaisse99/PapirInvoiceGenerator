@@ -155,7 +155,7 @@ final class ShipmentLine {
     }
 }
 
-struct InvoiceSnapshot: Sendable {
+nonisolated struct InvoiceSnapshot: Sendable {
     struct Item: Sendable {
         let name: String
         let unitCount: UInt16

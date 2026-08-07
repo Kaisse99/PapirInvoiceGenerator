@@ -22,7 +22,7 @@
 
 import Foundation
 
-enum AppCurrency: String, CaseIterable, Identifiable {
+nonisolated enum AppCurrency: String, CaseIterable, Identifiable {
     case hryvnia
     case zloty
     case rouble
