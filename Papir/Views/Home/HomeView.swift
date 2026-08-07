@@ -6,9 +6,11 @@
 //  so a swipe reads as one sheet of paper sliding rather than a push. Every
 //  direction is drawn the same way, its name in one type size above an arrow
 //  pointing the way the finger goes, so the four read as one set. The
-//  horizontal pair are three stacked chevrons fading back from the leading
-//  one, which says swipe more plainly than the rules that used to run to the
-//  edges; the name sits above them rather than beside them because at the same
+//  horizontal pair are three stacked chevrons, all the same weight, which say
+//  swipe more plainly than the rules that used to run to the edges; they were
+//  drawn fading back from the leading one at first, which read as three
+//  mismatched arrows rather than as one moving in a direction. The name sits
+//  above them rather than beside them because at the same
 //  size as menu and create it would not otherwise leave the mark room to stay
 //  centred. Statistics is drawn faint because the screen behind it does not
 //  exist yet, and swiping at it springs back. The whole stack sits slightly
@@ -222,18 +224,15 @@ struct HomeView: View {
                 .minimumScaleFactor(0.7)
 
             HStack(spacing: -7) {
-                ForEach(0..<3, id: \.self) { index in
-                    chevron(pointsLeft: pointsLeft, available: available, index: index)
+                ForEach(0..<3, id: \.self) { _ in
+                    chevron(pointsLeft: pointsLeft, available: available)
                 }
             }
         }
         .offset(y: -8)
     }
 
-    private func chevron(pointsLeft: Bool, available: Bool, index: Int) -> some View {
-        let lead = pointsLeft ? 0 : 2
-        let fade = [1.0, 0.5, 0.25][abs(index - lead)]
-
+    private func chevron(pointsLeft: Bool, available: Bool) -> some View {
         let glyph = Image(systemName: pointsLeft ? "chevron.left" : "chevron.right")
             .font(.system(size: 28, weight: .light))
 
@@ -244,7 +243,6 @@ struct HomeView: View {
                 glyph.foregroundStyle(.primary.opacity(0.22))
             }
         }
-        .opacity(fade)
     }
 
     private func dragGesture(limits: HomeViewModel.DragLimits) -> some Gesture {

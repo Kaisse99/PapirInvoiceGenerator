@@ -11,6 +11,10 @@
 //  The address book opens from here rather than from the home swipe, because
 //  it is a thing you consult while writing or checking an invoice rather than
 //  a destination of its own.
+//  Selection mode does not swap the row for a different one: the same button
+//  and the same card stay on screen and a checkbox slides in beside them, so
+//  turning it on reads as the list making room rather than as every row being
+//  replaced mid-animation by something that looks almost the same.
 //  Used by: HomeView.
 //
 
@@ -161,6 +165,8 @@ struct MyInvoicesView: View {
                 .fontDesign(.monospaced)
                 .fontWeight(.black)
                 .padding(.horizontal, 4)
+                .contentTransition(.opacity)
+                .animation(AppAnimation.smooth, value: viewModel.isEditing)
         }
         
         ToolbarItemGroup(placement: .topBarTrailing) {
@@ -219,6 +225,7 @@ struct MyInvoicesView: View {
                     .stroke(.primary.opacity(0.40), lineWidth: 1)
             )
             .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
+            .raisedShadow()
             
             Menu {
                 ForEach(MyInvoicesViewModel.SortOption.allCases) { option in
@@ -244,49 +251,45 @@ struct MyInvoicesView: View {
                         RoundedRectangle(cornerRadius: 18)
                             .stroke(Color.primary.opacity(0.55), lineWidth: 1)
                     )
+                    .raisedShadow()
             }
             .tint(Color.primary)
         }
         .padding(.horizontal, 20)
     }
     
-    @ViewBuilder
     private func invoiceRow(for invoice: Invoice) -> some View {
-        if viewModel.isEditing {
-            Button {
-                viewModel.toggleSelection(invoice.id)
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: viewModel.selectedIDs.contains(invoice.id)
-                          ? "checkmark.circle.fill"
-                          : "circle")
-                        .font(.system(size: 22))
-                        .foregroundStyle(viewModel.selectedIDs.contains(invoice.id)
-                                         ? Color.blue
-                                         : Color.secondary.opacity(0.4))
-                        .padding(.bottom, 24)
+        let isSelected = viewModel.selectedIDs.contains(invoice.id)
 
-                    InvoiceRowItem(invoice: invoice)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(viewModel.selectedIDs.contains(invoice.id)
-                                        ? Color.blue
-                                        : Color.clear,
-                                        lineWidth: 2.5)
-                        )
+        return Button {
+            if viewModel.isEditing {
+                viewModel.toggleSelection(invoice.id)
+            } else {
+                Haptics.light()
+                navigationPath.append(invoice)
+            }
+        } label: {
+            HStack(spacing: 12) {
+                if viewModel.isEditing {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 22))
+                        .foregroundStyle(isSelected ? Color.blue : Color.secondary.opacity(0.4))
+                        .contentTransition(.symbolEffect(.replace))
+                        .padding(.bottom, 24)
+                        .transition(.move(edge: .leading).combined(with: .opacity))
                 }
-                .animation(AppAnimation.quick, value: viewModel.isEditing)
-                .animation(AppAnimation.fast, value: viewModel.selectedIDs.contains(invoice.id))
-            }
-            .buttonStyle(.plain)
-        } else {
-            NavigationLink(value: invoice) {
+
                 InvoiceRowItem(invoice: invoice)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2.5)
+                            .animation(AppAnimation.fast, value: isSelected)
+                    )
             }
-            .buttonStyle(PressableStyle())
-            .contextMenu {
-                contextMenuButtons(for: invoice)
-            }
+        }
+        .buttonStyle(PressableStyle())
+        .contextMenu {
+            contextMenuButtons(for: invoice)
         }
     }
     

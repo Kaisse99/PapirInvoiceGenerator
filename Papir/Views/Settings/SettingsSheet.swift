@@ -34,6 +34,9 @@ struct SettingsSheet: View {
     @AppStorage(AppSettings.lowStockKey)
     private var lowStockThreshold: Int = AppSettings.fallbackLowStock
 
+    @AppStorage(AppSettings.defaultSenderKey)
+    private var defaultSender: String = ""
+
     @AppStorage(AppSettings.cloudSyncKey)
     private var cloudSyncEnabled: Bool = false
 
@@ -51,6 +54,7 @@ struct SettingsSheet: View {
                 VStack(spacing: 26) {
                     languageSection
                     currencySection
+                    senderSection
                     defaultsSection
                     stockSection
                     syncSection
@@ -126,6 +130,38 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private var senderSection: some View {
+        section(title: L.t(.sender, language)) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 12) {
+                    TextField(L.t(.defaultSenderPlaceholder, language), text: $defaultSender)
+                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .autocorrectionDisabled()
+                        .limitInput($defaultSender, to: 40)
+
+                    if !defaultSender.isEmpty {
+                        Button {
+                            defaultSender = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .padding(.horizontal, 18)
+                .frame(height: 60)
+                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
+
+                Text(L.t(.defaultSenderCaption, language))
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
             }
         }
     }

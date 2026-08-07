@@ -112,9 +112,9 @@ enum PDFLanguage: String, CaseIterable, Identifiable {
     var totalLabel: String {
         switch self {
         case .english:   return "TOTAL"
-        case .ukrainian: return "УСЬОГО"
-        case .russian:   return "ИТОГО"
-        case .polish:    return "RAZEM"
+        case .ukrainian: return "СУМА"
+        case .russian:   return "СУММА"
+        case .polish:    return "SUMA"
         }
     }
     
@@ -242,25 +242,39 @@ struct PDFGenerator {
             .foregroundColor: UIColor.black
         ]
         
+        let detailAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.monospacedSystemFont(ofSize: 9.5 * fontScale, weight: .regular),
+            .foregroundColor: UIColor.darkGray
+        ]
+
         let columnWidth = (pageWidth - margin * 2 - 20) / 2
 
-        var parties: [(String, String)] = []
+        var parties: [(label: String, name: String, details: [String])] = []
         if !invoice.sender.isEmpty {
-            parties.append((language.fromLabel, invoice.sender))
+            parties.append((language.fromLabel, invoice.sender, []))
         }
         if !invoice.receiver.isEmpty {
-            parties.append((language.toLabel, invoice.receiver))
+            parties.append((language.toLabel, invoice.receiver, invoice.receiverDetails))
         }
 
         guard !parties.isEmpty else { return startY }
 
+        var deepest = startY + 34
+
         for (index, party) in parties.enumerated() {
             let x = margin + CGFloat(index) * (columnWidth + 20)
-            party.0.draw(at: CGPoint(x: x, y: startY), withAttributes: labelAttrs)
-            party.1.draw(at: CGPoint(x: x, y: startY + 14), withAttributes: valueAttrs)
+            party.label.draw(at: CGPoint(x: x, y: startY), withAttributes: labelAttrs)
+            party.name.draw(at: CGPoint(x: x, y: startY + 14), withAttributes: valueAttrs)
+
+            var lineY = startY + 32
+            for detail in party.details {
+                detail.draw(at: CGPoint(x: x, y: lineY), withAttributes: detailAttrs)
+                lineY += 13
+            }
+            deepest = max(deepest, lineY + (party.details.isEmpty ? 2 : 4))
         }
 
-        return startY + 34
+        return deepest
     }
     
     private static func drawTableHeader(language: PDFLanguage, startY: CGFloat, pageWidth: CGFloat) -> CGFloat {

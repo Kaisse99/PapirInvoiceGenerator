@@ -302,57 +302,53 @@ struct InvoiceDetailView: View {
     
     private func rowEntry(index: Int, item: ItemRow) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text("\(L.t(.entry)) #\(index):")
-                    .font(.callout)
-                    .fontDesign(.monospaced)
-                    .fontWeight(.semibold)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text("#\(index)")
+                    .font(.system(size: 18, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
-                
+
                 Text(item.name)
-                    .font(.callout)
-                    .fontDesign(.monospaced)
-                    .fontWeight(.medium)
+                    .font(.system(size: 18, weight: .medium, design: .monospaced))
                     .foregroundStyle(.primary)
-                
+
                 Spacer()
             }
             
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(item.unitCount)")
-                    .font(.footnote)
+                    .font(.subheadline)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.primary.opacity(0.85))
                 Text("×")
-                    .font(.footnote)
+                    .font(.subheadline)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
                 Text("\(item.itemsPerUnit)")
-                    .font(.footnote)
+                    .font(.subheadline)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.primary.opacity(0.85))
                 Text("×")
-                    .font(.footnote)
+                    .font(.subheadline)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
                 Text(formatted(item.price))
-                    .font(.footnote)
+                    .font(.subheadline)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.primary.opacity(0.85))
                 Text(AppSettings.currencySymbol)
-                    .font(.caption2)
+                    .font(.caption)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
                 
                 Spacer()
                 
                 Text(formatted(item.totalForItem))
-                    .font(.footnote)
+                    .font(.subheadline)
                     .fontDesign(.monospaced)
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
                 Text(AppSettings.currencySymbol)
-                    .font(.caption2)
+                    .font(.caption)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
             }
@@ -361,7 +357,7 @@ struct InvoiceDetailView: View {
                 FlowLayout(spacing: 4) {
                     ForEach(item.colorBreakdown, id: \.self) { allocation in
                         Text("\(allocation.color) \(allocation.packs)")
-                            .font(.caption2)
+                            .font(.caption)
                             .fontDesign(.monospaced)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 2)

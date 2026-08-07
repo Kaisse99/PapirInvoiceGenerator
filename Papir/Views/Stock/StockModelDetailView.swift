@@ -8,9 +8,16 @@
 //  negative. Taking stock out is the everyday action so it is the filled
 //  button; recounting is the correction, so it is the quiet outlined one.
 //  Taking stock in is also how a new color appears, so there is no separate
-//  add-color step. The price per piece sits under the total as a tappable
-//  capsule rather than a row in a form, because it is read far more often than
-//  it is changed and it is what a new invoice row fills itself in with.
+//  add-color step. The price per piece sits under the pack total in the same
+//  shape as it, a spaced label over a big monospaced number, because they are
+//  the two facts about a model worth reading from across the room and a
+//  bordered capsule between them looked like a control that had wandered in
+//  from another screen. Tapping it opens the sheet that sets it.
+//  The colour chips are filled with the same grey every card on the app uses
+//  rather than a wash of their own state: a red number on a chip lying
+//  straight on the near black background read as far more alarming than the
+//  same number on a card, so the state is carried by the number and the hairline
+//  around it while the chip itself stays furniture.
 //  Used by: StockView.
 //
 
@@ -136,50 +143,52 @@ struct StockModelDetailView: View {
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
 
-            priceButton
-                .padding(.top, 6)
+            priceBlock
+                .padding(.top, 18)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
     }
 
-    private var priceButton: some View {
+    private var priceBlock: some View {
         Button {
             Haptics.light()
             showPrice = true
         } label: {
-            HStack(spacing: 10) {
+            VStack(spacing: 4) {
                 Text(L.t(.pricePerPiece).uppercased())
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .tracking(1.5)
+                    .font(.caption)
+                    .fontDesign(.monospaced)
+                    .tracking(4)
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
 
-                if model.hasPrice {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 5) {
+                    if model.hasPrice {
                         Text(PriceText.display(model.pricePerPiece))
-                            .font(.system(size: 26, weight: .bold, design: .monospaced))
+                            .font(.system(size: 30, weight: .bold, design: .monospaced))
                             .foregroundStyle(.primary)
                             .contentTransition(.numericText())
                             .animation(AppAnimation.quick, value: model.pricePerPiece)
 
                         Text(AppSettings.currencySymbol)
-                            .font(.system(size: 15, weight: .medium, design: .monospaced))
+                            .font(.system(size: 16, weight: .medium, design: .monospaced))
                             .foregroundStyle(.secondary)
+                    } else {
+                        Text(L.t(.noPriceYet))
+                            .font(.system(size: 17, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.secondary.opacity(0.8))
                     }
-                } else {
-                    Text(L.t(.noPriceYet))
-                        .font(.system(size: 15, weight: .medium, design: .monospaced))
-                        .foregroundStyle(.secondary.opacity(0.8))
-                }
 
-                Image(systemName: "pencil")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    Image(systemName: "pencil")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.secondary.opacity(0.7))
+                        .padding(.leading, 2)
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(Capsule().fill(Color.primary.opacity(0.05)))
-            .overlay(Capsule().stroke(Color.primary.opacity(0.15), lineWidth: 0.9))
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
@@ -221,7 +230,7 @@ struct StockModelDetailView: View {
         }
         .padding(.horizontal, 11)
         .padding(.vertical, 6)
-        .background(Capsule().fill(line.state.isFlagged ? line.state.tint.opacity(0.14) : Color.primary.opacity(0.06)))
+        .background(Capsule().fill(Color(.secondarySystemGroupedBackground)))
         .overlay(Capsule().stroke(line.state.accent.opacity(line.state.isFlagged ? 0.7 : 0.4), lineWidth: 0.9))
     }
 

@@ -1,8 +1,13 @@
 //
 //  StockModel.swift
-//  A garment model held in stock, identified by its code (1987, 6395C), plus
-//  one StockLine per color under it. Codes differing only by a letter are
-//  separate models, not variants of one, so the code is the whole identity.
+//  A garment model held in stock, identified by whatever she calls it (1987,
+//  6395C, a name), plus one StockLine per color under it. Two codes differing
+//  by a letter are separate models, not variants of one, so the code is the
+//  whole identity. It used to be held to four digits and an optional letter;
+//  that turned out to be her supplier's habit rather than a rule, so the only
+//  thing enforced now is that it is not blank and that runs of spaces are
+//  collapsed, since "132.   FSD" and "132. FSD" are the same box on the shelf
+//  and only one of them can be found by searching.
 //  Stock is counted in whole packs and nothing else. Loose pieces left over
 //  from a part-pack order are deliberately not tracked: she does not store
 //  partials separately, so counting them would be bookkeeping with no shelf
@@ -87,13 +92,10 @@ final class StockModel {
     }
 
     static func normalizedCode(_ raw: String) -> String? {
-        let trimmed = raw.trimmingCharacters(in: .whitespaces).uppercased()
-        guard trimmed.count == 4 || trimmed.count == 5 else { return nil }
-        guard trimmed.prefix(4).allSatisfy(\.isNumber) else { return nil }
-        if trimmed.count == 5, let suffix = trimmed.last, !suffix.isLetter {
-            return nil
-        }
-        return trimmed
+        let collapsed = raw
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+        return collapsed.isEmpty ? nil : collapsed
     }
 }
 

@@ -8,10 +8,14 @@
 //  state while the sheet is open.
 //  An invoice points at the contact its receiver was picked from, so counting
 //  what someone has bought is a question about a relationship rather than
-//  about matching two strings that a typo can pull apart. The link is nullify,
-//  never cascade: deleting a customer must not take their invoices with them,
-//  and the invoice keeps the receiver name it was written with regardless.
-//  Rows written before the address book existed simply have no contact.
+//  about matching two strings that a typo can pull apart. Only the receiver:
+//  the sender is whoever is holding the phone, which is a name set once in
+//  settings, not a customer. The link is nullify, never cascade: deleting a
+//  customer must not take their invoices with them, and the invoice keeps the
+//  name it was written with regardless. Invoices written before the address
+//  book existed have no contact.
+//  documentLines is what goes under a name on the PDF, in the order the parcel
+//  needs it: the city, then the branch or branches, then the phone.
 //  Used by: AddressBookView, ContactEditorSheet, AddressBookViewModel,
 //  NewInvoiceView, NewInvoiceViewModel, Invoice.
 //
@@ -74,6 +78,16 @@ final class Contact {
 
     var invoiceCount: Int {
         invoices?.count ?? 0
+    }
+
+    var documentLines: [String] {
+        var lines: [String] = []
+        let city = city.trimmingCharacters(in: .whitespaces)
+        if !city.isEmpty { lines.append(city) }
+        lines.append(contentsOf: branches)
+        let phone = phone.trimmingCharacters(in: .whitespaces)
+        if !phone.isEmpty { lines.append(phone) }
+        return lines
     }
 
     func matches(_ query: String) -> Bool {

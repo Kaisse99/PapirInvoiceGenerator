@@ -11,7 +11,9 @@
 //  The receiver can be picked from the address book, which remembers which
 //  contact it was and saves that alongside the typed name. Editing the name
 //  away from the contact's own drops the link rather than leaving an invoice
-//  filed under someone it no longer names.
+//  filed under someone it no longer names. The sender is only ever a string,
+//  prefilled from the name in settings, because it is always whoever is
+//  holding the phone and never someone in the address book.
 //  Used by: NewInvoiceView, HomeView, EditInvoiceSheet in InvoiceDetailView.
 //
 
@@ -38,7 +40,7 @@ struct InvoiceRowDraft: Identifiable {
 @MainActor
 final class NewInvoiceViewModel: ObservableObject {
     @Published var showHeader = false
-    @Published var sender: String = ""
+    @Published var sender: String = AppSettings.defaultSender
     @Published var receiver: String = "" {
         didSet { dropContactIfRenamed() }
     }

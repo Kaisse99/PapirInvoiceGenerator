@@ -42,8 +42,24 @@
 import SwiftUI
 
 struct InvoiceRowCard: View {
-    enum Field: Hashable {
+    enum Field: Hashable, CaseIterable {
         case name, units, perUnit, price
+    }
+
+    private var stepFields: [Field] {
+        unitsFollowColors ? [.name, .perUnit, .price] : Field.allCases
+    }
+
+    private func stepIndex() -> Int? {
+        guard let focusedField else { return nil }
+        return stepFields.firstIndex(of: focusedField)
+    }
+
+    private func step(_ offset: Int) {
+        guard let index = stepIndex() else { return }
+        let next = index + offset
+        guard stepFields.indices.contains(next) else { return }
+        focusedField = stepFields[next]
     }
     
     @Environment(\.colorScheme) var colorScheme
@@ -122,8 +138,8 @@ struct InvoiceRowCard: View {
             RoundedRectangle(cornerRadius: 22)
                 .fill(cardBackground)
                 .stroke(.primary.opacity(0.30), lineWidth: 0.8)
-                .shadow(color: .primary.opacity(0.10), radius: 8, y: 4)
         )
+        .raisedShadow()
         .animation(AppAnimation.quick, value: isLocked)
         .onAppear { syncDerived(animated: false) }
         .onChange(of: name) { _, _ in
@@ -145,6 +161,17 @@ struct InvoiceRowCard: View {
         }
         .overlay(alignment: .topTrailing) {
             lockButton.offset(x: 6, y: -6)
+        }
+        .toolbar {
+            if focusedField != nil {
+                KeyboardStepBar(
+                    canGoBack: (stepIndex() ?? 0) > 0,
+                    canGoForward: (stepIndex() ?? stepFields.count) < stepFields.count - 1,
+                    onBack: { step(-1) },
+                    onForward: { step(1) },
+                    onDone: { focusedField = nil }
+                )
+            }
         }
         .onLongPressGesture(minimumDuration: 0.5) {
             if !isLocked {
@@ -348,12 +375,12 @@ struct InvoiceRowCard: View {
     }
 
     private var matchedModel: StockSuggestion? {
-        if let exact = stockSuggestions.first(where: { $0.code == typedCode }) {
+        if let exact = stockSuggestions.first(where: { $0.code.caseInsensitiveCompare(typedCode) == .orderedSame }) {
             return exact
         }
         for token in name.split(whereSeparator: { !$0.isLetter && !$0.isNumber }) {
-            let candidate = String(token).uppercased()
-            if let hit = stockSuggestions.first(where: { $0.code == candidate }) {
+            let candidate = String(token)
+            if let hit = stockSuggestions.first(where: { $0.code.caseInsensitiveCompare(candidate) == .orderedSame }) {
                 return hit
             }
         }
@@ -395,22 +422,28 @@ struct InvoiceRowCard: View {
     }
 
     private var typedCode: String {
-        name.trimmingCharacters(in: .whitespaces).uppercased()
+        name.trimmingCharacters(in: .whitespaces)
     }
 
     private var matchingCodes: [StockSuggestion] {
         guard focusedField == .name, !typedCode.isEmpty else { return [] }
-        guard !stockSuggestions.contains(where: { $0.code == typedCode }) else { return [] }
+        guard !stockSuggestions.contains(where: { $0.code.caseInsensitiveCompare(typedCode) == .orderedSame }) else {
+            return []
+        }
 
-        let starting = stockSuggestions.filter { $0.code.hasPrefix(typedCode) }
-        let containing = stockSuggestions.filter { !$0.code.hasPrefix(typedCode) && $0.code.contains(typedCode) }
+        let needle = typedCode.lowercased()
+        let starting = stockSuggestions.filter { $0.code.lowercased().hasPrefix(needle) }
+        let containing = stockSuggestions.filter {
+            let code = $0.code.lowercased()
+            return !code.hasPrefix(needle) && code.contains(needle)
+        }
         return Array((starting + containing).prefix(5))
     }
 
     private var showsUnknownCodeHint: Bool {
         guard focusedField == .name, !stockSuggestions.isEmpty else { return false }
-        guard StockModel.normalizedCode(typedCode) != nil else { return false }
-        return !stockSuggestions.contains { $0.code == typedCode }
+        guard typedCode.count >= 3, matchingCodes.isEmpty else { return false }
+        return matchedModel == nil
     }
 
     private var suggestionList: some View {

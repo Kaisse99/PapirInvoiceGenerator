@@ -17,6 +17,11 @@
 //  Nothing typed into one of these is a word: model codes, surnames, colors
 //  and branch numbers all get autocorrected into something else, so the field
 //  turns correction off everywhere rather than per caller.
+//  The focus blue is written out rather than taken from the accent colour,
+//  because screens that tint themselves ink to keep their buttons monochrome
+//  were quietly turning the focus ring and the label the same colour as
+//  everything else, which left a field with no way to say it was the one
+//  being typed in.
 //  Used by: InvoiceRowCard.
 //
 
@@ -51,7 +56,7 @@ struct LabeledField<FocusValue: Hashable>: View {
     private var labelColor: Color {
         if isError { return .red }
         if isWarning { return .orange }
-        if isFocused { return Color.accentColor }
+        if isFocused { return .blue.opacity(0.9) }
         return .secondary
     }
     

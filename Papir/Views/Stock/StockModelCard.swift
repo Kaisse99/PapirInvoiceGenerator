@@ -70,7 +70,7 @@ struct StockModelCard: View {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.primary.opacity(0.12), lineWidth: 0.8)
         )
-        .shadow(color: .primary.opacity(0.08), radius: 8, y: 3)
+        .raisedShadow()
     }
 
     private func colorChip(_ line: StockLine) -> some View {

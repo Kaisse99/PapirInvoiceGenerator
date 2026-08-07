@@ -18,9 +18,13 @@
 //  exist: a non-optional enum would come back null on every older invoice and
 //  trap the moment anything read it.
 //  receiverContact is who the receiver was picked from in the address book,
-//  and is nil whenever the name was simply typed. The receiver string stays
-//  the record of what the document says; the link is only there so counting by
-//  customer is a relationship rather than a string match.
+//  and is nil whenever the name was simply typed. The sender has no such link
+//  on purpose: it is always whoever is holding the phone, prefilled from a
+//  name kept in settings, and nothing about the business is worth counting by.
+//  The receiver string stays the record of what the document says; the link is
+//  there so counting by customer is a relationship rather than a string match,
+//  and so the PDF can print the city, branch and phone underneath the name
+//  without the invoice storing a second copy of them.
 //  Used by: NewInvoiceViewModel, MyInvoicesViewModel, InvoiceDetailViewModel,
 //  ShipmentPlanner, PDFGenerator, PDFStorage, MyInvoicesView,
 //  InvoiceDetailView, InvoiceRowItem.
@@ -84,6 +88,7 @@ final class Invoice {
             date: date,
             sender: sender,
             receiver: receiver,
+            receiverDetails: receiverContact?.documentLines ?? [],
             items: orderedItems.map {
                 InvoiceSnapshot.Item(
                     name: $0.name,
@@ -154,6 +159,7 @@ struct InvoiceSnapshot: Sendable {
     let date: Date
     let sender: String
     let receiver: String
+    let receiverDetails: [String]
     let items: [Item]
 
     var total: Double {

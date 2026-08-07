@@ -87,7 +87,7 @@ final class MyInvoicesViewModel: ObservableObject {
     
     func toggleEditing() {
         Haptics.light()
-        withAnimation(AppAnimation.snappy) {
+        withAnimation(AppAnimation.smooth) {
             isEditing.toggle()
             if !isEditing { selectedIDs.removeAll() }
         }

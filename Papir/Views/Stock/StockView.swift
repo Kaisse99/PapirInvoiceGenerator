@@ -193,6 +193,7 @@ struct StockView: View {
                 .stroke(.primary.opacity(0.40), lineWidth: 1)
         )
         .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
+        .raisedShadow()
         .padding(.horizontal, 20)
     }
 
@@ -210,12 +211,11 @@ struct StockView: View {
             }
             .padding(.top, 24)
 
-            TextField("1987", text: $viewModel.newModelCode)
+            TextField(L.t(.modelCode), text: $viewModel.newModelCode)
                 .font(.system(size: 28, weight: .bold, design: .monospaced))
                 .multilineTextAlignment(.center)
-                .textInputAutocapitalization(.characters)
                 .autocorrectionDisabled()
-                .limitInput($viewModel.newModelCode, to: 5)
+                .limitInput($viewModel.newModelCode, to: 30)
                 .frame(height: 64)
                 .frame(maxWidth: .infinity)
                 .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))

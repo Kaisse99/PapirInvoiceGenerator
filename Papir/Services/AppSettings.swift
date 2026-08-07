@@ -2,7 +2,9 @@
 //  AppSettings.swift
 //  The few preferences that outlive a launch, kept in UserDefaults because
 //  they are choices rather than data: the app's language, the currency every
-//  amount is written in, and the two numbers a fresh invoice row starts with.
+//  amount is written in, the two numbers a fresh invoice row starts with, and
+//  the name that goes in the sender field, which is the same person on every
+//  invoice she writes and so is set once here rather than typed each time.
 //  A pack is nearly always six, so typing that once here beats retyping it on
 //  every row, and a stored zero means the field starts empty instead.
 //  Reads are plain statics so any layer can ask; writes go through @AppStorage
@@ -22,6 +24,7 @@ enum AppSettings {
     static let languageKey = "appLanguage"
     static let currencyKey = "appCurrency"
     static let lowStockKey = "lowStockThreshold"
+    static let defaultSenderKey = "defaultSender"
     static let cloudSyncKey = "iCloudSyncEnabled"
     static let cloudFailureKey = "iCloudSyncUnavailable"
     static let cloudContainerID = "iCloud.com.kaissenberg.Papir"
@@ -48,6 +51,10 @@ enum AppSettings {
 
     static var lowStockThreshold: Int {
         UserDefaults.standard.object(forKey: lowStockKey) as? Int ?? fallbackLowStock
+    }
+
+    static var defaultSender: String {
+        UserDefaults.standard.string(forKey: defaultSenderKey) ?? ""
     }
 
     static var cloudSyncEnabled: Bool {

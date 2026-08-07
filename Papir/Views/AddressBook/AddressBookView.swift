@@ -172,6 +172,7 @@ struct AddressBookView: View {
                 .stroke(.primary.opacity(0.40), lineWidth: 1)
         )
         .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
+        .raisedShadow()
         .padding(.horizontal, 20)
     }
 

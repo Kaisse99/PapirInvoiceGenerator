@@ -7,6 +7,10 @@
 //  is the one collections re-flow with when their contents change, and
 //  toolbarIcon is the single size every bar glyph is drawn at, because they
 //  otherwise inherit whatever weight their symbol happens to carry.
+//  raisedShadow is the one lift every card, row and bar in the app sits on. It
+//  is two layers because one cannot do both jobs: a black one that shows where
+//  a card overlaps something pale, and a faint primary one that reads as a
+//  glow on a dark screen and as a second soft shadow on a light one.
 //  Used by: every view and view model in the app.
 //
 
@@ -60,6 +64,12 @@ extension View {
 
     func toolbarIcon() -> some View {
         font(.system(size: 16, weight: .medium))
+    }
+
+    func raisedShadow() -> some View {
+        self
+            .shadow(color: .black.opacity(0.14), radius: 5, y: 3)
+            .shadow(color: .primary.opacity(0.06), radius: 6, y: 2)
     }
 
     func dismissKeyboardOnTap() -> some View {

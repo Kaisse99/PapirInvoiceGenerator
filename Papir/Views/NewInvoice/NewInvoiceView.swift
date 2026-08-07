@@ -9,9 +9,11 @@
 //  The receiver offers matching contacts under it the way a row's name offers
 //  stock codes, and for the same reason: three at most, only once there is a
 //  letter to match on, so tapping into the field does not throw a list over
-//  the form. What is showing is held in state and swapped inside an animation,
-//  because the rows below have to move down to make room and a list that
-//  appears under a moving form reads as a glitch.
+//  the form. The sender gets none of that; it arrives already filled from the
+//  name in settings and is only ever typed over. What is showing is held in
+//  state and swapped inside an animation, because the rows below have to move
+//  down to make room and a list that appears under a moving form reads as a
+//  glitch.
 //  Used by: HomeView, EditInvoiceSheet in InvoiceDetailView.
 //
 
@@ -50,6 +52,11 @@ struct NewInvoiceView: View {
         }
 
         return Array(contacts.filter { $0.matches(typed) }.prefix(3))
+    }
+
+    private func pickContact(_ contact: Contact) {
+        viewModel.pick(contact)
+        focusedHeaderField = nil
     }
 
     private func syncContactSuggestions() {
@@ -118,6 +125,15 @@ struct NewInvoiceView: View {
                 .padding(.horizontal, 4)
         }
 
+        if focusedHeaderField != nil {
+            KeyboardStepBar(
+                canGoBack: focusedHeaderField == .receiver,
+                canGoForward: focusedHeaderField == .sender,
+                onBack: { focusedHeaderField = .sender },
+                onForward: { focusedHeaderField = .receiver },
+                onDone: { focusedHeaderField = nil }
+            )
+        }
     }
     
     private var senderReceiverSection: some View {
@@ -158,7 +174,7 @@ struct NewInvoiceView: View {
                             focus: .receiver
                         )
 
-                        if !visibleContacts.isEmpty {
+                        if focusedHeaderField == .receiver && !visibleContacts.isEmpty {
                             contactSuggestionList
                         }
                     }
@@ -204,10 +220,17 @@ struct NewInvoiceView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.primary.opacity(colorScheme == .dark ? 0.18 : 0.15), lineWidth: 1)
+                .stroke(
+                    focusedHeaderField == focus
+                        ? Color.blue.opacity(0.9)
+                        : Color.primary.opacity(colorScheme == .dark ? 0.18 : 0.15),
+                    lineWidth: 1
+                )
         )
-        .shadow(color: .black.opacity(colorScheme == .dark ? 0.0 : 0.04), radius: 8, y: 3)
+        .raisedShadow()
+        .animation(AppAnimation.fast, value: focusedHeaderField == focus)
         .contentShape(RoundedRectangle(cornerRadius: 16))
+        .onTapGesture { focusedHeaderField = focus }
     }
     
     private var contactSuggestionList: some View {
@@ -215,8 +238,7 @@ struct NewInvoiceView: View {
             ForEach(Array(visibleContacts.enumerated()), id: \.element.persistentModelID) { index, contact in
                 Button {
                     Haptics.light()
-                    viewModel.pick(contact)
-                    focusedHeaderField = nil
+                    pickContact(contact)
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "person.crop.circle")

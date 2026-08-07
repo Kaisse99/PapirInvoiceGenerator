@@ -44,7 +44,7 @@ final class StockViewModel: ObservableObject {
             return
         }
 
-        if existing.contains(where: { $0.code == code }) {
+        if existing.contains(where: { $0.code.caseInsensitiveCompare(code) == .orderedSame }) {
             Haptics.warning()
             addModelError = "\(L.t(.modelExists)): \(code)"
             return

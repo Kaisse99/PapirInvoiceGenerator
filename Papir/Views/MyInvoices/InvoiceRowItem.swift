@@ -16,6 +16,10 @@
 //  tighter than its top ones so it sits into the strip instead of floating
 //  above it, and the item count is centred on the total rather than sharing
 //  its baseline, since a capsule hung off a baseline reads as having slipped.
+//  The card casts a real shadow onto the strip, two of them, a wide soft one
+//  and a tight one at the edge, because without it two flat rectangles of the
+//  same width read as one shape with a coloured end rather than as a card
+//  lying on a sheet of paper.
 //  Used by: MyInvoicesView.
 //
 
@@ -107,7 +111,7 @@ struct InvoiceRowItem: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardShape.fill(Color(.secondarySystemGroupedBackground)))
         .overlay(cardShape.stroke(.primary.opacity(0.12), lineWidth: 0.8))
-        .shadow(color: .primary.opacity(0.08), radius: 8, y: 3)
+        .raisedShadow()
         .padding(.bottom, Self.statusStrip)
         .background(statusPlate)
         .animation(AppAnimation.quick, value: invoice.status)
@@ -126,12 +130,12 @@ struct InvoiceRowItem: View {
 
     private var statusPlate: some View {
         RoundedRectangle(cornerRadius: 20)
-            .fill(invoice.status.plateTint(colorScheme))
+            .fill(invoice.status.plateTint)
             .overlay(alignment: .bottomLeading) {
                 Text(invoice.status.label.uppercased())
                     .font(.system(size: 10, weight: .heavy, design: .monospaced))
                     .tracking(1.5)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(invoice.status.plateText)
                     .padding(.leading, 18)
                     .padding(.bottom, 6)
                     .contentTransition(.opacity)

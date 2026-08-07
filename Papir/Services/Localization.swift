@@ -111,6 +111,8 @@ enum LKey: String {
 
     case senderAndReceiver = "Sender & Receiver"
     case sender = "Sender"
+    case defaultSenderPlaceholder = "Your name or business"
+    case defaultSenderCaption = "Filled into the sender field on every new invoice"
     case receiver = "Receiver"
     case from = "From"
     case to = "To"
@@ -139,8 +141,9 @@ enum LKey: String {
     case noModels = "No models yet"
     case noModelsHint = "Add a model code to start counting packs"
     case newModel = "New model"
-    case modelCodeHint = "Four digits, plus a letter if it has one"
-    case modelCodeInvalid = "A model code is four digits, with an optional letter. For example 1987 or 6395C."
+    case modelCode = "Model code"
+    case modelCodeHint = "Whatever you call it on the shelf"
+    case modelCodeInvalid = "A model needs a name or a code."
     case modelExists = "Model already exists"
     case addModel = "Add model"
     case deleteModel = "Delete model"
@@ -315,6 +318,8 @@ enum L {
         .generatePDFIn: "Створити PDF", .chooseLanguage: "Оберіть мову",
         .senderAndReceiver: "Від кого / Кому",
         .sender: "Від кого", .receiver: "Кому",
+        .defaultSenderPlaceholder: "Ваше імʼя або фірма",
+        .defaultSenderCaption: "Підставляється у поле «Від кого» на кожній новій накладній",
         .from: "Від", .to: "Для", .date: "Дата", .items: "Позицій",
         .entry: "Позиція", .row: "Рядок", .name: "Назва",
         .units: "Пачки", .perUnit: "У пачці", .price: "Ціна",
@@ -326,9 +331,9 @@ enum L {
         .stockTitle: "Склад", .searchStock: "Модель або колір...",
         .noModels: "Ще немає моделей",
         .noModelsHint: "Додайте код моделі",
-        .newModel: "Нова модель",
-        .modelCodeHint: "Чотири цифри та літера",
-        .modelCodeInvalid: "Чотири цифри та літера. Наприклад 1987 або 6395C.",
+        .newModel: "Нова модель", .modelCode: "Код моделі",
+        .modelCodeHint: "Як ви називаєте її на складі",
+        .modelCodeInvalid: "Потрібна назва або код.",
         .modelExists: "Така модель вже є",
         .addModel: "Додати модель", .deleteModel: "Видалити модель",
         .deleteModelTitle: "Видалити цю модель?",
@@ -413,6 +418,8 @@ enum L {
         .generatePDFIn: "Создать PDF", .chooseLanguage: "Выберите язык",
         .senderAndReceiver: "От кого / Кому",
         .sender: "От кого", .receiver: "Кому",
+        .defaultSenderPlaceholder: "Ваше имя или фирма",
+        .defaultSenderCaption: "Подставляется в поле «От кого» на каждой новой накладной",
         .from: "От", .to: "Для", .date: "Дата", .items: "Позиций",
         .entry: "Позиция", .row: "Строка", .name: "Название",
         .units: "Пачки", .perUnit: "В пачке", .price: "Цена",
@@ -424,9 +431,9 @@ enum L {
         .stockTitle: "Склад", .searchStock: "Модель или цвет...",
         .noModels: "Пока нет моделей",
         .noModelsHint: "Добавьте код модели",
-        .newModel: "Новая модель",
-        .modelCodeHint: "Четыре цифры и буква",
-        .modelCodeInvalid: "Четыре цифры и буква. Например 1987 или 6395C.",
+        .newModel: "Новая модель", .modelCode: "Код модели",
+        .modelCodeHint: "Как вы называете её на складе",
+        .modelCodeInvalid: "Нужно название или код.",
         .modelExists: "Такая модель уже есть",
         .addModel: "Добавить модель", .deleteModel: "Удалить модель",
         .deleteModelTitle: "Удалить эту модель?",
@@ -511,6 +518,8 @@ enum L {
         .generatePDFIn: "Utwórz PDF w", .chooseLanguage: "Wybierz język",
         .senderAndReceiver: "Nadawca i odbiorca",
         .sender: "Nadawca", .receiver: "Odbiorca",
+        .defaultSenderPlaceholder: "Twoje imię lub firma",
+        .defaultSenderCaption: "Wypełnia pole nadawcy na każdej nowej fakturze",
         .from: "Od", .to: "Do", .date: "Data", .items: "Pozycji",
         .entry: "Pozycja", .row: "Wiersz", .name: "Nazwa",
         .units: "Paczki", .perUnit: "W paczce", .price: "Cena",
@@ -522,9 +531,9 @@ enum L {
         .stockTitle: "Magazyn", .searchStock: "Szukaj modelu lub koloru...",
         .noModels: "Brak modeli",
         .noModelsHint: "Dodaj kod modelu, aby liczyć paczki",
-        .newModel: "Nowy model",
-        .modelCodeHint: "Cztery cyfry, opcjonalnie z literą",
-        .modelCodeInvalid: "Kod modelu to cztery cyfry i opcjonalna litera. Na przykład 1987 lub 6395C.",
+        .newModel: "Nowy model", .modelCode: "Kod modelu",
+        .modelCodeHint: "Jak nazywasz go w magazynie",
+        .modelCodeInvalid: "Potrzebna nazwa lub kod.",
         .modelExists: "Taki model już istnieje",
         .addModel: "Dodaj model", .deleteModel: "Usuń model",
         .deleteModelTitle: "Usunąć ten model?",

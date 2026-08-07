@@ -20,8 +20,25 @@ struct ContactEditorSheet: View {
     @State private var form: ContactDraft
     @FocusState private var focused: Field?
 
-    private enum Field: Hashable {
+    private enum Field: Hashable, CaseIterable {
         case firstName, lastName, phone, city, branchOne, branchTwo
+    }
+
+    private var canGoBack: Bool {
+        guard let focused, let index = Field.allCases.firstIndex(of: focused) else { return false }
+        return index > 0
+    }
+
+    private var canGoForward: Bool {
+        guard let focused, let index = Field.allCases.firstIndex(of: focused) else { return false }
+        return index < Field.allCases.count - 1
+    }
+
+    private func step(_ offset: Int) {
+        guard let focused, let index = Field.allCases.firstIndex(of: focused) else { return }
+        let next = index + offset
+        guard Field.allCases.indices.contains(next) else { return }
+        self.focused = Field.allCases[next]
     }
 
     init(draft: ContactDraft, onSave: @escaping (ContactDraft) -> Void) {
@@ -83,6 +100,14 @@ struct ContactEditorSheet: View {
                         .fontWeight(.black)
                         .padding(.horizontal, 4)
                 }
+
+                KeyboardStepBar(
+                    canGoBack: canGoBack,
+                    canGoForward: canGoForward,
+                    onBack: { step(-1) },
+                    onForward: { step(1) },
+                    onDone: { focused = nil }
+                )
             }
             .tint(Color.primary)
         }
@@ -112,8 +137,8 @@ struct ContactEditorSheet: View {
             RoundedRectangle(cornerRadius: 22)
                 .fill(cardBackground)
                 .stroke(.primary.opacity(0.30), lineWidth: 0.8)
-                .shadow(color: .primary.opacity(0.10), radius: 8, y: 4)
         )
+        .raisedShadow()
     }
 
     private func field(
