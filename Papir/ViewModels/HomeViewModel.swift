@@ -9,9 +9,7 @@
 //  vertical axis there are two thresholds: past the first, letting go commits;
 //  past the second, it commits under the finger. Horizontal has one, and each
 //  direction carries the screen the arrow on that side points to: left opens
-//  stock, right is where statistics will go and until it exists that drag
-//  springs back with a warning rather than landing somewhere it did not
-//  promise. isCommitting keeps a drag that is already
+//  stock, right opens statistics. isCommitting keeps a drag that is already
 //  committing from firing a second time. Also holds deepLinkInvoice, the
 //  invoice a save wants the list to open once it appears.
 //  Used by: HomeView; the Screen case is passed around by NewInvoiceView,
@@ -24,7 +22,7 @@ import Combine
 @MainActor
 final class HomeViewModel: ObservableObject {
     enum Screen {
-        case home, create, menu, stock
+        case home, create, menu, stock, statistics
     }
 
     struct DragLimits {
@@ -121,18 +119,12 @@ final class HomeViewModel: ObservableObject {
     private func commitScreen(for translation: CGSize) {
         guard !isCommitting, let axis = lockedAxis else { return }
 
-        let destination: Screen?
+        let destination: Screen
         switch axis {
         case .horizontal:
-            destination = translation.width < 0 ? .stock : nil
+            destination = translation.width < 0 ? .stock : .statistics
         case .vertical:
             destination = translation.height < 0 ? .create : .menu
-        }
-
-        guard let destination else {
-            Haptics.warning()
-            settle()
-            return
         }
 
         isCommitting = true

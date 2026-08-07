@@ -65,6 +65,18 @@ enum LKey: String {
     case create = "create"
     case stock = "stock"
     case statistics = "statistics"
+    case statisticsTitle = "Statistics"
+    case thisMonth = "This month"
+    case lastMonth = "Last month"
+    case thisYear = "This year"
+    case everything = "Everything"
+    case earnedCaps = "EARNED"
+    case averageInvoice = "average"
+    case topCustomersCaps = "WHO BUYS"
+    case topModelsCaps = "WHAT SELLS"
+    case shelfWorthCaps = "THE SHELF IS WORTH"
+    case modelsWithoutPrice = "models have no price yet"
+    case nothingHereYet = "Nothing here yet"
 
     case settings = "Settings"
     case done = "Done"
@@ -275,6 +287,12 @@ enum L {
         .movementRecounted: "Перераховано", .assignedToColors: "по кольорах", .draftExplained: "Зі складу ще нічого не списано.", .shippedExplained: "Пачки вже списані зі складу.",
         .menu: "меню", .create: "створити", .stock: "склад",
         .statistics: "статистика",
+        .statisticsTitle: "Статистика", .thisMonth: "Цей місяць",
+        .lastMonth: "Минулий місяць", .thisYear: "Цей рік", .everything: "Увесь час",
+        .earnedCaps: "ЗАРОБЛЕНО", .averageInvoice: "середня",
+        .topCustomersCaps: "ХТО КУПУЄ", .topModelsCaps: "ЩО ПРОДАЄТЬСЯ",
+        .shelfWorthCaps: "СКЛАД КОШТУЄ", .modelsWithoutPrice: "моделей без ціни",
+        .nothingHereYet: "Тут поки порожньо",
         .pricePerPiece: "Ціна за штуку", .setPrice: "Вказати ціну",
         .noPriceYet: "Ціна не вказана",
         .unitsFollowColors: "Пачки рахуються за кольорами",
@@ -375,6 +393,12 @@ enum L {
         .movementRecounted: "Пересчитано", .assignedToColors: "по цветам", .draftExplained: "Со склада ещё ничего не списано.", .shippedExplained: "Пачки уже списаны со склада.",
         .menu: "меню", .create: "создать", .stock: "склад",
         .statistics: "статистика",
+        .statisticsTitle: "Статистика", .thisMonth: "Этот месяц",
+        .lastMonth: "Прошлый месяц", .thisYear: "Этот год", .everything: "Всё время",
+        .earnedCaps: "ЗАРАБОТАНО", .averageInvoice: "средняя",
+        .topCustomersCaps: "КТО ПОКУПАЕТ", .topModelsCaps: "ЧТО ПРОДАЁТСЯ",
+        .shelfWorthCaps: "СКЛАД СТОИТ", .modelsWithoutPrice: "моделей без цены",
+        .nothingHereYet: "Пока пусто",
         .pricePerPiece: "Цена за штуку", .setPrice: "Указать цену",
         .noPriceYet: "Цена не указана",
         .unitsFollowColors: "Пачки считаются по цветам",
@@ -475,6 +499,12 @@ enum L {
         .movementRecounted: "Przeliczono", .assignedToColors: "przypisano", .draftExplained: "Nic jeszcze nie zeszło z magazynu dla tej faktury.", .shippedExplained: "Paczki z tej faktury zostały odjęte od stanu.",
         .menu: "menu", .create: "nowa", .stock: "magazyn",
         .statistics: "statystyka",
+        .statisticsTitle: "Statystyka", .thisMonth: "Ten miesiąc",
+        .lastMonth: "Poprzedni miesiąc", .thisYear: "Ten rok", .everything: "Cały czas",
+        .earnedCaps: "ZAROBIONE", .averageInvoice: "średnia",
+        .topCustomersCaps: "KTO KUPUJE", .topModelsCaps: "CO SIĘ SPRZEDAJE",
+        .shelfWorthCaps: "MAGAZYN WART", .modelsWithoutPrice: "modeli bez ceny",
+        .nothingHereYet: "Na razie pusto",
         .pricePerPiece: "Cena za sztukę", .setPrice: "Ustal cenę",
         .noPriceYet: "Brak ceny",
         .unitsFollowColors: "Paczki liczone wg kolorów",

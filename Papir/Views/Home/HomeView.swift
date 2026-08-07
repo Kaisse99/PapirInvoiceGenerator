@@ -12,8 +12,7 @@
 //  mismatched arrows rather than as one moving in a direction. The name sits
 //  above them rather than beside them because at the same
 //  size as menu and create it would not otherwise leave the mark room to stay
-//  centred. Statistics is drawn faint because the screen behind it does not
-//  exist yet, and swiping at it springs back. The whole stack sits slightly
+//  centred. The whole stack sits slightly
 //  above centre, since an optically centred column reads low. The arrows and a
 //  glint across the mark share one gradient that animates while this screen is
 //  on top, and the gear sits in the corner
@@ -87,6 +86,10 @@ struct HomeView: View {
                 case .stock:
                     StockView(currentScreen: $viewModel.currentScreen)
                         .transition(.move(edge: .trailing))
+
+                case .statistics:
+                    StatisticsView(currentScreen: $viewModel.currentScreen)
+                        .transition(.move(edge: .leading))
                 }
             }
             .animation(AppAnimation.smooth, value: viewModel.currentScreen)
@@ -135,7 +138,7 @@ struct HomeView: View {
                     directionArrow(
                         title: L.t(.statistics, language),
                         pointsLeft: false,
-                        available: false
+                        available: true
                     )
                     .frame(maxWidth: .infinity)
 
