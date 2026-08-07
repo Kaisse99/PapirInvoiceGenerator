@@ -32,6 +32,13 @@ struct StatisticsView: View {
     @Binding var currentScreen: HomeViewModel.Screen
 
     @State private var selectedDate: Date? = nil
+    @State private var modelsShown = StatisticsView.modelPage
+    @State private var buyersShown = StatisticsView.buyerPage
+
+    private static let modelPage = 5
+    private static let modelStep = 20
+    private static let buyerPage = 5
+    private static let buyerStep = 10
 
     @Query(sort: \Invoice.date, order: .reverse)
     private var allInvoices: [Invoice]
@@ -51,16 +58,7 @@ struct StatisticsView: View {
                     revenueHeader
                     chartCard
                     PaperclipDivider(iconSize: 36)
-                    modelsCard(
-                        L.t(.mostProfitableCaps),
-                        stats: viewModel.mostProfitable(shipped),
-                        byPacks: false
-                    )
-                    modelsCard(
-                        L.t(.mostSoldCaps),
-                        stats: viewModel.mostSold(shipped),
-                        byPacks: true
-                    )
+                    profitabilityCard
                     buyersCard
                     shelfCard
                 }
@@ -134,8 +132,9 @@ struct StatisticsView: View {
                     .font(.scaled(size: 11, weight: .semibold))
             }
             .foregroundStyle(Color.primary)
-            .padding(.horizontal, 16)
-            .frame(height: 44)
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity)
+            .frame(height: 46)
             .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)).raisedShadow())
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(.primary.opacity(0.40), lineWidth: 1))
         }
@@ -178,9 +177,9 @@ struct StatisticsView: View {
             }
 
             HStack(spacing: 14) {
-                footnote("\(shipped.count)", L.t(.invoices))
+                footnote("\(shipped.count)", L.t(.invoicesShipped))
                 footnote(PriceText.display(viewModel.averageInvoice(shipped).rounded()), L.t(.averageInvoice))
-                footnote("\(viewModel.packsSold(shipped))", L.t(.packsLower))
+                footnote("\(viewModel.packsSold(shipped))", L.t(AppSettings.sellsInPacks ? .packsSoldLower : .itemsSoldLower))
             }
             .padding(.top, 10)
         }
@@ -391,18 +390,28 @@ struct StatisticsView: View {
             : String(format: "%.1f", value).replacingOccurrences(of: ".0", with: "")
     }
 
-    private func modelsCard(_ title: String, stats: [ModelStat], byPacks: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            caps(title)
+    private var profitabilityCard: some View {
+        let all = viewModel.byProfit(shipped)
+        let shown = Array(all.prefix(modelsShown))
 
-            if stats.isEmpty {
+        return VStack(alignment: .leading, spacing: 14) {
+            caps(L.t(.profitabilityCaps))
+
+            if all.isEmpty {
                 emptyLine
             } else {
                 VStack(spacing: 16) {
-                    ForEach(Array(stats.enumerated()), id: \.element.id) { index, stat in
-                        modelRow(rank: index + 1, stat: stat, byPacks: byPacks)
+                    ForEach(Array(shown.enumerated()), id: \.element.id) { index, stat in
+                        modelRow(rank: index + 1, stat: stat)
                     }
                 }
+
+                expander(
+                    shown: modelsShown,
+                    total: all.count,
+                    step: Self.modelStep,
+                    reset: Self.modelPage
+                ) { modelsShown = $0 }
             }
         }
         .padding(18)
@@ -411,11 +420,11 @@ struct StatisticsView: View {
         .padding(.horizontal, 20)
     }
 
-    private func modelRow(rank: Int, stat: ModelStat, byPacks: Bool) -> some View {
+    private func modelRow(rank: Int, stat: ModelStat) -> some View {
         HStack(alignment: .top, spacing: 10) {
             rankBadge(rank)
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(stat.name)
                         .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
@@ -425,38 +434,67 @@ struct StatisticsView: View {
 
                     Spacer(minLength: 8)
 
-                    if byPacks {
-                        HStack(alignment: .firstTextBaseline, spacing: 3) {
-                            Text("\(stat.packs)")
-                                .font(.scaled(size: 15, weight: .bold, design: .monospaced))
-                                .foregroundStyle(.primary)
-                            Text(L.t(.packsLower))
-                                .font(.scaled(size: 10, weight: .medium, design: .monospaced))
-                                .foregroundStyle(.secondary)
-                        }
-                    } else {
-                        HStack(alignment: .firstTextBaseline, spacing: 3) {
-                            Text(PriceText.display(stat.money))
-                                .font(.scaled(size: 15, weight: .bold, design: .monospaced))
-                                .foregroundStyle(.primary)
-                            Text(AppSettings.currencySymbol)
-                                .font(.scaled(size: 10, weight: .medium, design: .monospaced))
-                                .foregroundStyle(.secondary)
-                        }
+                    HStack(alignment: .firstTextBaseline, spacing: 3) {
+                        Text(PriceText.display(stat.money))
+                            .font(.scaled(size: 15, weight: .bold, design: .monospaced))
+                            .foregroundStyle(.primary)
+                        Text(AppSettings.currencySymbol)
+                            .font(.scaled(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.secondary)
                     }
                 }
 
-                Text(
-                    byPacks
-                        ? "\(PriceText.display(stat.money)) \(AppSettings.currencySymbol)"
-                        : "\(stat.packs) \(L.t(.packsLower))"
-                )
-                .font(.scaled(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(.secondary)
+                Text("\(L.t(AppSettings.sellsInPacks ? .packsSoldLabel : .itemsSoldLabel)): \(stat.packs)")
+                    .font(.scaled(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
 
                 if !stat.colors.isEmpty {
                     colorChips(stat.colors)
                 }
+            }
+        }
+    }
+
+    private func expander(
+        shown: Int,
+        total: Int,
+        step: Int,
+        reset: Int,
+        set: @escaping (Int) -> Void
+    ) -> some View {
+        Group {
+            if total > reset {
+                let remaining = max(0, total - shown)
+                Button {
+                    Haptics.light()
+                    withAnimation(AppAnimation.list) {
+                        set(remaining > 0 ? min(total, shown + step) : reset)
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: remaining > 0 ? "chevron.down" : "chevron.up")
+                            .font(.scaled(size: 10, weight: .bold))
+                        Text(
+                            remaining > 0
+                                ? String(format: L.t(.showMoreFormat), min(step, remaining))
+                                : L.t(.showLess)
+                        )
+                        .font(.scaled(size: 12, weight: .semibold, design: .monospaced))
+                    }
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 9)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.primary.opacity(0.05))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.primary.opacity(0.12), lineWidth: 0.8)
+                    )
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 2)
             }
         }
     }
@@ -483,19 +521,27 @@ struct StatisticsView: View {
     }
 
     private var buyersCard: some View {
-        let buyers = viewModel.topBuyers(shipped)
+        let all = viewModel.allBuyers(shipped)
+        let shown = Array(all.prefix(buyersShown))
 
         return VStack(alignment: .leading, spacing: 14) {
             caps(L.t(.topBuyersCaps))
 
-            if buyers.isEmpty {
+            if all.isEmpty {
                 emptyLine
             } else {
                 VStack(spacing: 14) {
-                    ForEach(Array(buyers.enumerated()), id: \.element.id) { index, buyer in
+                    ForEach(Array(shown.enumerated()), id: \.element.id) { index, buyer in
                         buyerRow(rank: index + 1, buyer: buyer)
                     }
                 }
+
+                expander(
+                    shown: buyersShown,
+                    total: all.count,
+                    step: Self.buyerStep,
+                    reset: Self.buyerPage
+                ) { buyersShown = $0 }
             }
         }
         .padding(18)
@@ -515,14 +561,10 @@ struct StatisticsView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
-                HStack(spacing: 4) {
-                    Image(systemName: "doc.text")
-                        .font(.scaled(size: 9))
-                    Text("\(buyer.invoices)" + (buyer.detail.map { " · \($0)" } ?? ""))
-                        .font(.scaled(size: 11, weight: .medium, design: .monospaced))
-                        .lineLimit(1)
-                }
-                .foregroundStyle(.secondary)
+                Text("\(L.t(.ordersMade)): \(buyer.invoices)")
+                    .font(.scaled(size: 11, weight: .medium, design: .monospaced))
+                    .lineLimit(1)
+                    .foregroundStyle(.secondary)
             }
 
             Spacer(minLength: 8)
@@ -544,7 +586,7 @@ struct StatisticsView: View {
         let shelf = viewModel.stockValue(stockModels)
 
         return VStack(alignment: .leading, spacing: 10) {
-            caps(L.t(.shelfWorthCaps))
+            caps(L.t(.inventoryValueCaps))
 
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text(PriceText.display(shelf.value))

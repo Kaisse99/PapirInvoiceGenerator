@@ -158,6 +158,7 @@ final class MyInvoicesViewModel: ObservableObject {
         }
         let copy = Invoice(items: copiedItems, date: .now, sender: invoice.sender, receiver: invoice.receiver)
         copy.receiverContact = invoice.receiverContact
+        copy.number = InvoiceNumbering.next(in: context)
         context.insert(copy)
         save(context)
     }

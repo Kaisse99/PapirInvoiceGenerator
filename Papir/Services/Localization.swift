@@ -277,6 +277,24 @@ nonisolated enum LKey: String, CaseIterable {
     case deleteContactMessage = "Invoices already written keep the name on them."
     case draftExplained = "Nothing has been taken off the shelf for this invoice yet."
     case shippedExplained = "The packs on this invoice have been deducted from stock."
+    case invoicesShipped = "invoices shipped"
+    case packsSoldLower = "packs sold"
+    case profitabilityCaps = "PROFITABILITY"
+    case packsSoldLabel = "Packs sold"
+    case ordersMade = "Orders made"
+    case inventoryValueCaps = "VALUE OF THE INVENTORY"
+    case showMoreFormat = "Show %d more"
+    case showLess = "Show less"
+    case pdfNumber = "No."
+    case backedUpNever = "No backup yet. Everything is on this phone only."
+    case backedUpOn = "Last backup"
+    case onThisPhoneOnly = "Invoices, stock and contacts live on this phone. If it is lost, so are they. Make a backup or turn on iCloud."
+    case aboutCaps = "ABOUT"
+    case privacyPolicy = "Privacy policy"
+    case supportPage = "Support"
+    case versionLabel = "Version"
+    case itemsSoldLower = "items sold"
+    case itemsSoldLabel = "Items sold"
 }
 
 nonisolated enum L {
@@ -296,6 +314,18 @@ nonisolated enum L {
     ]
 
     static let ukrainian: [LKey: String] = [
+        .itemsSoldLower: "штук продано", .itemsSoldLabel: "Штук продано",
+        .invoicesShipped: "накладних", .packsSoldLower: "пачок продано",
+        .profitabilityCaps: "ПРИБУТКОВІСТЬ", .packsSoldLabel: "Пачок продано",
+        .ordersMade: "Замовлень зроблено",
+        .inventoryValueCaps: "ВАРТІСТЬ СКЛАДУ",
+        .showMoreFormat: "Показати ще %d", .showLess: "Згорнути",
+        .pdfNumber: "№",
+        .backedUpNever: "Копії ще не було. Усе лише на цьому телефоні.",
+        .backedUpOn: "Остання копія",
+        .onThisPhoneOnly: "Накладні, склад і контакти лежать лише на цьому телефоні. Загубиться він, загубляться й вони. Зробіть копію або увімкніть iCloud.",
+        .aboutCaps: "ПРО ЗАСТОСУНОК", .privacyPolicy: "Політика конфіденційності",
+        .supportPage: "Підтримка", .versionLabel: "Версія",
         .pdfTitle: "НАКЛАДНА", .pdfFrom: "ВІД", .pdfTo: "ДЛЯ",
         .pdfItem: "ТОВАР", .pdfQty: "К-ТЬ", .pdfPrice: "ЦІНА",
         .pdfTotal: "СУМА", .pdfFooter: "СТВОРЕНО У PAPIR",
@@ -424,6 +454,18 @@ nonisolated enum L {
     ]
 
     static let russian: [LKey: String] = [
+        .itemsSoldLower: "штук продано", .itemsSoldLabel: "Штук продано",
+        .invoicesShipped: "накладных", .packsSoldLower: "пачек продано",
+        .profitabilityCaps: "ПРИБЫЛЬНОСТЬ", .packsSoldLabel: "Пачек продано",
+        .ordersMade: "Заказов сделано",
+        .inventoryValueCaps: "СТОИМОСТЬ СКЛАДА",
+        .showMoreFormat: "Показать ещё %d", .showLess: "Свернуть",
+        .pdfNumber: "№",
+        .backedUpNever: "Копии ещё не было. Всё только на этом телефоне.",
+        .backedUpOn: "Последняя копия",
+        .onThisPhoneOnly: "Накладные, склад и контакты лежат только на этом телефоне. Потеряется он, потеряются и они. Сделайте копию или включите iCloud.",
+        .aboutCaps: "О ПРИЛОЖЕНИИ", .privacyPolicy: "Политика конфиденциальности",
+        .supportPage: "Поддержка", .versionLabel: "Версия",
         .pdfTitle: "НАКЛАДНАЯ", .pdfFrom: "ОТ", .pdfTo: "ДЛЯ",
         .pdfItem: "ТОВАР", .pdfQty: "К-ВО", .pdfPrice: "ЦЕНА",
         .pdfTotal: "СУММА", .pdfFooter: "СОЗДАНО В PAPIR",
@@ -552,6 +594,18 @@ nonisolated enum L {
     ]
 
     static let polish: [LKey: String] = [
+        .itemsSoldLower: "sztuk sprzedanych", .itemsSoldLabel: "Sztuk sprzedanych",
+        .invoicesShipped: "faktur wysłanych", .packsSoldLower: "paczek sprzedanych",
+        .profitabilityCaps: "RENTOWNOŚĆ", .packsSoldLabel: "Paczek sprzedanych",
+        .ordersMade: "Złożonych zamówień",
+        .inventoryValueCaps: "WARTOŚĆ MAGAZYNU",
+        .showMoreFormat: "Pokaż jeszcze %d", .showLess: "Zwiń",
+        .pdfNumber: "Nr",
+        .backedUpNever: "Brak kopii zapasowej. Wszystko tylko na tym telefonie.",
+        .backedUpOn: "Ostatnia kopia",
+        .onThisPhoneOnly: "Faktury, magazyn i kontakty są tylko na tym telefonie. Zgubi się on, zgubią się i one. Zrób kopię albo włącz iCloud.",
+        .aboutCaps: "O APLIKACJI", .privacyPolicy: "Polityka prywatności",
+        .supportPage: "Wsparcie", .versionLabel: "Wersja",
         .pdfTitle: "FAKTURA", .pdfFrom: "OD", .pdfTo: "DLA",
         .pdfItem: "TOWAR", .pdfQty: "ILOSC", .pdfPrice: "CENA",
         .pdfTotal: "SUMA", .pdfFooter: "UTWORZONE W PAPIR",

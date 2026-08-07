@@ -62,6 +62,7 @@ struct BackupFile: Codable {
 
     struct InvoiceRecord: Codable {
         var id: UUID
+        var number: Int?
         var date: Date
         var sender: String
         var receiver: String
@@ -154,6 +155,7 @@ enum Backup {
             invoices: invoices.map { invoice in
                 BackupFile.InvoiceRecord(
                     id: invoice.id,
+                    number: invoice.number,
                     date: invoice.date,
                     sender: invoice.sender,
                     receiver: invoice.receiver,
@@ -244,6 +246,7 @@ enum Backup {
                 pdfFileName: record.pdfFileName
             )
             invoice.id = record.id
+            invoice.number = record.number ?? 0
             invoice.statusRaw = record.statusRaw
             invoice.shippedAt = record.shippedAt
             if let index = record.contactIndex, contacts.indices.contains(index) {

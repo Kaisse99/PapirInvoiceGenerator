@@ -63,7 +63,9 @@ nonisolated enum PDFLanguage: String, CaseIterable, Identifiable {
     }
 
     var title: String { L.t(.pdfTitle, appLanguage) }
-    
+
+    var numberPrefix: String { L.t(.pdfNumber, appLanguage) }
+
     var fromLabel: String { L.t(.pdfFrom, appLanguage) }
 
     var toLabel: String { L.t(.pdfTo, appLanguage) }
@@ -157,7 +159,19 @@ nonisolated struct PDFGenerator {
         ]
         
         language.title.draw(at: CGPoint(x: margin, y: startY), withAttributes: titleAttrs)
-        
+
+        let titleWidth = (language.title as NSString).size(withAttributes: titleAttrs).width
+        if invoice.number > 0 {
+            let numberAttrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.monospacedSystemFont(ofSize: 18 * fontScale, weight: .bold),
+                .foregroundColor: UIColor.darkGray
+            ]
+            "\(language.numberPrefix)\(invoice.number)".draw(
+                at: CGPoint(x: margin + titleWidth + 10, y: startY + 7),
+                withAttributes: numberAttrs
+            )
+        }
+
         let dateFormatter = DateFormatter()
         dateFormatter.locale = language.dateLocale
         dateFormatter.dateStyle = .long
@@ -315,7 +329,7 @@ nonisolated struct PDFGenerator {
             )
         }
 
-        let qtyText = "\(item.unitCount) × \(item.itemsPerUnit)"
+        let qtyText = item.itemsPerUnit > 1 ? "\(item.unitCount) × \(item.itemsPerUnit)" : "\(item.unitCount)"
         let qtySize = (qtyText as NSString).size(withAttributes: valueAttrs)
         qtyText.draw(
             at: CGPoint(x: margin + cols.indexW + cols.nameW + (cols.qtyW - qtySize.width) / 2, y: startY),

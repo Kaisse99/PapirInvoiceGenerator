@@ -18,6 +18,7 @@ struct PDFGeneratorTests {
     private func snapshot(rows: Int) -> InvoiceSnapshot {
         InvoiceSnapshot(
             id: UUID(),
+            number: 42,
             date: Date(timeIntervalSince1970: 1_700_000_000),
             sender: "Kaissenberg",
             receiver: "Olena Shevchenko",

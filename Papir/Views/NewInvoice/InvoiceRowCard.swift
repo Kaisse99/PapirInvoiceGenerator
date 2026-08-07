@@ -223,7 +223,7 @@ struct InvoiceRowCard: View {
                 }
                 
                 multiplySign
-                
+
                 LabeledField(
                     label: L.t(.perUnit),
                     text: $itemsPerUnit,
@@ -241,7 +241,7 @@ struct InvoiceRowCard: View {
                     if perUnitError { onClearError(.perUnit) }
                     if newValue.count == 4 { focusedField = .price }
                 }
-                
+
                 multiplySign
                 
                 LabeledField(
@@ -512,11 +512,13 @@ struct InvoiceRowCard: View {
                     .font(.callout)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.primary)
-                multiplySign
-                Text(itemsPerUnit)
-                    .font(.callout)
-                    .fontDesign(.monospaced)
-                    .foregroundStyle(.primary)
+                if (Int(itemsPerUnit) ?? 1) > 1 {
+                    multiplySign
+                    Text(itemsPerUnit)
+                        .font(.callout)
+                        .fontDesign(.monospaced)
+                        .foregroundStyle(.primary)
+                }
                 multiplySign
                 Text(price)
                     .font(.callout)

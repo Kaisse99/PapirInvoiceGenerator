@@ -100,6 +100,7 @@ enum DebugData {
         }
 
         var invoiceCount = 0
+        var nextNumber = InvoiceNumbering.next(in: context)
         for daysAgo in stride(from: 250, through: 0, by: -1) {
             guard Int.random(in: 0...3, using: &rng) == 0 else { continue }
             guard let date = calendar.date(byAdding: .day, value: -daysAgo, to: .now) else { continue }
@@ -129,8 +130,10 @@ enum DebugData {
                 receiver: contact?.displayName ?? "Готівка"
             )
             invoice.receiverContact = contact
-            context.insert(invoice)
             invoiceCount += 1
+            invoice.number = nextNumber
+            nextNumber += 1
+            context.insert(invoice)
 
             if daysAgo > 7 || Bool.random(using: &rng) {
                 ship(invoice, models: models, date: date, context: context)

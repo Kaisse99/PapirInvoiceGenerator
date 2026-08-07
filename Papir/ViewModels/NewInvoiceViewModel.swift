@@ -205,6 +205,7 @@ final class NewInvoiceViewModel: ObservableObject {
             } else {
                 let invoice = Invoice(items: items, date: .now, sender: sender, receiver: receiver)
                 invoice.receiverContact = receiverContact
+                invoice.number = InvoiceNumbering.next(in: context)
                 context.insert(invoice)
                 try context.save()
                 result = invoice

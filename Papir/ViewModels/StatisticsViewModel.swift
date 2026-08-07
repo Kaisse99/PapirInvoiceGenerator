@@ -205,12 +205,13 @@ final class StatisticsViewModel: ObservableObject {
         return stats
     }
 
+    func byProfit(_ shipped: [Invoice]) -> [ModelStat] {
+        modelStats(shipped)
+            .sorted { $0.money == $1.money ? $0.name < $1.name : $0.money > $1.money }
+    }
+
     func mostProfitable(_ shipped: [Invoice], limit: Int = 5) -> [ModelStat] {
-        Array(
-            modelStats(shipped)
-                .sorted { $0.money == $1.money ? $0.name < $1.name : $0.money > $1.money }
-                .prefix(limit)
-        )
+        Array(byProfit(shipped).prefix(limit))
     }
 
     func mostSold(_ shipped: [Invoice], limit: Int = 5) -> [ModelStat] {
@@ -219,6 +220,10 @@ final class StatisticsViewModel: ObservableObject {
                 .sorted { $0.packs == $1.packs ? $0.name < $1.name : $0.packs > $1.packs }
                 .prefix(limit)
         )
+    }
+
+    func allBuyers(_ shipped: [Invoice]) -> [BuyerStat] {
+        topBuyers(shipped, limit: Int.max)
     }
 
     func topBuyers(_ shipped: [Invoice], limit: Int = 5) -> [BuyerStat] {

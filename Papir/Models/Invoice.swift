@@ -8,6 +8,11 @@
 //  to a name tiebreak, so they keep one settled order instead of reshuffling.
 //  InvoiceSnapshot is the frozen, Sendable copy handed to PDF rendering, which
 //  runs off the main thread where touching the model itself would be unsafe.
+//  number is what the customer and her accountant refer the document by, one
+//  running sequence over the whole store, assigned once when an invoice is
+//  first saved and never reused or reordered afterwards. Zero means unnumbered,
+//  which is what every invoice written before numbering existed holds until
+//  InvoiceNumbering backfills them in date order.
 //  Both replaceItems and clearShipment delete what they drop rather than just
 //  unhooking it. A row cut from an edited invoice is reachable from nothing
 //  once the array no longer holds it, so leaving it behind would pile up dead
@@ -42,6 +47,7 @@ final class Invoice {
     @Relationship(deleteRule: .cascade, inverse: \ItemRow.invoice)
     var items: [ItemRow]? = nil
     var id: UUID = UUID()
+    var number: Int = 0
     var date: Date = Date.now
     var sender: String = ""
     var receiver: String = ""
@@ -59,6 +65,10 @@ final class Invoice {
 
     var shipment: [ShipmentLine] {
         shipmentLines ?? []
+    }
+
+    var hasNumber: Bool {
+        number > 0
     }
 
     init(items: [ItemRow], date: Date = .now, sender: String, receiver: String, pdfFileName: String? = nil) {
@@ -89,6 +99,7 @@ final class Invoice {
     var snapshot: InvoiceSnapshot {
         InvoiceSnapshot(
             id: id,
+            number: number,
             date: date,
             sender: sender,
             receiver: receiver,
@@ -170,6 +181,7 @@ nonisolated struct InvoiceSnapshot: Sendable {
     }
 
     let id: UUID
+    let number: Int
     let date: Date
     let sender: String
     let receiver: String

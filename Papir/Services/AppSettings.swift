@@ -28,6 +28,25 @@ nonisolated enum AppSettings {
     static let cloudSyncKey = "iCloudSyncEnabled"
     static let cloudFailureKey = "iCloudSyncUnavailable"
     static let cloudContainerID = "iCloud.com.kaissenberg.Papir"
+    static let lastBackupKey = "lastBackupAt"
+
+    static let privacyPolicyURL = "https://kaissenberg.github.io/papir/privacy"
+    static let supportURL = "https://kaissenberg.github.io/papir/support"
+
+    static var lastBackupAt: Date? {
+        UserDefaults.standard.object(forKey: lastBackupKey) as? Date
+    }
+
+    static func recordBackup(_ date: Date = .now) {
+        UserDefaults.standard.set(date, forKey: lastBackupKey)
+    }
+
+    static var appVersion: String {
+        let bundle = Bundle.main
+        let short = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = bundle.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "\(short) (\(build))"
+    }
 
     static let fallbackUnits = 1
     static let fallbackItemsPerUnit = 6
@@ -47,6 +66,10 @@ nonisolated enum AppSettings {
 
     static var defaultItemsPerUnitText: String {
         fieldText(defaultItemsPerUnit)
+    }
+
+    static var sellsInPacks: Bool {
+        defaultItemsPerUnit != 1
     }
 
     static var lowStockThreshold: Int {

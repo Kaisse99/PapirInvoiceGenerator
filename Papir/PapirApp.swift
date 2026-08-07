@@ -95,6 +95,9 @@ struct PapirApp: App {
             case .ready(let container):
                 HomeView()
                     .modelContainer(container)
+                    .task {
+                        InvoiceNumbering.backfill(context: container.mainContext)
+                    }
             case .failed(let message):
                 StoreFailureView(
                     message: message,

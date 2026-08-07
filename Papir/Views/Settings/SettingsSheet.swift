@@ -80,6 +80,7 @@ struct SettingsSheet: View {
                     exportSection
                     syncSection
                     historySection
+                    aboutSection
 #if DEBUG
                     debugSection
 #endif
@@ -305,7 +306,71 @@ struct SettingsSheet: View {
                 if let exportError {
                     noticeLine(exportError, tint: .red)
                 }
+
+                backupStateLine
             }
+        }
+    }
+
+    private var backupStateLine: some View {
+        Group {
+            if let last = AppSettings.lastBackupAt {
+                noticeLine("\(L.t(.backedUpOn, language)): \(backupDate(last))", tint: .secondary)
+            } else {
+                noticeLine(L.t(.backedUpNever, language), tint: .orange)
+            }
+
+            if !cloudSyncEnabled {
+                noticeLine(L.t(.onThisPhoneOnly, language), tint: .orange)
+            }
+        }
+    }
+
+    private func backupDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = language.locale
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
+    }
+
+    private var aboutSection: some View {
+        section(title: L.t(.aboutCaps, language)) {
+            VStack(spacing: 8) {
+                linkRow(icon: "hand.raised", title: L.t(.privacyPolicy, language), url: AppSettings.privacyPolicyURL)
+                linkRow(icon: "questionmark.circle", title: L.t(.supportPage, language), url: AppSettings.supportURL)
+
+                HStack {
+                    Text(L.t(.versionLabel, language))
+                        .font(.scaled(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(AppSettings.appVersion)
+                        .font(.scaled(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 18)
+                .padding(.top, 4)
+            }
+        }
+    }
+
+    private func linkRow(icon: String, title: String, url: String) -> some View {
+        Link(destination: URL(string: url) ?? URL(string: "https://example.com")!) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.scaled(size: 15, weight: .semibold))
+                Text(title)
+                    .font(.scaled(size: 17, weight: .medium, design: .rounded))
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.scaled(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 18)
+            .frame(height: 60)
+            .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
         }
     }
 
@@ -342,6 +407,7 @@ struct SettingsSheet: View {
     private func backupEverything() {
         do {
             exportURLs = [try Backup.write(context: modelContext)]
+            AppSettings.recordBackup()
             exportError = nil
             Haptics.success()
         } catch {
