@@ -228,7 +228,6 @@ struct NewInvoiceView: View {
                     lineWidth: 1
                 )
         )
-        .raisedShadow()
         .animation(AppAnimation.fast, value: focusedHeaderField == focus)
         .contentShape(RoundedRectangle(cornerRadius: 16))
         .onTapGesture { focusedHeaderField = focus }

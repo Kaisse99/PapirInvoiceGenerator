@@ -202,11 +202,6 @@ enum LKey: String {
     case shortfallOnShipment = "Some colors went negative. Recount them when you can."
     case notInStockYet = "This code is not in stock yet."
     case lowStock = "Low"
-    case privacyCaps = "PRIVACY"
-    case appLock = "Face ID"
-    case appLockCaption = "Ask for Face ID when the app opens"
-    case unlock = "Unlock"
-    case unlockReason = "Unlock Papir"
     case iCloudSync = "iCloud"
     case allModels = "All models"
     case lockedWhileShipped = "Return to draft to make changes"
@@ -279,9 +274,6 @@ enum L {
         .shortfallOnShipment: "Деякі кольори пішли в мінус.",
         .notInStockYet: "Цього коду ще немає на складі.",
         .lowStock: "Мало",
-        .privacyCaps: "ПРИВАТНІСТЬ", .appLock: "Face ID",
-        .appLockCaption: "Питати Face ID при відкритті застосунку",
-        .unlock: "Розблокувати", .unlockReason: "Розблокуйте Papir",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладні та склад на всіх пристроях",
         .allModels: "Усі моделі", .lockedWhileShipped: "Поверніть у чернетку, щоб змінити", .allDays: "Усі дні",
         .clearHistory: "Очистити історію", .clearHistoryCaption: "Прибрати всі записи руху",
@@ -388,9 +380,6 @@ enum L {
         .shortfallOnShipment: "Некоторые цвета ушли в минус.",
         .notInStockYet: "Этого кода ещё нет на складе.",
         .lowStock: "Мало",
-        .privacyCaps: "ПРИВАТНОСТЬ", .appLock: "Face ID",
-        .appLockCaption: "Спрашивать Face ID при открытии приложения",
-        .unlock: "Разблокировать", .unlockReason: "Разблокируйте Papir",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Накладные и склад на всех устройствах",
         .allModels: "Все модели", .lockedWhileShipped: "Верните в черновик, чтобы изменить", .allDays: "Все дни",
         .clearHistory: "Очистить историю", .clearHistoryCaption: "Убрать все записи движения",
@@ -497,9 +486,6 @@ enum L {
         .shortfallOnShipment: "Niektóre kolory zeszły poniżej zera. Przelicz je przy okazji.",
         .notInStockYet: "Tego kodu nie ma jeszcze w magazynie.",
         .lowStock: "Mało", .lowStockThreshold: "Niski stan",
-        .privacyCaps: "PRYWATNOŚĆ", .appLock: "Face ID",
-        .appLockCaption: "Pytaj o Face ID przy otwarciu aplikacji",
-        .unlock: "Odblokuj", .unlockReason: "Odblokuj Papir",
         .iCloudSync: "iCloud", .iCloudSyncCaption: "Faktury i magazyn na wszystkich urządzeniach",
         .allModels: "Wszystkie modele", .lockedWhileShipped: "Wróć do szkicu, aby edytować", .allDays: "Wszystkie dni",
         .clearHistory: "Wyczyść historię", .clearHistoryCaption: "Usuń wszystkie zapisy ruchu",

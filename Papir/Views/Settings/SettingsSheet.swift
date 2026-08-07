@@ -37,9 +37,6 @@ struct SettingsSheet: View {
     @AppStorage(AppSettings.defaultSenderKey)
     private var defaultSender: String = ""
 
-    @AppStorage(AppSettings.appLockKey)
-    private var appLockEnabled: Bool = false
-
     @AppStorage(AppSettings.cloudSyncKey)
     private var cloudSyncEnabled: Bool = false
 
@@ -60,7 +57,6 @@ struct SettingsSheet: View {
                     senderSection
                     defaultsSection
                     stockSection
-                    lockSection
                     syncSection
                     historySection
                     Spacer(minLength: 20)
@@ -238,34 +234,6 @@ struct SettingsSheet: View {
         } catch {
             Haptics.error()
             clearHistoryError = "\(L.t(.couldNotSave, language)): \(error.localizedDescription)"
-        }
-    }
-
-    private var lockSection: some View {
-        section(title: L.t(.privacyCaps, language)) {
-            VStack(spacing: 8) {
-                Toggle(isOn: Binding(
-                    get: { appLockEnabled },
-                    set: { newValue in
-                        Haptics.light()
-                        appLockEnabled = newValue
-                    }
-                )) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(L.t(.appLock, language))
-                            .font(.system(size: 17, weight: .medium, design: .rounded))
-                            .foregroundStyle(.primary)
-                        Text(L.t(.appLockCaption, language))
-                            .font(.system(size: 12, weight: .regular, design: .rounded))
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .tint(InvoiceStatus.shipped.tint)
-                .padding(.horizontal, 18)
-                .frame(minHeight: 72)
-                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
-                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.12), lineWidth: 0.8))
-            }
         }
     }
 
