@@ -175,6 +175,7 @@ struct HomeView: View {
                 Spacer()
             }
             .offset(y: -55)
+            .readableWidth(560)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppBackground())
             .navigationBarTitleDisplayMode(.inline)

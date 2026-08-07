@@ -62,6 +62,7 @@ struct MyInvoicesView: View {
                         }
                     }
                     .padding(.top, 12)
+                    .readableWidth()
                     .animation(AppAnimation.list, value: invoices.map(\.id))
                 }
             }

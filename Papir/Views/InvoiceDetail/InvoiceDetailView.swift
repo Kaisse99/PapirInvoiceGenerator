@@ -62,6 +62,7 @@ struct InvoiceDetailView: View {
             }
             .padding(.top, 12)
             .padding(.bottom, 40)
+            .readableWidth()
         }
         .background(AppBackground())
         .navigationBarTitleDisplayMode(.inline)

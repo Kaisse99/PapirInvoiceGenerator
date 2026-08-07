@@ -91,6 +91,7 @@ struct NewInvoiceView: View {
                     totalSection
                     actionButtons
                 }
+                .readableWidth()
             }
             .dismissKeyboardOnTap()
             .background(AppBackground())

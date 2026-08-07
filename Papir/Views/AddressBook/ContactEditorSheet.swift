@@ -76,6 +76,7 @@ struct ContactEditorSheet: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
                 .padding(.bottom, 40)
+                .readableWidth()
             }
             .dismissKeyboardOnTap()
             .background(AppBackground())

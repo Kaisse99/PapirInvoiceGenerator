@@ -63,6 +63,7 @@ struct AddressBookView: View {
                         }
                     }
                     .padding(.top, 12)
+                    .readableWidth()
                     .animation(AppAnimation.list, value: contacts.map(\.persistentModelID))
                 }
             }

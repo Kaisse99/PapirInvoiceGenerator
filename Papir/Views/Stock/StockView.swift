@@ -61,6 +61,7 @@ struct StockView: View {
                         }
                     }
                     .padding(.top, 12)
+                    .readableWidth()
                     .animation(AppAnimation.list, value: models.map(\.code))
                 }
             }

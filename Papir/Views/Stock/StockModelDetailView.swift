@@ -63,6 +63,7 @@ struct StockModelDetailView: View {
             }
             .padding(.top, 8)
             .padding(.bottom, 40)
+            .readableWidth()
             .animation(AppAnimation.list, value: lines.map(\.color))
         }
         .background(AppBackground())
