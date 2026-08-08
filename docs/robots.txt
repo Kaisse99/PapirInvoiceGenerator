@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kaisse99.github.io/PapirInvoiceGenerator/sitemap.xml

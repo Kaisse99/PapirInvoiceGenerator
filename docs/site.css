@@ -1,0 +1,219 @@
+/*
+  site.css
+  The marketing pages. Same face as the app — monospaced ink on paper, one
+  blue accent, inverting with the reader's theme — but laid out as a landing
+  page rather than a document: a hero, a row of screens, a grid of what it
+  does. The policy pages keep using style.css; this is only for the front.
+*/
+
+:root {
+  --ink: #1b1b1b;
+  --paper: #ffffff;
+  --muted: #6b6b6b;
+  --rule: rgba(0, 0, 0, 0.12);
+  --card: #f6f6f6;
+  --blue: #2f6fd0;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e8e8e8;
+    --paper: #0a0a0a;
+    --muted: #8d8d8d;
+    --rule: rgba(255, 255, 255, 0.14);
+    --card: #141414;
+    --blue: #5b95ee;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  padding: 0 24px 80px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 940px; margin: 0 auto; }
+
+/* ---- top bar ---- */
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 0;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.brand img {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: block;
+}
+
+nav .spacer { flex: 1; }
+
+nav a.link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+nav a.link:hover { color: var(--ink); }
+
+nav .langs { display: flex; gap: 8px; font-size: 13px; }
+nav .langs a { color: var(--muted); text-decoration: none; }
+nav .langs a[aria-current="true"] { color: var(--ink); font-weight: 700; }
+
+/* ---- hero ---- */
+
+header.hero {
+  padding: 40px 0 20px;
+  border-top: 1px solid var(--rule);
+}
+
+h1 {
+  font-size: clamp(30px, 6vw, 46px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+  max-width: 18ch;
+}
+
+.lede {
+  font-size: clamp(15px, 2.2vw, 18px);
+  color: var(--muted);
+  max-width: 58ch;
+  margin: 0 0 26px;
+}
+
+.cta {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
+  font-weight: 700;
+  padding: 14px 26px;
+  border-radius: 14px;
+  font-size: 15px;
+}
+
+.cta.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  margin-left: 10px;
+}
+
+.note { color: var(--muted); font-size: 13px; margin-top: 14px; }
+
+/* ---- screens ---- */
+
+.screens {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  padding: 46px 0 10px;
+  scroll-snap-type: x mandatory;
+}
+
+.screens figure {
+  margin: 0;
+  flex: 0 0 auto;
+  width: 250px;
+  scroll-snap-align: start;
+}
+
+.screens img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 26px;
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+}
+
+.screens figcaption {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---- sections ---- */
+
+h2 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 60px 0 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 22px 24px;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+p.body { max-width: 62ch; }
+p.body a { color: var(--blue); }
+
+/* ---- footer ---- */
+
+footer {
+  margin-top: 70px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: center;
+}
+
+footer a { color: var(--muted); }
+
+@media (max-width: 560px) {
+  body { padding: 0 18px 60px; font-size: 14px; }
+  .screens figure { width: 210px; }
+  .cta.secondary { margin-left: 0; margin-top: 10px; }
+}
