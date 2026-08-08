@@ -8,11 +8,12 @@
 //  negative. Taking stock out is the everyday action so it is the filled
 //  button; add up is its blue opposite for a delivery that arrives against a
 //  colour already on the shelf, so she never has to recount to add five;
-//  recounting is the correction, so it is the quiet outlined one, and remove
-//  is the red one that takes the colour off the model entirely. Four actions
-//  in a row means each is an icon over a short word rather than a wide pill:
-//  removing a colour used to hide in a long press, which is somewhere nobody
-//  looks.
+//  recounting is the correction, so it is the quiet outlined one. Each is an
+//  icon over a short word rather than a wide pill, so three fit without
+//  crowding. Removing a colour is deliberately not among them: destructive
+//  actions live behind a long press everywhere in this app, and a delete
+//  sitting a thumb's width from Take out is a delete that gets hit by
+//  accident.
 //  Taking stock in is also how a new color appears, so there is no separate
 //  add-color step. The price per piece sits under the pack total in the same
 //  shape as it, a spaced label over a big monospaced number, because they are
@@ -296,7 +297,6 @@ struct StockModelDetailView: View {
                 takeOutButton(line)
                 addUpButton(line)
                 recountButton(line)
-                removeButton(line)
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 12)
@@ -327,21 +327,6 @@ struct StockModelDetailView: View {
             stockButtonLabel(icon: "minus", title: L.t(.takeOut))
                 .foregroundStyle(Color(.systemBackground))
                 .background(RoundedRectangle(cornerRadius: 11).fill(Color.primary.opacity(0.88)))
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func removeButton(_ line: StockLine) -> some View {
-        Button {
-            Haptics.warning()
-            viewModel.removeLine(line, from: model, context: modelContext)
-        } label: {
-            stockButtonLabel(icon: "trash", title: L.t(.remove))
-                .foregroundStyle(StockRed.full)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 11)
-                        .stroke(StockRed.full.opacity(0.45), lineWidth: 1)
-                )
         }
         .buttonStyle(.plain)
     }
