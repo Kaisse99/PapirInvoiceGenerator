@@ -1,6 +1,11 @@
 //
 //  MyInvoicesView.swift
 //  The saved-invoice list: search and sort on top, a card per invoice, and a
+//  Deleting an invoice that has already shipped says what that costs before
+//  it happens: the packs stay off the shelf because they really did leave,
+//  the movement log keeps the record, and the money simply drops out of
+//  statistics. Returning it to draft first is the way to get the stock back,
+//  and the alert says so rather than leaving her to find out from a total.
 //  long-press menu for preview, share, duplicate, and delete. The checklist
 //  button turns the rows into checkboxes with a batch bar along the bottom.
 //  Owns the @Query and the navigation stack: tapping a card opens
@@ -90,8 +95,12 @@ struct MyInvoicesView: View {
                 Button(L.t(.cancel), role: .cancel) {
                     viewModel.invoiceToDelete = nil
                 }
-            } message: { _ in
-                Text(L.t(.cannotBeUndone))
+            } message: { invoice in
+                Text(
+                    invoice.status == .shipped
+                        ? "\(L.t(.cannotBeUndone)) \(L.t(.deletingShippedWarning))"
+                        : L.t(.cannotBeUndone)
+                )
             }
             .alert(
                 L.t(.deleteSelectedTitle),
@@ -102,7 +111,11 @@ struct MyInvoicesView: View {
                 }
                 Button(L.t(.cancel), role: .cancel) {}
             } message: {
-                Text(L.t(.cannotBeUndone))
+                Text(
+                    viewModel.selectionHasShipped(allInvoices)
+                        ? "\(L.t(.cannotBeUndone)) \(L.t(.deletingShippedCount))"
+                        : L.t(.cannotBeUndone)
+                )
             }
             .onChange(of: allInvoices.count) { _, newCount in
                 viewModel.exitEditingIfEmpty(invoiceCount: newCount)

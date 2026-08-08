@@ -118,6 +118,12 @@ final class MyInvoicesViewModel: ObservableObject {
         return result
     }
     
+    /// Whether anything about to be deleted has already moved stock, which is
+    /// what decides how loud the confirmation has to be.
+    func selectionHasShipped(_ invoices: [Invoice]) -> Bool {
+        invoices.contains { selectedIDs.contains($0.id) && $0.status == .shipped }
+    }
+
     var selectionTitle: String {
         selectedIDs.isEmpty ? L.t(.selectInvoices) : "\(selectedIDs.count) \(L.t(.selected))"
     }

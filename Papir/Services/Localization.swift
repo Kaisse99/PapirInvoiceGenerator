@@ -310,6 +310,8 @@ nonisolated enum LKey: String, CaseIterable {
     case welcomeStart = "Start"
     case cannotRevertMissingModel = "These models were deleted, so their packs cannot go back. Add them to stock again first"
     case inAnotherCurrency = "invoices are in another currency and are not counted here"
+    case deletingShippedWarning = "This invoice has already shipped. The packs it took stay off the shelf, since they really did leave, and the movement log keeps the record. What goes is the money: it disappears from statistics. To put the stock back, return the invoice to draft first."
+    case deletingShippedCount = "Some of these have already shipped. Their packs stay off the shelf and their money disappears from statistics. Return an invoice to draft first if you want its stock back."
     case newRowDefaultsExplained = "Every new invoice row starts with these two numbers, so the ones you type most are already there. Units is how many packs; Per unit is how many pieces are in one pack."
     case sellSinglesExplained = "Selling single items rather than boxes? Set Per unit to 1. The invoice then reads as a plain count times a price, and the × 1 stops appearing on the document."
 }
@@ -331,6 +333,8 @@ nonisolated enum L {
     ]
 
     static let ukrainian: [LKey: String] = [
+        .deletingShippedWarning: "Ця накладна вже відвантажена. Пачки, які вона забрала, зі складу не повернуться, бо вони справді пішли, і в історії руху запис лишиться. Зникнуть гроші: накладна більше не рахуватиметься у статистиці. Щоб повернути склад, спершу поверніть накладну в чернетку.",
+        .deletingShippedCount: "Деякі з них уже відвантажені. Їхні пачки зі складу не повернуться, а гроші зникнуть зі статистики. Якщо потрібен склад назад, спершу поверніть накладну в чернетку.",
         .newRowDefaultsExplained: "Кожен новий рядок накладної починається з цих двох чисел, щоб те, що ви вводите найчастіше, вже стояло. Кількість — це скільки пачок; У пачці — скільки штук в одній пачці.",
         .sellSinglesExplained: "Продаєте поштучно, а не коробками? Поставте «У пачці» 1. Тоді накладна читається як кількість помножена на ціну, а × 1 зникає з документа.",
         .inAnotherCurrency: "накладних в іншій валюті сюди не входять",
@@ -482,6 +486,8 @@ nonisolated enum L {
     ]
 
     static let russian: [LKey: String] = [
+        .deletingShippedWarning: "Эта накладная уже отгружена. Пачки, которые она забрала, на склад не вернутся, потому что они действительно ушли, и в истории движения запись останется. Исчезнут деньги: накладная больше не будет считаться в статистике. Чтобы вернуть склад, сначала верните накладную в черновик.",
+        .deletingShippedCount: "Некоторые из них уже отгружены. Их пачки на склад не вернутся, а деньги исчезнут из статистики. Если нужен склад обратно, сначала верните накладную в черновик.",
         .newRowDefaultsExplained: "Каждая новая строка накладной начинается с этих двух чисел, чтобы то, что вы вводите чаще всего, уже стояло. Количество — это сколько пачек; В пачке — сколько штук в одной пачке.",
         .sellSinglesExplained: "Продаёте поштучно, а не коробками? Поставьте «В пачке» 1. Тогда накладная читается как количество умноженное на цену, а × 1 исчезает из документа.",
         .inAnotherCurrency: "накладных в другой валюте сюда не входят",
@@ -633,6 +639,8 @@ nonisolated enum L {
     ]
 
     static let polish: [LKey: String] = [
+        .deletingShippedWarning: "Ta faktura została już wysłana. Paczki, które zabrała, nie wrócą do magazynu, bo naprawdę wyszły, a w historii ruchu wpis zostanie. Znikną pieniądze: faktura przestanie liczyć się w statystykach. Aby odzyskać stan magazynu, najpierw cofnij fakturę do szkicu.",
+        .deletingShippedCount: "Niektóre z nich zostały już wysłane. Ich paczki nie wrócą do magazynu, a pieniądze znikną ze statystyk. Jeśli chcesz odzyskać stan magazynu, najpierw cofnij fakturę do szkicu.",
         .newRowDefaultsExplained: "Każdy nowy wiersz faktury zaczyna się od tych dwóch liczb, żeby to, co wpisujesz najczęściej, już tam było. Ilość to liczba paczek; W paczce to liczba sztuk w jednej paczce.",
         .sellSinglesExplained: "Sprzedajesz na sztuki, a nie w kartonach? Ustaw „W paczce” na 1. Faktura czyta się wtedy jako liczba razy cena, a × 1 znika z dokumentu.",
         .inAnotherCurrency: "faktur w innej walucie nie jest tu liczonych",
