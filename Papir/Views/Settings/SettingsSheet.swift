@@ -235,6 +235,8 @@ struct SettingsSheet: View {
     private var defaultsSection: some View {
         section(title: L.t(.newRowDefaults, language)) {
             VStack(spacing: 10) {
+                explainer(L.t(.newRowDefaultsExplained, language))
+
                 numberRow(
                     label: L.t(.units, language),
                     caption: L.t(.unitsSettingCaption, language),
@@ -246,6 +248,8 @@ struct SettingsSheet: View {
                     value: $defaultItemsPerUnit
                 )
 
+                explainer(L.t(.sellSinglesExplained, language), tint: AppWarning.tint)
+
                 Text(L.t(.zeroLeavesEmpty, language))
                     .font(.scaled(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
@@ -254,6 +258,22 @@ struct SettingsSheet: View {
                     .padding(.top, 2)
             }
         }
+    }
+
+    /// A paragraph above a group of controls that says what they are for.
+    /// Settings had captions on each row but nothing saying why the pair of
+    /// them existed, and nothing at all about the one setting whose value
+    /// changes how the invoice reads.
+    private func explainer(_ text: String, tint: Color = .secondary) -> some View {
+        Text(text)
+            .font(.scaled(size: 12, weight: .regular, design: .rounded))
+            .foregroundStyle(tint)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 12)
+            .background(RoundedRectangle(cornerRadius: 14).fill(Color(.secondarySystemGroupedBackground)))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.primary.opacity(0.10), lineWidth: 0.8))
     }
 
     private var exportSection: some View {

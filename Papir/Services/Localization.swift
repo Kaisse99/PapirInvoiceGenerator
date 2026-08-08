@@ -310,6 +310,10 @@ nonisolated enum LKey: String, CaseIterable {
     case welcomeStart = "Start"
     case cannotRevertMissingModel = "These models were deleted, so their packs cannot go back. Add them to stock again first"
     case inAnotherCurrency = "invoices are in another currency and are not counted here"
+    case piecesInPack = "Pieces in a pack"
+    case piecesInPackHint = "How many pieces one pack of this model holds. Only this model changes."
+    case newRowDefaultsExplained = "Every new invoice row starts with these two numbers, so the ones you type most are already there. Units is how many packs; Per unit is how many pieces are in one pack."
+    case sellSinglesExplained = "Selling single items rather than boxes? Set Per unit to 1. The invoice then reads as a plain count times a price, and the × 1 stops appearing on the document."
 }
 
 nonisolated enum L {
@@ -329,6 +333,10 @@ nonisolated enum L {
     ]
 
     static let ukrainian: [LKey: String] = [
+        .piecesInPack: "Штук у пачці",
+        .piecesInPackHint: "Скільки штук в одній пачці цієї моделі. Зміниться лише ця модель.",
+        .newRowDefaultsExplained: "Кожен новий рядок накладної починається з цих двох чисел, щоб те, що ви вводите найчастіше, вже стояло. Кількість — це скільки пачок; У пачці — скільки штук в одній пачці.",
+        .sellSinglesExplained: "Продаєте поштучно, а не коробками? Поставте «У пачці» 1. Тоді накладна читається як кількість помножена на ціну, а × 1 зникає з документа.",
         .inAnotherCurrency: "накладних в іншій валюті сюди не входять",
         .cannotRevertMissingModel: "Ці моделі видалено, тож пачки нікуди повертати. Спочатку додайте їх на склад знову",
         .welcomeTitle: "Papir", .welcomeSubtitle: "Усе за один рух пальця звідси.",
@@ -478,6 +486,10 @@ nonisolated enum L {
     ]
 
     static let russian: [LKey: String] = [
+        .piecesInPack: "Штук в пачке",
+        .piecesInPackHint: "Сколько штук в одной пачке этой модели. Изменится только эта модель.",
+        .newRowDefaultsExplained: "Каждая новая строка накладной начинается с этих двух чисел, чтобы то, что вы вводите чаще всего, уже стояло. Количество — это сколько пачек; В пачке — сколько штук в одной пачке.",
+        .sellSinglesExplained: "Продаёте поштучно, а не коробками? Поставьте «В пачке» 1. Тогда накладная читается как количество умноженное на цену, а × 1 исчезает из документа.",
         .inAnotherCurrency: "накладных в другой валюте сюда не входят",
         .cannotRevertMissingModel: "Эти модели удалены, поэтому пачки некуда вернуть. Сначала добавьте их на склад снова",
         .welcomeTitle: "Papir", .welcomeSubtitle: "Всё в одном движении отсюда.",
@@ -627,6 +639,10 @@ nonisolated enum L {
     ]
 
     static let polish: [LKey: String] = [
+        .piecesInPack: "Sztuk w paczce",
+        .piecesInPackHint: "Ile sztuk mieści jedna paczka tego modelu. Zmieni się tylko ten model.",
+        .newRowDefaultsExplained: "Każdy nowy wiersz faktury zaczyna się od tych dwóch liczb, żeby to, co wpisujesz najczęściej, już tam było. Ilość to liczba paczek; W paczce to liczba sztuk w jednej paczce.",
+        .sellSinglesExplained: "Sprzedajesz na sztuki, a nie w kartonach? Ustaw „W paczce” na 1. Faktura czyta się wtedy jako liczba razy cena, a × 1 znika z dokumentu.",
         .inAnotherCurrency: "faktur w innej walucie nie jest tu liczonych",
         .cannotRevertMissingModel: "Te modele usunięto, więc paczki nie mają dokąd wrócić. Najpierw dodaj je ponownie do magazynu",
         .welcomeTitle: "Papir", .welcomeSubtitle: "Wszystko o jeden gest stąd.",

@@ -196,6 +196,7 @@ final class NewInvoiceViewModel: ObservableObject {
                 existing.sender = sender
                 existing.receiver = receiver
                 existing.receiverContact = receiverContact
+                existing.receiverContactID = receiverContact?.identifier
                 if let oldFileName = existing.pdfFileName {
                     PDFStorage.deletePDF(fileName: oldFileName)
                     existing.pdfFileName = nil
@@ -205,6 +206,7 @@ final class NewInvoiceViewModel: ObservableObject {
             } else {
                 let invoice = Invoice(items: items, date: .now, sender: sender, receiver: receiver)
                 invoice.receiverContact = receiverContact
+                invoice.receiverContactID = receiverContact?.identifier
                 invoice.number = InvoiceNumbering.next(in: context)
                 invoice.currencyCode = AppSettings.currency.rawValue
                 context.insert(invoice)

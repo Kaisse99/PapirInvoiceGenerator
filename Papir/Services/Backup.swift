@@ -8,6 +8,10 @@
 //  Contacts are referenced by their position in the file rather than by any
 //  id, because Contact has no stable identifier of its own and inventing one
 //  for the wire keeps the models untouched.
+//  Anything that comes back without an invoice number gets one, because a
+//  backup written before numbering existed carries zeroes and the one-time
+//  launch backfill has long since run: without this those invoices would stay
+//  unnumbered for good while new ones counted up from one.
 //  Restoring replaces everything. A merge would need rules for every way two
 //  stores can disagree and would get them wrong quietly; replace is the one
 //  behaviour whose outcome she can predict, and it sits behind a confirmation
@@ -25,6 +29,7 @@ import SwiftData
 
 struct BackupFile: Codable {
     struct ContactRecord: Codable {
+        var identifier: UUID?
         var firstName: String
         var lastName: String
         var phone: String
@@ -42,6 +47,7 @@ struct BackupFile: Codable {
     struct StockModelRecord: Codable {
         var code: String
         var pricePerPiece: Double
+        var piecesPerPack: Int?
         var lines: [StockLineRecord]
     }
 
@@ -137,6 +143,7 @@ enum Backup {
             exportedAt: .now,
             contacts: contacts.map {
                 BackupFile.ContactRecord(
+                    identifier: $0.identifier,
                     firstName: $0.firstName,
                     lastName: $0.lastName,
                     phone: $0.phone,
@@ -150,6 +157,7 @@ enum Backup {
                 BackupFile.StockModelRecord(
                     code: model.code,
                     pricePerPiece: model.pricePerPiece,
+                    piecesPerPack: model.piecesPerPack,
                     lines: model.orderedLines.map {
                         BackupFile.StockLineRecord(color: $0.color, packs: $0.packs)
                     }
@@ -217,6 +225,7 @@ enum Backup {
                         .first { !$0.isEmpty }
                     ?? ""
             )
+            if let identifier = record.identifier { contact.identifier = identifier }
             context.insert(contact)
             contacts.append(contact)
         }
@@ -225,6 +234,7 @@ enum Backup {
             let model = StockModel(
                 code: record.code,
                 pricePerPiece: record.pricePerPiece,
+                piecesPerPack: record.piecesPerPack ?? 0,
                 lines: record.lines.map { StockLine(color: $0.color, packs: $0.packs) }
             )
             context.insert(model)
@@ -259,6 +269,7 @@ enum Backup {
             invoice.shippedAt = record.shippedAt
             if let index = record.contactIndex, contacts.indices.contains(index) {
                 invoice.receiverContact = contacts[index]
+                invoice.receiverContactID = contacts[index].identifier
             }
             for line in record.shipment {
                 invoice.recordShipment(
@@ -280,6 +291,8 @@ enum Backup {
                 )
             )
         }
+
+        InvoiceNumbering.numberAnythingUnnumbered(context: context)
 
         try context.save()
         return (file.invoices.count, file.models.count, file.contacts.count)

@@ -11,6 +11,11 @@
 //  except that a contact needs a name to be worth listing, which the editor
 //  enforces rather than the model, since a half-typed contact is a normal
 //  state while the sheet is open.
+//  identifier is a UUID of the contact's own, copied onto every invoice
+//  addressed to it. The relationship alone was not enough: deleting a customer
+//  nullifies it, and the invoices then fell back to grouping by typed name, so
+//  two different people who happened to share one dropped into a single line
+//  in the rankings. The copy survives the deletion and keeps them apart.
 //  An invoice points at the contact its receiver was picked from, so counting
 //  what someone has bought is a question about a relationship rather than
 //  about matching two strings that a typo can pull apart. Only the receiver:
@@ -37,6 +42,7 @@ final class Contact {
     @Attribute(originalName: "branchOne")
     var shipmentAddress: String = ""
     var createdAt: Date = Date.now
+    var identifier: UUID = UUID()
 
     @Relationship(deleteRule: .nullify, inverse: \Invoice.receiverContact)
     var invoices: [Invoice]? = nil

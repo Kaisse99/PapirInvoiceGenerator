@@ -43,6 +43,7 @@ struct StockModelDetailView: View {
     @State private var recountTarget: StockLine? = nil
     @State private var showHistory = false
     @State private var showPrice = false
+    @State private var showPackSize = false
 
     private var lines: [StockLine] {
         model.orderedLines
@@ -116,6 +117,14 @@ struct StockModelDetailView: View {
             .presentationDetents([.height(360)])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showPackSize) {
+            SetPackSizeSheet(model: model) { size in
+                viewModel.setPackSize(size, on: model, context: modelContext)
+                showPackSize = false
+            }
+            .presentationDetents([.height(340)])
+            .presentationDragIndicator(.visible)
+        }
         .sheet(isPresented: $showPrice) {
             SetPriceSheet(model: model) { price in
                 viewModel.setPrice(price, on: model, context: modelContext)
@@ -143,6 +152,23 @@ struct StockModelDetailView: View {
     }
 
 
+    private var packSizeBlock: some View {
+        Button {
+            Haptics.light()
+            showPackSize = true
+        } label: {
+            HStack(spacing: 6) {
+                Text("\(L.t(.piecesInPack)): \(model.packSize)")
+                    .font(.scaled(size: 13, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                Image(systemName: "pencil")
+                    .font(.scaled(size: 10, weight: .semibold))
+                    .foregroundStyle(.secondary.opacity(0.7))
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
     private var totalHeader: some View {
         VStack(spacing: 4) {
             Text(L.t(.totalPacksCaps))
@@ -161,6 +187,9 @@ struct StockModelDetailView: View {
 
             priceBlock
                 .padding(.top, 18)
+
+            packSizeBlock
+                .padding(.top, 10)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)

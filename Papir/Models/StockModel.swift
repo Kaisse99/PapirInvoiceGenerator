@@ -29,6 +29,13 @@
 //  warning number in settings, and otherwise plain ink. It is deliberately not
 //  StockState, because one color sitting at zero says nothing about whether
 //  there is anything left to sell.
+//  piecesPerPack is how many pieces are in one pack of this model, kept on the
+//  model rather than read from settings, because a shop can sell one code in
+//  sixes and another in twelves and the shelf has to be worth what it is
+//  worth. Zero means it was never set and the app default stands in, which is
+//  what every model held before this existed; changing that default used to
+//  revalue the entire shelf backwards, which is a thing a stock count should
+//  never do on its own.
 //  pricePerPiece is what this model sells for per piece, kept on the model
 //  rather than on the invoice row so writing an invoice fills the price in
 //  instead of asking for it again. Zero means it has never been set, which is
@@ -50,18 +57,36 @@ final class StockModel {
     var code: String = ""
     var createdAt: Date = Date.now
     var pricePerPiece: Double = 0
+    var piecesPerPack: Int = 0
     @Relationship(deleteRule: .cascade, inverse: \StockLine.model)
     var lines: [StockLine]? = nil
 
-    init(code: String, pricePerPiece: Double = 0, lines: [StockLine] = []) {
+    init(code: String, pricePerPiece: Double = 0, piecesPerPack: Int = 0, lines: [StockLine] = []) {
         self.code = code
         self.createdAt = .now
         self.pricePerPiece = pricePerPiece
+        self.piecesPerPack = piecesPerPack
         self.lines = lines
     }
 
     var hasPrice: Bool {
         pricePerPiece > 0
+    }
+
+    /// How many pieces are in one pack of this model. Zero means it was never
+    /// set on the model itself and the app default stands in, which is what
+    /// every model held before this existed.
+    var packSize: Int {
+        piecesPerPack > 0 ? piecesPerPack : max(1, AppSettings.defaultItemsPerUnit)
+    }
+
+    /// What the packs on the shelf are worth, at this model's own pack size.
+    var shelfValue: Double {
+        Double(totalPacks) * Double(packSize) * pricePerPiece
+    }
+
+    var unitsOnShelf: Int {
+        totalPacks * packSize
     }
 
     var allLines: [StockLine] {

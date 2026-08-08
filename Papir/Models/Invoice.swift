@@ -65,6 +65,7 @@ final class Invoice {
     @Relationship(deleteRule: .cascade, inverse: \ShipmentLine.invoice)
     var shipmentLines: [ShipmentLine]? = nil
     var receiverContact: Contact? = nil
+    var receiverContactID: UUID? = nil
 
     var status: InvoiceStatus {
         get { InvoiceStatus(rawValue: statusRaw ?? "") ?? .draft }

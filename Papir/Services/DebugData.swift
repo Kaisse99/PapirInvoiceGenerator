@@ -140,6 +140,7 @@ enum DebugData {
                 receiver: contact?.displayName ?? "Готівка"
             )
             invoice.receiverContact = contact
+            invoice.receiverContactID = contact?.identifier
             invoiceCount += 1
             invoice.currencyCode = AppSettings.currency.rawValue
             invoice.number = nextNumber

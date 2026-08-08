@@ -56,7 +56,11 @@ final class StockViewModel: ObservableObject {
             return
         }
 
-        let model = StockModel(code: code, pricePerPiece: max(0, Double(newModelPrice) ?? 0).moneyRounded)
+        let model = StockModel(
+            code: code,
+            pricePerPiece: max(0, Double(newModelPrice) ?? 0).moneyRounded,
+            piecesPerPack: max(1, AppSettings.defaultItemsPerUnit)
+        )
         context.insert(model)
         save(context)
 
@@ -65,6 +69,12 @@ final class StockViewModel: ObservableObject {
         newModelPrice = ""
         addModelError = nil
         showAddModel = false
+    }
+
+    func setPackSize(_ size: Int, on model: StockModel, context: ModelContext) {
+        model.piecesPerPack = max(1, size)
+        save(context)
+        Haptics.success()
     }
 
     func setPrice(_ price: Double, on model: StockModel, context: ModelContext) {

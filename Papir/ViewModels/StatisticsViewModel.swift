@@ -26,8 +26,11 @@
 //  breakdown summed across rows, so one card can say both what a model earned
 //  and which colours of it actually went.
 //  Buyers are grouped by the contact an invoice was addressed to when there is
-//  one and by the typed name when there is not, which is what makes older
-//  invoices written before the address book still count towards somebody.
+//  one, then by the id copied onto the invoice when that contact has since
+//  been deleted, and only then by the typed name. Falling straight to the name
+//  merged two different customers who happened to share one the moment either
+//  was deleted; the copied id keeps them apart for good. Invoices written
+//  before the address book existed still count towards somebody by name.
 //  Holds no models of its own, the view owns the @Query and hands them in.
 //  Used by: StatisticsView.
 //
@@ -256,9 +259,15 @@ final class StatisticsViewModel: ObservableObject {
             let detail: String?
 
             if let contact = invoice.receiverContact {
-                key = "contact:\(contact.persistentModelID)"
+                key = "contact:\(contact.identifier.uuidString)"
                 name = contact.displayName
                 detail = contact.whereTo.isEmpty ? nil : contact.whereTo
+            } else if let stored = invoice.receiverContactID {
+                key = "contact:\(stored.uuidString)"
+                name = invoice.receiver.trimmingCharacters(in: .whitespaces).isEmpty
+                    ? L.t(.noReceiver)
+                    : invoice.receiver
+                detail = nil
             } else {
                 let typed = invoice.receiver.trimmingCharacters(in: .whitespaces)
                 key = typed.isEmpty ? "none" : typed.lowercased()
@@ -301,7 +310,6 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     func stockValue(_ models: [StockModel]) -> (value: Double, priced: Int, unpriced: Int) {
-        let piecesPerPack = max(1, AppSettings.defaultItemsPerUnit)
         var value: Double = 0
         var priced = 0
         var unpriced = 0
@@ -312,15 +320,14 @@ final class StatisticsViewModel: ObservableObject {
                 continue
             }
             priced += 1
-            value += Double(model.totalPacks) * Double(piecesPerPack) * model.pricePerPiece
+            value += model.shelfValue
         }
 
         return (value, priced, unpriced)
     }
 
     func unitsInStock(_ models: [StockModel]) -> Int {
-        let piecesPerPack = max(1, AppSettings.defaultItemsPerUnit)
-        return models.reduce(0) { $0 + $1.totalPacks * piecesPerPack }
+        models.reduce(0) { $0 + $1.unitsOnShelf }
     }
 
     private func bucketDomain(_ shipped: [Invoice], calendar: Calendar) -> ClosedRange<Date>? {

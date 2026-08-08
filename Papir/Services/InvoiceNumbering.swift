@@ -46,6 +46,34 @@ enum InvoiceNumbering {
         invoice.number = next(in: context)
     }
 
+    /// Numbers anything that has no number yet, whatever put it there. The
+    /// launch backfill runs once and is done; this is what a restore calls,
+    /// because a backup written before numbering existed brings back invoices
+    /// carrying zero and the one-time flag has long since been set, which left
+    /// them unnumbered for good.
+    @discardableResult
+    static func numberAnythingUnnumbered(context: ModelContext) -> Int {
+        do {
+            let invoices = try context.fetch(
+                FetchDescriptor<Invoice>(sortBy: [SortDescriptor(\.date)])
+            )
+            var next = invoices.map(\.number).max().map { max(0, $0) + 1 } ?? 1
+            var numbered = 0
+            for invoice in invoices where !invoice.hasNumber {
+                invoice.number = next
+                next += 1
+                numbered += 1
+            }
+            if numbered > 0 {
+                AppLog.data.notice("Numbered \(numbered) invoices that had none")
+            }
+            return numbered
+        } catch {
+            AppLog.data.error("Could not number invoices: \(error.localizedDescription, privacy: .public)")
+            return 0
+        }
+    }
+
     @discardableResult
     static func backfill(context: ModelContext) -> Int {
         guard !UserDefaults.standard.bool(forKey: backfilledKey) else { return 0 }
