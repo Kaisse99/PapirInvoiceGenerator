@@ -30,6 +30,7 @@ struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel = HomeViewModel()
     @State private var showSettings = false
+    @State private var showWelcome = !AppSettings.welcomeSeen
 
     @AppStorage(AppSettings.languageKey)
     private var languageRaw: String = AppLanguage.english.rawValue
@@ -102,6 +103,12 @@ struct HomeView: View {
                 viewModel.resetOnReturnHome()
             }
         }
+        .fullScreenCover(isPresented: $showWelcome) {
+            WelcomeSheet(language: language) {
+                AppSettings.markWelcomeSeen()
+                showWelcome = false
+            }
+        }
         .sheet(isPresented: $showSettings) {
             SettingsSheet()
         }
@@ -142,7 +149,7 @@ struct HomeView: View {
                     )
                     .frame(maxWidth: .infinity)
 
-                    centerMark
+                    centerColumn
 
                     directionArrow(
                         title: L.t(.stock, language),
@@ -177,7 +184,7 @@ struct HomeView: View {
 
                 Spacer()
             }
-            .offset(y: -55)
+
             .readableWidth(560)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppBackground())
@@ -210,10 +217,7 @@ struct HomeView: View {
     }
 
     private var centerMark: some View {
-        let mark = Image("smallIcon")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 60, height: 60)
+        let mark = AppMark(size: 42)
 
         return mark
             .overlay {
@@ -226,6 +230,20 @@ struct HomeView: View {
                 .mask(mark)
             }
             .compositingGroup()
+    }
+
+    private var centerColumn: some View {
+        VStack(spacing: 7) {
+            Text(" ")
+                .font(.callout)
+                .fontWidth(.expanded)
+                .fontDesign(.monospaced)
+                .tracking(3)
+                .hidden()
+
+            centerMark
+        }
+        .offset(y: -8)
     }
 
     private func directionArrow(title: String, pointsLeft: Bool, available: Bool) -> some View {

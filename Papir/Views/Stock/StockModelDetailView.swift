@@ -8,7 +8,11 @@
 //  negative. Taking stock out is the everyday action so it is the filled
 //  button; add up is its blue opposite for a delivery that arrives against a
 //  colour already on the shelf, so she never has to recount to add five;
-//  recounting is the correction, so it is the quiet outlined one.
+//  recounting is the correction, so it is the quiet outlined one, and remove
+//  is the red one that takes the colour off the model entirely. Four actions
+//  in a row means each is an icon over a short word rather than a wide pill:
+//  removing a colour used to hide in a long press, which is somewhere nobody
+//  looks.
 //  Taking stock in is also how a new color appears, so there is no separate
 //  add-color step. The price per piece sits under the pack total in the same
 //  shape as it, a spaced label over a big monospaced number, because they are
@@ -48,7 +52,7 @@ struct StockModelDetailView: View {
             VStack(spacing: 22) {
                 totalHeader
                 colorsOverview
-                PaperclipDivider(iconSize: 36)
+                PaperclipDivider(iconSize: 25)
 
                 if lines.isEmpty {
                     emptyState
@@ -288,10 +292,11 @@ struct StockModelDetailView: View {
                 .fill(Color.primary.opacity(0.08))
                 .frame(height: 1)
 
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 takeOutButton(line)
                 addUpButton(line)
                 recountButton(line)
+                removeButton(line)
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 12)
@@ -319,17 +324,38 @@ struct StockModelDetailView: View {
             Haptics.light()
             withdrawTarget = line
         } label: {
-            HStack(spacing: 7) {
-                Image(systemName: "shippingbox.and.arrow.backward")
-                    .font(.scaled(size: 13, weight: .medium))
-                Text(L.t(.takeOut))
-                    .font(.scaled(size: 14, weight: .bold, design: .monospaced))
-            }
-            .frame(maxWidth: .infinity, minHeight: 46)
-            .foregroundStyle(Color(.systemBackground))
-            .background(RoundedRectangle(cornerRadius: 13).fill(Color.primary.opacity(0.88)))
+            stockButtonLabel(icon: "minus", title: L.t(.takeOut))
+                .foregroundStyle(Color(.systemBackground))
+                .background(RoundedRectangle(cornerRadius: 11).fill(Color.primary.opacity(0.88)))
         }
         .buttonStyle(.plain)
+    }
+
+    private func removeButton(_ line: StockLine) -> some View {
+        Button {
+            Haptics.warning()
+            viewModel.removeLine(line, from: model, context: modelContext)
+        } label: {
+            stockButtonLabel(icon: "trash", title: L.t(.remove))
+                .foregroundStyle(StockRed.full)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 11)
+                        .stroke(StockRed.full.opacity(0.45), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func stockButtonLabel(icon: String, title: String) -> some View {
+        VStack(spacing: 3) {
+            Image(systemName: icon)
+                .font(.scaled(size: 12, weight: .semibold))
+            Text(title)
+                .font(.scaled(size: 10, weight: .bold, design: .monospaced))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
     }
 
     private func addUpButton(_ line: StockLine) -> some View {
@@ -337,16 +363,9 @@ struct StockModelDetailView: View {
             Haptics.light()
             addUpTarget = line
         } label: {
-            HStack(spacing: 7) {
-                Image(systemName: "shippingbox.and.arrow.backward")
-                    .font(.scaled(size: 13, weight: .medium))
-                    .scaleEffect(x: -1, y: 1)
-                Text(L.t(.addUp))
-                    .font(.scaled(size: 14, weight: .bold, design: .monospaced))
-            }
-            .frame(maxWidth: .infinity, minHeight: 46)
-            .foregroundStyle(Color(.systemBackground))
-            .background(RoundedRectangle(cornerRadius: 13).fill(InvoiceStatus.shipped.tint))
+            stockButtonLabel(icon: "plus", title: L.t(.addUp))
+                .foregroundStyle(.white)
+                .background(RoundedRectangle(cornerRadius: 11).fill(InvoiceStatus.shipped.tint))
         }
         .buttonStyle(.plain)
     }
@@ -356,18 +375,12 @@ struct StockModelDetailView: View {
             Haptics.light()
             recountTarget = line
         } label: {
-            HStack(spacing: 7) {
-                Image(systemName: "arrow.counterclockwise")
-                    .font(.scaled(size: 12, weight: .medium))
-                Text(L.t(.recount))
-                    .font(.scaled(size: 13, weight: .medium, design: .monospaced))
-            }
-            .frame(maxWidth: .infinity, minHeight: 46)
-            .foregroundStyle(.secondary)
-            .overlay(
-                RoundedRectangle(cornerRadius: 13)
-                    .stroke(Color.primary.opacity(0.22), lineWidth: 1)
-            )
+            stockButtonLabel(icon: "arrow.counterclockwise", title: L.t(.recount))
+                .foregroundStyle(.secondary)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 11)
+                        .stroke(Color.primary.opacity(0.22), lineWidth: 1)
+                )
         }
         .buttonStyle(.plain)
     }

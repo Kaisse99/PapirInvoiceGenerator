@@ -29,9 +29,18 @@ nonisolated enum AppSettings {
     static let cloudFailureKey = "iCloudSyncUnavailable"
     static let cloudContainerID = "iCloud.com.kaissenberg.Papir"
     static let lastBackupKey = "lastBackupAt"
+    static let welcomeSeenKey = "welcomeSeen"
 
     static let privacyPolicyURL = "https://kaissenberg.github.io/papir/privacy"
     static let supportURL = "https://kaissenberg.github.io/papir/support"
+
+    static var welcomeSeen: Bool {
+        UserDefaults.standard.bool(forKey: welcomeSeenKey)
+    }
+
+    static func markWelcomeSeen() {
+        UserDefaults.standard.set(true, forKey: welcomeSeenKey)
+    }
 
     static var lastBackupAt: Date? {
         UserDefaults.standard.object(forKey: lastBackupKey) as? Date

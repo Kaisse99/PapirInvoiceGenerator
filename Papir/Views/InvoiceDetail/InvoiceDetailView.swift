@@ -55,9 +55,9 @@ struct InvoiceDetailView: View {
             VStack(spacing: 24) {
                 actionButtons
                 receiptHeader
-                PaperclipDivider(iconSize: 36)
+                PaperclipDivider(iconSize: 25)
                 rowsSection
-                PaperclipDivider(iconSize: 36)
+                PaperclipDivider(iconSize: 25)
                 totalSection
             }
             .padding(.top, 12)

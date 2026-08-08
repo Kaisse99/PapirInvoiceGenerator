@@ -57,7 +57,7 @@ struct StatisticsView: View {
                     periodBar
                     revenueHeader
                     chartCard
-                    PaperclipDivider(iconSize: 36)
+                    PaperclipDivider(iconSize: 25)
                     profitabilityCard
                     buyersCard
                     shelfCard

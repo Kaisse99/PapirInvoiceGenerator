@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PaperclipDivider: View {
     @Environment(\.colorScheme) var colorScheme
-    var iconSize: CGFloat = 50
+    var iconSize: CGFloat = 35
     
     private var glowColor: Color {
         colorScheme == .dark ? .white : .gray
@@ -23,11 +23,7 @@ struct PaperclipDivider: View {
                 .foregroundStyle(.primary.opacity(0.8))
                 .shadow(color: glowColor.opacity(0.75), radius: 4)
             
-            Image("smallIcon")
-                .resizable()
-                .scaledToFit()
-                .frame(width: iconSize, height: iconSize)
-                .foregroundStyle(.primary)
+            AppMark(size: iconSize)
             
             Rectangle()
                 .frame(height: 1.5)

@@ -301,6 +301,13 @@ nonisolated enum LKey: String, CaseIterable {
     case draftsOnly = "Drafts only"
     case shippedOnly = "Shipped only"
     case addUp = "Add up"
+    case welcomeTitle = "Papir"
+    case welcomeSubtitle = "Everything is one swipe from here."
+    case welcomeCreate = "Write a new invoice"
+    case welcomeInvoices = "Everything you have written"
+    case welcomeStock = "What is on the shelf"
+    case welcomeStats = "What actually sold"
+    case welcomeStart = "Start"
 }
 
 nonisolated enum L {
@@ -320,6 +327,10 @@ nonisolated enum L {
     ]
 
     static let ukrainian: [LKey: String] = [
+        .welcomeTitle: "Papir", .welcomeSubtitle: "Усе за один рух пальця звідси.",
+        .welcomeCreate: "Написати нову накладну", .welcomeInvoices: "Усе, що вже написано",
+        .welcomeStock: "Що лежить на складі", .welcomeStats: "Що справді продалося",
+        .welcomeStart: "Почати",
         .addUp: "Додати",
         .allInvoices: "Усі накладні", .draftsOnly: "Лише чернетки", .shippedOnly: "Лише відвантажені",
         .shipmentAddress: "Адреса доставки", .unitsInStock: "штук на складі",
@@ -463,6 +474,10 @@ nonisolated enum L {
     ]
 
     static let russian: [LKey: String] = [
+        .welcomeTitle: "Papir", .welcomeSubtitle: "Всё в одном движении отсюда.",
+        .welcomeCreate: "Написать новую накладную", .welcomeInvoices: "Всё, что уже написано",
+        .welcomeStock: "Что лежит на складе", .welcomeStats: "Что действительно продалось",
+        .welcomeStart: "Начать",
         .addUp: "Добавить",
         .allInvoices: "Все накладные", .draftsOnly: "Только черновики", .shippedOnly: "Только отгруженные",
         .shipmentAddress: "Адрес доставки", .unitsInStock: "штук на складе",
@@ -606,6 +621,10 @@ nonisolated enum L {
     ]
 
     static let polish: [LKey: String] = [
+        .welcomeTitle: "Papir", .welcomeSubtitle: "Wszystko o jeden gest stąd.",
+        .welcomeCreate: "Napisz nową fakturę", .welcomeInvoices: "Wszystko, co już napisane",
+        .welcomeStock: "Co jest w magazynie", .welcomeStats: "Co naprawdę się sprzedało",
+        .welcomeStart: "Zacznij",
         .addUp: "Dodaj",
         .allInvoices: "Wszystkie faktury", .draftsOnly: "Tylko szkice", .shippedOnly: "Tylko wysłane",
         .shipmentAddress: "Adres dostawy", .unitsInStock: "sztuk w magazynie",
