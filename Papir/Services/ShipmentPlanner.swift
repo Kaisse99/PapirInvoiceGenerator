@@ -20,11 +20,24 @@
 //  Reverting puts the packs back and then hands the shipment record to the
 //  invoice to clear, which deletes the lines itself, so the lifetime of a
 //  ShipmentLine lives in one place rather than half here and half there.
+//  It refuses outright if any model on the record has since been deleted.
+//  It used to skip those lines and clear the record anyway, which returned
+//  nothing, logged nothing, said nothing, and destroyed the only account of
+//  what had left the shelf. All or nothing is the one outcome she can predict:
+//  the codes it names can be added back, and then the revert works.
 //  Used by: ShipmentSheet, InvoiceDetailView.
 //
 
 import Foundation
 import SwiftData
+
+struct ShipmentRevertBlocked: LocalizedError {
+    let missingCodes: [String]
+
+    var errorDescription: String? {
+        "\(L.t(.cannotRevertMissingModel)): \(missingCodes.joined(separator: ", "))"
+    }
+}
 
 struct ShipmentDraft: Identifiable {
     let id = UUID()
@@ -130,6 +143,14 @@ enum ShipmentPlanner {
     }
 
     static func revert(_ invoice: Invoice, stock: [StockModel], context: ModelContext) throws {
+        let missing = invoice.shipment
+            .filter { model($0.modelCode, in: stock) == nil }
+            .map(\.modelCode)
+
+        guard missing.isEmpty else {
+            throw ShipmentRevertBlocked(missingCodes: Array(Set(missing)).sorted())
+        }
+
         for line in invoice.shipment {
             guard let model = model(line.modelCode, in: stock) else { continue }
             if let stockLine = model.line(for: line.color) {
@@ -152,6 +173,17 @@ enum ShipmentPlanner {
         invoice.status = .draft
         invoice.shippedAt = nil
         try context.save()
+    }
+
+    /// What a row name refers to once the shelf has had its say: the model's
+    /// own code when the row matches one, the trimmed name when it does not.
+    /// Statistics groups by this so a row typed "Cotton Tee 2337" counts under
+    /// 2337, the same model shipping already deducted it from.
+    static func canonicalName(for rowName: String, in stock: [StockModel]) -> String {
+        if let model = match(name: rowName, in: stock) {
+            return model.code
+        }
+        return rowName.trimmingCharacters(in: .whitespaces)
     }
 
     private static func match(name: String, in stock: [StockModel]) -> StockModel? {

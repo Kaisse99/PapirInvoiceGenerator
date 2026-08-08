@@ -308,6 +308,8 @@ nonisolated enum LKey: String, CaseIterable {
     case welcomeStock = "What is on the shelf"
     case welcomeStats = "What actually sold"
     case welcomeStart = "Start"
+    case cannotRevertMissingModel = "These models were deleted, so their packs cannot go back. Add them to stock again first"
+    case inAnotherCurrency = "invoices are in another currency and are not counted here"
 }
 
 nonisolated enum L {
@@ -327,6 +329,8 @@ nonisolated enum L {
     ]
 
     static let ukrainian: [LKey: String] = [
+        .inAnotherCurrency: "накладних в іншій валюті сюди не входять",
+        .cannotRevertMissingModel: "Ці моделі видалено, тож пачки нікуди повертати. Спочатку додайте їх на склад знову",
         .welcomeTitle: "Papir", .welcomeSubtitle: "Усе за один рух пальця звідси.",
         .welcomeCreate: "Написати нову накладну", .welcomeInvoices: "Усе, що вже написано",
         .welcomeStock: "Що лежить на складі", .welcomeStats: "Що справді продалося",
@@ -474,6 +478,8 @@ nonisolated enum L {
     ]
 
     static let russian: [LKey: String] = [
+        .inAnotherCurrency: "накладных в другой валюте сюда не входят",
+        .cannotRevertMissingModel: "Эти модели удалены, поэтому пачки некуда вернуть. Сначала добавьте их на склад снова",
         .welcomeTitle: "Papir", .welcomeSubtitle: "Всё в одном движении отсюда.",
         .welcomeCreate: "Написать новую накладную", .welcomeInvoices: "Всё, что уже написано",
         .welcomeStock: "Что лежит на складе", .welcomeStats: "Что действительно продалось",
@@ -621,6 +627,8 @@ nonisolated enum L {
     ]
 
     static let polish: [LKey: String] = [
+        .inAnotherCurrency: "faktur w innej walucie nie jest tu liczonych",
+        .cannotRevertMissingModel: "Te modele usunięto, więc paczki nie mają dokąd wrócić. Najpierw dodaj je ponownie do magazynu",
         .welcomeTitle: "Papir", .welcomeSubtitle: "Wszystko o jeden gest stąd.",
         .welcomeCreate: "Napisz nową fakturę", .welcomeInvoices: "Wszystko, co już napisane",
         .welcomeStock: "Co jest w magazynie", .welcomeStats: "Co naprawdę się sprzedało",

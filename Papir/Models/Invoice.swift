@@ -8,6 +8,13 @@
 //  to a name tiebreak, so they keep one settled order instead of reshuffling.
 //  InvoiceSnapshot is the frozen, Sendable copy handed to PDF rendering, which
 //  runs off the main thread where touching the model itself would be unsafe.
+//  currencyCode is the currency the amounts on this invoice are in, copied at
+//  save the same way a row copies its price. Money was stored as a bare
+//  number with the symbol read from settings at draw time, so switching
+//  currency relabelled every invoice ever written rather than converting it:
+//  a year of hryvnia silently became dollars. Nil means it predates this and
+//  falls back to the current setting, which is the old behaviour and the best
+//  guess available for those.
 //  number is what the customer and her accountant refer the document by, one
 //  running sequence over the whole store, assigned once when an invoice is
 //  first saved and never reused or reordered afterwards. Zero means unnumbered,
@@ -53,6 +60,7 @@ final class Invoice {
     var receiver: String = ""
     var pdfFileName: String? = nil
     var statusRaw: String? = nil
+    var currencyCode: String? = nil
     var shippedAt: Date? = nil
     @Relationship(deleteRule: .cascade, inverse: \ShipmentLine.invoice)
     var shipmentLines: [ShipmentLine]? = nil
@@ -69,6 +77,14 @@ final class Invoice {
 
     var hasNumber: Bool {
         number > 0
+    }
+
+    var currency: AppCurrency {
+        currencyCode.flatMap(AppCurrency.init(rawValue:)) ?? AppSettings.currency
+    }
+
+    var currencySymbol: String {
+        currency.symbol
     }
 
     init(items: [ItemRow], date: Date = .now, sender: String, receiver: String, pdfFileName: String? = nil) {
@@ -100,6 +116,7 @@ final class Invoice {
         InvoiceSnapshot(
             id: id,
             number: number,
+            currencySymbol: currencySymbol,
             date: date,
             sender: sender,
             receiver: receiver,
@@ -182,6 +199,7 @@ nonisolated struct InvoiceSnapshot: Sendable {
 
     let id: UUID
     let number: Int
+    let currencySymbol: String
     let date: Date
     let sender: String
     let receiver: String

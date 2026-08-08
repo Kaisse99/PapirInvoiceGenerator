@@ -9,13 +9,22 @@
 //  Everything here counts shipped invoices only. A draft is an intention, not
 //  money, and putting the two in one figure taught the screen to flatter; the
 //  drafts are simply absent rather than shown and subtracted.
+//  Only invoices written in the currency now selected are counted, because an
+//  invoice carries the currency it was written in and summing two of them
+//  produces a number that is true in neither. Any that are left out are
+//  counted and said out loud under the total rather than quietly dropped.
 //  The period is a concrete month picked from the months that actually hold
 //  invoices, or the year, or everything. The chart series is zero-filled
 //  across its whole span, day by day inside a month and month by month above
 //  that, because a line that skips empty days lies about the pace.
-//  Models are grouped by row name as she typed it, matched without regard to
-//  case, and carry their colour breakdown summed across rows, so one card can
-//  say both what a model earned and which colours of it actually went.
+//  Models are grouped through the same matcher that decides what a row takes
+//  off the shelf, so a row typed "Cotton Tee 2337" counts under 2337 rather
+//  than forming a rank of its own. Grouping on the raw name meant shipping and
+//  statistics disagreed about what a row was, and a model's takings could sit
+//  split across two entries while stock deducted them from one. A row matching
+//  no model still groups under its own trimmed name. They carry their colour
+//  breakdown summed across rows, so one card can say both what a model earned
+//  and which colours of it actually went.
 //  Buyers are grouped by the contact an invoice was addressed to when there is
 //  one and by the typed name when there is not, which is what makes older
 //  invoices written before the address book still count towards somebody.
@@ -106,7 +115,15 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     func shipped(_ all: [Invoice]) -> [Invoice] {
-        all.filter { $0.status == .shipped && period.contains($0.date) }
+        all.filter { $0.status == .shipped && period.contains($0.date) && $0.currency == AppSettings.currency }
+    }
+
+    /// Shipped invoices in the period written in some other currency. Adding
+    /// them to the total would be adding hryvnia to dollars, so they are left
+    /// out and counted here instead, because silently dropping money is the
+    /// one thing worse than not showing it.
+    func inAnotherCurrency(_ all: [Invoice]) -> Int {
+        all.filter { $0.status == .shipped && period.contains($0.date) && $0.currency != AppSettings.currency }.count
     }
 
     func revenue(_ shipped: [Invoice]) -> Double {
@@ -145,7 +162,7 @@ final class StatisticsViewModel: ObservableObject {
         return points
     }
 
-    func modelStats(_ shipped: [Invoice]) -> [ModelStat] {
+    func modelStats(_ shipped: [Invoice], stock: [StockModel] = []) -> [ModelStat] {
         var order: [String] = []
         var names: [String: String] = [:]
         var money: [String: Double] = [:]
@@ -154,7 +171,7 @@ final class StatisticsViewModel: ObservableObject {
         var colorNames: [String: [String: String]] = [:]
 
         for item in shipped.flatMap(\.orderedItems) {
-            let trimmed = item.name.trimmingCharacters(in: .whitespaces)
+            let trimmed = ShipmentPlanner.canonicalName(for: item.name, in: stock)
             guard !trimmed.isEmpty else { continue }
             let key = trimmed.lowercased()
 
@@ -205,8 +222,8 @@ final class StatisticsViewModel: ObservableObject {
         return stats
     }
 
-    func byProfit(_ shipped: [Invoice]) -> [ModelStat] {
-        modelStats(shipped)
+    func byProfit(_ shipped: [Invoice], stock: [StockModel] = []) -> [ModelStat] {
+        modelStats(shipped, stock: stock)
             .sorted { $0.money == $1.money ? $0.name < $1.name : $0.money > $1.money }
     }
 

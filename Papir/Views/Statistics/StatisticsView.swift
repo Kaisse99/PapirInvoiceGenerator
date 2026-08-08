@@ -176,6 +176,14 @@ struct StatisticsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            if viewModel.inAnotherCurrency(allInvoices) > 0 {
+                Text("\(viewModel.inAnotherCurrency(allInvoices)) \(L.t(.inAnotherCurrency))")
+                    .font(.scaled(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(AppWarning.tint)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 6)
+            }
+
             HStack(spacing: 14) {
                 footnote("\(shipped.count)", L.t(.invoicesShipped))
                 footnote(PriceText.display(viewModel.averageInvoice(shipped).rounded()), L.t(.averageInvoice))
@@ -391,7 +399,7 @@ struct StatisticsView: View {
     }
 
     private var profitabilityCard: some View {
-        let all = viewModel.byProfit(shipped)
+        let all = viewModel.byProfit(shipped, stock: stockModels)
         let shown = Array(all.prefix(modelsShown))
 
         return VStack(alignment: .leading, spacing: 14) {

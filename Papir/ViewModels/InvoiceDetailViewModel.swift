@@ -35,7 +35,7 @@ final class InvoiceDetailViewModel: ObservableObject {
     func generatePDF(for invoice: Invoice, language: PDFLanguage, context: ModelContext) {
         isGeneratingPDF = true
         let snapshot = invoice.snapshot
-        let currencySymbol = AppSettings.currencySymbol
+        let currencySymbol = snapshot.currencySymbol
 
         Task {
             let pdfData = await PDFGenerator.render(snapshot, language: language, currencySymbol: currencySymbol)

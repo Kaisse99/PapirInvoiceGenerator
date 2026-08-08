@@ -68,6 +68,7 @@ struct BackupFile: Codable {
         var sender: String
         var receiver: String
         var statusRaw: String?
+        var currencyCode: String?
         var shippedAt: Date?
         var pdfFileName: String?
         var contactIndex: Int?
@@ -162,6 +163,7 @@ enum Backup {
                     sender: invoice.sender,
                     receiver: invoice.receiver,
                     statusRaw: invoice.statusRaw,
+                    currencyCode: invoice.currencyCode,
                     shippedAt: invoice.shippedAt,
                     pdfFileName: invoice.pdfFileName,
                     contactIndex: invoice.receiverContact.flatMap { contactIndex[$0.persistentModelID] },
@@ -253,6 +255,7 @@ enum Backup {
             invoice.id = record.id
             invoice.number = record.number ?? 0
             invoice.statusRaw = record.statusRaw
+            invoice.currencyCode = record.currencyCode
             invoice.shippedAt = record.shippedAt
             if let index = record.contactIndex, contacts.indices.contains(index) {
                 invoice.receiverContact = contacts[index]

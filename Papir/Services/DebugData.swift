@@ -141,6 +141,7 @@ enum DebugData {
             )
             invoice.receiverContact = contact
             invoiceCount += 1
+            invoice.currencyCode = AppSettings.currency.rawValue
             invoice.number = nextNumber
             nextNumber += 1
             context.insert(invoice)

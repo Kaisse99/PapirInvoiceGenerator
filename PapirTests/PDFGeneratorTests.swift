@@ -20,6 +20,7 @@ struct PDFGeneratorTests {
         InvoiceSnapshot(
             id: UUID(),
             number: 42,
+            currencySymbol: "₴",
             date: Date(timeIntervalSince1970: 1_700_000_000),
             sender: "Kaissenberg",
             receiver: "Olena Shevchenko",

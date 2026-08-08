@@ -62,7 +62,7 @@ struct InvoiceRowItem: View {
                         .minimumScaleFactor(0.6)
                         .lineLimit(1)
 
-                    Text(AppSettings.currencySymbol)
+                    Text(invoice.currencySymbol)
                         .font(.scaled(size: 15, weight: .semibold, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }

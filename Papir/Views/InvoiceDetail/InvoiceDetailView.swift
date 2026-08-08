@@ -337,7 +337,7 @@ struct InvoiceDetailView: View {
                     .font(.subheadline)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.primary.opacity(0.85))
-                Text(AppSettings.currencySymbol)
+                Text(invoice.currencySymbol)
                     .font(.caption)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
@@ -349,7 +349,7 @@ struct InvoiceDetailView: View {
                     .fontDesign(.monospaced)
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
-                Text(AppSettings.currencySymbol)
+                Text(invoice.currencySymbol)
                     .font(.caption)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.secondary)
@@ -391,7 +391,7 @@ struct InvoiceDetailView: View {
                     .font(.scaled(size: 42, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                 
-                Text(AppSettings.currencySymbol)
+                Text(invoice.currencySymbol)
                     .font(.scaled(size: 24, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.secondary)
             }

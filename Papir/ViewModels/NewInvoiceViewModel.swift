@@ -206,6 +206,7 @@ final class NewInvoiceViewModel: ObservableObject {
                 let invoice = Invoice(items: items, date: .now, sender: sender, receiver: receiver)
                 invoice.receiverContact = receiverContact
                 invoice.number = InvoiceNumbering.next(in: context)
+                invoice.currencyCode = AppSettings.currency.rawValue
                 context.insert(invoice)
                 try context.save()
                 result = invoice
@@ -220,8 +221,8 @@ final class NewInvoiceViewModel: ObservableObject {
         }
 
         let language = AppSettings.language.pdfLanguage
-        let currencySymbol = AppSettings.currencySymbol
         let snapshot = result.snapshot
+        let currencySymbol = snapshot.currencySymbol
 
         Task {
             let pdfData = await PDFGenerator.render(snapshot, language: language, currencySymbol: currencySymbol)
