@@ -7,11 +7,45 @@ on:
 
 jobs:
   test:
-    runs-on: macos-15
+    # The app is written against Swift 6.3: it uses nonisolated on type
+    # declarations and SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor, neither of
+    # which the Xcode 16 on macos-15 understands. An older runner does not
+    # fail the tests, it fails to compile, which reads like a broken test
+    # suite and is not one.
+    runs-on: macos-26
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
+      - name: Use the newest Xcode on the runner
+        run: |
+          latest=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Selecting $latest"
+          sudo xcode-select -s "$latest"
+          xcodebuild -version
+          swift --version
+
+      # Device names move with every Xcode, so asking for one by name is a
+      # yearly breakage. Take whatever iPhone the newest installed runtime
+      # offers instead.
+      - name: Pick an iPhone simulator
+        id: sim
+        run: |
+          udid=$(xcrun simctl list devices available --json | python3 -c '
+import json, sys
+devices = json.load(sys.stdin)["devices"]
+for runtime in sorted(devices, reverse=True):
+    for device in devices[runtime]:
+        if "iPhone" in device["name"]:
+            print(device["udid"])
+            sys.exit(0)
+sys.exit("no iPhone simulator available")')
+          echo "Using simulator $udid"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
       - name: Build and test
         run: |
+          set -o pipefail
           xcodebuild -project Papir.xcodeproj -scheme Papir \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
             -skipPackagePluginValidation test

@@ -12,6 +12,7 @@ import SwiftData
 import Testing
 @testable import Papir
 
+@MainActor
 struct BackupTests {
     @Test func roundTripKeepsEverythingTheSheetsFlatten() throws {
         let source = try makeContainer()

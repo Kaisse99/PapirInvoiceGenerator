@@ -10,6 +10,7 @@
 import Testing
 @testable import Papir
 
+@MainActor
 struct BreakdownTests {
     @Test func explicitPacksAreKeptAsTyped() {
         let result = ItemRow.breakdown(colors: ["Black", "White"], packs: [5, 1], total: 6)

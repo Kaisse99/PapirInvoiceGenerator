@@ -12,6 +12,7 @@ import Foundation
 import Testing
 @testable import Papir
 
+@MainActor
 struct MoneyAndArchiveTests {
     @Test func priceDisplayGroupsThousands() {
         #expect(PriceText.display(21150) == "21,150")

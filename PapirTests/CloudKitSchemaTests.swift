@@ -16,6 +16,7 @@ import SwiftData
 import Testing
 @testable import Papir
 
+@MainActor
 struct CloudKitSchemaTests {
     private var schema: Schema {
         Schema(versionedSchema: PapirSchemaV1.self)

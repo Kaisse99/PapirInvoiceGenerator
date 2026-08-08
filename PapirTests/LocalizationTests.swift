@@ -10,6 +10,7 @@
 import Testing
 @testable import Papir
 
+@MainActor
 struct LocalizationTests {
     @Test func everyKeyIsTranslatedInEveryLanguage() {
         for key in LKey.allCases {

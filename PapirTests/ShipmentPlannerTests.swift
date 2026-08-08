@@ -13,6 +13,7 @@ import SwiftData
 import Testing
 @testable import Papir
 
+@MainActor
 struct ShipmentPlannerTests {
     @Test func planMatchesModelCodeIgnoringCase() throws {
         let container = try makeContainer()

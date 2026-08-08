@@ -14,6 +14,7 @@ import PDFKit
 import Testing
 @testable import Papir
 
+@MainActor
 struct PDFGeneratorTests {
     private func snapshot(rows: Int) -> InvoiceSnapshot {
         InvoiceSnapshot(

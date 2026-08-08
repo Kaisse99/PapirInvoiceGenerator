@@ -13,6 +13,7 @@ import SwiftData
 import Testing
 @testable import Papir
 
+@MainActor
 struct InvoiceListTests {
     @Test func duplicateKeepsColorPacksAndContact() throws {
         let container = try makeContainer()

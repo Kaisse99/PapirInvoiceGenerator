@@ -13,6 +13,7 @@ import SwiftData
 import Testing
 @testable import Papir
 
+@MainActor
 struct StockTests {
     @Test func withdrawReportsShortfallAndGoesNegative() {
         let line = StockLine(color: "Black", packs: 3)
@@ -82,6 +83,7 @@ struct StockTests {
     }
 }
 
+@MainActor
 struct DuplicateModelTests {
     @Test func aCodeAlreadyOnTheShelfCannotBeAddedAgain() throws {
         let container = try makeContainer()
