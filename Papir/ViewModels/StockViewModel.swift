@@ -71,12 +71,6 @@ final class StockViewModel: ObservableObject {
         showAddModel = false
     }
 
-    func setPackSize(_ size: Int, on model: StockModel, context: ModelContext) {
-        model.piecesPerPack = max(1, size)
-        save(context)
-        Haptics.success()
-    }
-
     func setPrice(_ price: Double, on model: StockModel, context: ModelContext) {
         model.pricePerPiece = max(0, price).moneyRounded
         save(context)

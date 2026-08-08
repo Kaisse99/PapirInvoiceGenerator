@@ -127,4 +127,30 @@ struct ShipmentPlannerTests {
         #expect(drafts.first?.isMatched == false)
         #expect(drafts.first?.isActionable == false)
     }
+    @Test func aPartPackRowStillTakesAWholePackOffTheShelf() throws {
+        let container = try makeContainer()
+        let context = container.mainContext
+
+        let model = StockModel(code: "1987", pricePerPiece: 100, lines: [StockLine(color: "Black", packs: 10)])
+        context.insert(model)
+
+        // she sells three pieces rather than a full six: the row says 1 x 3,
+        // the money follows the three, and the shelf loses the whole pack
+        // because the leftovers go out of the shop by other means.
+        let row = ItemRow(name: "1987", unitCount: 1, itemsPerUnit: 3, price: 100, colors: ["Black"])
+        row.colorPacks = [1]
+        let invoice = Invoice(items: [row], date: .now, sender: "Me", receiver: "Olena")
+        context.insert(invoice)
+        try context.save()
+
+        try ShipmentPlanner.apply(
+            ShipmentPlanner.plan(for: invoice, stock: [model]),
+            to: invoice, stock: [model], context: context
+        )
+
+        #expect(model.line(for: "Black")?.packs == 9, "one whole pack, never a fraction")
+        #expect(invoice.shipment.first?.packs == 1)
+        #expect(row.totalForItem == 300, "the money counts the three pieces")
+    }
+
 }

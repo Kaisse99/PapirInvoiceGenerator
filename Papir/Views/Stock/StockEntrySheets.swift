@@ -193,41 +193,6 @@ struct RecountStockSheet: View {
     }
 }
 
-struct SetPackSizeSheet: View {
-    let model: StockModel
-    let onCommit: (Int) -> Void
-
-    @State private var size: String = ""
-    @State private var loaded = false
-
-    private var value: Int { max(0, Int(size) ?? 0) }
-
-    var body: some View {
-        StockSheetFrame(title: L.t(.piecesInPack), subtitle: model.code) {
-            VStack(spacing: 18) {
-                Text(L.t(.piecesInPackHint))
-                    .font(.scaled(size: 12, weight: .regular, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 8)
-
-                StockSheetField(placeholder: "1", text: $size, keyboard: .numberPad)
-                    .digitsOnly($size)
-                    .limitInput($size, to: 4)
-
-                StockSheetButton(title: L.t(.saveCount), enabled: value > 0) {
-                    onCommit(value)
-                }
-            }
-        }
-        .onAppear {
-            guard !loaded else { return }
-            loaded = true
-            size = "\(model.packSize)"
-        }
-    }
-}
-
 struct SetPriceSheet: View {
     let model: StockModel
     let onCommit: (Double) -> Void

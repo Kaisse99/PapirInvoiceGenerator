@@ -225,7 +225,7 @@ enum Backup {
                         .first { !$0.isEmpty }
                     ?? ""
             )
-            if let identifier = record.identifier { contact.identifier = identifier }
+            contact.identifier = record.identifier ?? UUID()
             context.insert(contact)
             contacts.append(contact)
         }

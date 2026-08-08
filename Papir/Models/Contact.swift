@@ -12,7 +12,11 @@
 //  enforces rather than the model, since a half-typed contact is a normal
 //  state while the sheet is open.
 //  identifier is a UUID of the contact's own, copied onto every invoice
-//  addressed to it. The relationship alone was not enough: deleting a customer
+//  addressed to it. It is optional rather than defaulted because SwiftData
+//  does not backfill a default onto rows that already exist, and a
+//  non-optional UUID would come back null on every contact written before
+//  today and trap the moment anything read it. Nil falls back to the store's
+//  own handle, and editing an old contact fills one in. The relationship alone was not enough: deleting a customer
 //  nullifies it, and the invoices then fell back to grouping by typed name, so
 //  two different people who happened to share one dropped into a single line
 //  in the rankings. The copy survives the deletion and keeps them apart.
@@ -42,7 +46,7 @@ final class Contact {
     @Attribute(originalName: "branchOne")
     var shipmentAddress: String = ""
     var createdAt: Date = Date.now
-    var identifier: UUID = UUID()
+    var identifier: UUID? = nil
 
     @Relationship(deleteRule: .nullify, inverse: \Invoice.receiverContact)
     var invoices: [Invoice]? = nil
@@ -60,6 +64,16 @@ final class Contact {
         self.city = city
         self.shipmentAddress = shipmentAddress
         self.createdAt = .now
+        self.identifier = UUID()
+    }
+
+    /// What the rankings key this customer on. The identifier when there is
+    /// one, and the store's own handle when there is not, which is every
+    /// contact written before the field existed. Both are stable while the
+    /// contact lives; only the identifier survives it being deleted, which is
+    /// why editing an old contact quietly gives it one.
+    var groupingKey: String {
+        identifier?.uuidString ?? "\(persistentModelID)"
     }
 
     var fullName: String {

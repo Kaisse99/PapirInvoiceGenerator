@@ -259,7 +259,7 @@ final class StatisticsViewModel: ObservableObject {
             let detail: String?
 
             if let contact = invoice.receiverContact {
-                key = "contact:\(contact.identifier.uuidString)"
+                key = "contact:\(contact.groupingKey)"
                 name = contact.displayName
                 detail = contact.whereTo.isEmpty ? nil : contact.whereTo
             } else if let stored = invoice.receiverContactID {

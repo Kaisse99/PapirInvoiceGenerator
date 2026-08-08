@@ -29,13 +29,12 @@
 //  warning number in settings, and otherwise plain ink. It is deliberately not
 //  StockState, because one color sitting at zero says nothing about whether
 //  there is anything left to sell.
-//  piecesPerPack is how many pieces are in one pack of this model, kept on the
-//  model rather than read from settings, because a shop can sell one code in
-//  sixes and another in twelves and the shelf has to be worth what it is
-//  worth. Zero means it was never set and the app default stands in, which is
-//  what every model held before this existed; changing that default used to
-//  revalue the entire shelf backwards, which is a thing a stock count should
-//  never do on its own.
+//  piecesPerPack records the pack size a model was created under. Nothing in
+//  the app asks for it and no screen shows it: a shop that sells everything in
+//  sixes should not be made to answer the question twice, so it is simply
+//  taken from Settings when the model is added. It exists at all so that
+//  changing that setting later does not silently revalue a shelf counted under
+//  the old one. Zero means it predates this and the current setting stands in.
 //  pricePerPiece is what this model sells for per piece, kept on the model
 //  rather than on the invoice row so writing an invoice fills the price in
 //  instead of asking for it again. Zero means it has never been set, which is

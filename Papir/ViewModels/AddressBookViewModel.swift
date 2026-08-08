@@ -70,6 +70,7 @@ final class AddressBookViewModel: ObservableObject {
         guard draft.hasName else { return }
 
         let target = draft.contact ?? Contact()
+        if target.identifier == nil { target.identifier = UUID() }
         target.firstName = draft.firstName.trimmingCharacters(in: .whitespaces)
         target.lastName = draft.lastName.trimmingCharacters(in: .whitespaces)
         target.phone = draft.phone.trimmingCharacters(in: .whitespaces)
