@@ -31,8 +31,8 @@ nonisolated enum AppSettings {
     static let lastBackupKey = "lastBackupAt"
     static let welcomeSeenKey = "welcomeSeen"
 
-    static let privacyPolicyURL = "https://kaissenberg.github.io/papir/privacy"
-    static let supportURL = "https://kaissenberg.github.io/papir/support"
+    static let privacyPolicyURL = "https://kaisse99.github.io/PapirInvoiceGenerator/privacy.html"
+    static let supportURL = "https://kaisse99.github.io/PapirInvoiceGenerator/support.html"
 
     static var welcomeSeen: Bool {
         UserDefaults.standard.bool(forKey: welcomeSeenKey)
