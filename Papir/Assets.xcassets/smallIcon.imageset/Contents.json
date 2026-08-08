@@ -1,23 +1,89 @@
 {
   "images" : [
     {
-      "filename" : "papir-iOS-Dark-1024x1024@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "appearances" : [ { "appearance" : "luminosity", "value" : "light" } ],
-      "filename" : "papir-iOS-Dark-1024x1024@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "appearances" : [ { "appearance" : "luminosity", "value" : "dark" } ],
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "light"
+        }
+      ],
       "filename" : "papir-iOS-Default-1024x1024@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "papir-iOS-Dark-1024x1024@1x.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "light"
+        }
+      ],
+      "filename" : "papir-iOS-Default-1024x1024@1x 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "papir-iOS-Dark-1024x1024@1x 4.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "light"
+        }
+      ],
+      "filename" : "papir-iOS-Default-1024x1024@1x 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "papir-iOS-Dark-1024x1024@1x 5.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
-  "info" : { "author" : "xcode", "version" : 1 },
-  "properties" : { "compression-type" : "lossless" }
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "compression-type" : "lossless"
+  }
 }
