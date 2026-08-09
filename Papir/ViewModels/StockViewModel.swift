@@ -23,6 +23,11 @@
 //  reorder question: how little is left of this model at all, whatever the
 //  colors under it are doing. Sorting always breaks a tie on the code, so a
 //  shelf full of equal numbers does not reshuffle itself when one count moves.
+//  No order chosen means code order, which is why sortOption is optional and
+//  the menu offers only the four real orders. There was a Model code entry
+//  standing for the default and it read as an odd fifth thing beside them, so
+//  the absence carries it instead. Nothing puts the code order back within a
+//  session; a relaunch does, since none of this is stored.
 //  Holds no models of its own, the view owns the @Query and hands them in.
 //  Used by: StockView, StockModelDetailView.
 //
@@ -35,13 +40,12 @@ import Combine
 @MainActor
 final class StockViewModel: ObservableObject {
     enum SortOption: String, CaseIterable, Identifiable {
-        case code, mostPacks, fewestPacks, newest, oldest
+        case mostPacks, fewestPacks, newest, oldest
 
         var id: String { rawValue }
 
         var title: String {
             switch self {
-            case .code:        return L.t(.modelCode)
             case .mostPacks:   return L.t(.mostPacks)
             case .fewestPacks: return L.t(.fewestPacks)
             case .newest:      return L.t(.newest)
@@ -51,7 +55,6 @@ final class StockViewModel: ObservableObject {
 
         var systemImage: String {
             switch self {
-            case .code:        return "textformat"
             case .mostPacks:   return "arrow.down"
             case .fewestPacks: return "arrow.up"
             case .newest:      return "clock"
@@ -91,7 +94,7 @@ final class StockViewModel: ObservableObject {
     }
 
     @Published var searchText: String = ""
-    @Published var sortOption: SortOption = .code
+    @Published var sortOption: SortOption? = nil
     @Published var stockFilter: StockFilter = .all
     @Published var showAddModel: Bool = false
     @Published var newModelCode: String = ""
@@ -112,7 +115,7 @@ final class StockViewModel: ObservableObject {
         }
 
         switch sortOption {
-        case .code:
+        case .none:
             result.sort { byCode($0, $1) }
         case .mostPacks:
             result.sort { $0.totalPacks == $1.totalPacks ? byCode($0, $1) : $0.totalPacks > $1.totalPacks }
