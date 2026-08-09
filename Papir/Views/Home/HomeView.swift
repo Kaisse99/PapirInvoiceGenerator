@@ -184,7 +184,7 @@ struct HomeView: View {
 
                 Spacer()
             }
-
+            .offset(y: -16)
             .readableWidth(560)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppBackground())

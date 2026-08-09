@@ -73,13 +73,10 @@ nonisolated enum LKey: String, CaseIterable {
     case earnedCaps = "EARNED"
     case averageInvoice = "average"
     case salesOverTimeCaps = "SALES OVER TIME"
-    case mostProfitableCaps = "MOST PROFITABLE"
-    case mostSoldCaps = "MOST SOLD"
     case topBuyersCaps = "TOP BUYERS"
     case noSalesInPeriod = "No sales in this period"
     case perDayLower = "a day"
     case perMonthLower = "a month"
-    case shelfWorthCaps = "THE SHELF IS WORTH"
     case modelsWithoutPrice = "models have no price yet"
     case nothingHereYet = "Nothing here yet"
 
@@ -267,8 +264,6 @@ nonisolated enum LKey: String, CaseIterable {
     case lastName = "Last name"
     case phone = "Phone"
     case city = "City"
-    case novaPoshtaOne = "Nova Poshta 1"
-    case novaPoshtaTwo = "Nova Poshta 2"
     case whoCaps = "WHO"
     case reachThemCaps = "REACH THEM"
     case whereToCaps = "WHERE TO"
@@ -404,12 +399,9 @@ nonisolated enum L {
         .thisYear: "Цей рік", .everything: "Увесь час",
         .earnedCaps: "ЗАРОБЛЕНО", .averageInvoice: "середня",
         .salesOverTimeCaps: "ДИНАМІКА ПРОДАЖІВ",
-        .mostProfitableCaps: "НАЙПРИБУТКОВІШІ",
-        .mostSoldCaps: "НАЙПРОДАВАНІШІ",
         .topBuyersCaps: "ТОП ПОКУПЦІВ",
         .noSalesInPeriod: "У цьому періоді продажів не було",
-        .perDayLower: "на день", .perMonthLower: "на місяць",
-        .shelfWorthCaps: "СКЛАД КОШТУЄ", .modelsWithoutPrice: "моделей без ціни",
+        .perDayLower: "на день", .perMonthLower: "на місяць", .modelsWithoutPrice: "моделей без ціни",
         .nothingHereYet: "Тут поки порожньо",
         .pricePerPiece: "Ціна за штуку", .setPrice: "Вказати ціну",
         .noPriceYet: "Ціна не вказана",
@@ -420,7 +412,7 @@ nonisolated enum L {
         .noContacts: "Ще немає контактів",
         .noContactsHint: "Додайте, кому ви відправляєте, і поле «Кому» їх знайде",
         .firstName: "Імʼя", .lastName: "Прізвище", .phone: "Телефон",
-        .city: "Місто", .novaPoshtaOne: "Нова пошта 1", .novaPoshtaTwo: "Нова пошта 2",
+        .city: "Місто",
         .whoCaps: "ХТО", .reachThemCaps: "ЗВʼЯЗОК", .whereToCaps: "КУДИ",
         .deleteContact: "Видалити контакт", .deleteContactTitle: "Видалити цей контакт?",
         .deleteContactMessage: "Уже виписані накладні збережуть імʼя.",
@@ -557,12 +549,9 @@ nonisolated enum L {
         .thisYear: "Этот год", .everything: "Всё время",
         .earnedCaps: "ЗАРАБОТАНО", .averageInvoice: "средняя",
         .salesOverTimeCaps: "ДИНАМИКА ПРОДАЖ",
-        .mostProfitableCaps: "САМЫЕ ПРИБЫЛЬНЫЕ",
-        .mostSoldCaps: "САМЫЕ ПРОДАВАЕМЫЕ",
         .topBuyersCaps: "ТОП ПОКУПАТЕЛЕЙ",
         .noSalesInPeriod: "В этом периоде продаж не было",
-        .perDayLower: "в день", .perMonthLower: "в месяц",
-        .shelfWorthCaps: "СКЛАД СТОИТ", .modelsWithoutPrice: "моделей без цены",
+        .perDayLower: "в день", .perMonthLower: "в месяц", .modelsWithoutPrice: "моделей без цены",
         .nothingHereYet: "Пока пусто",
         .pricePerPiece: "Цена за штуку", .setPrice: "Указать цену",
         .noPriceYet: "Цена не указана",
@@ -573,7 +562,7 @@ nonisolated enum L {
         .noContacts: "Пока нет контактов",
         .noContactsHint: "Добавьте, кому вы отправляете, и поле «Кому» их найдёт",
         .firstName: "Имя", .lastName: "Фамилия", .phone: "Телефон",
-        .city: "Город", .novaPoshtaOne: "Новая почта 1", .novaPoshtaTwo: "Новая почта 2",
+        .city: "Город",
         .whoCaps: "КТО", .reachThemCaps: "СВЯЗЬ", .whereToCaps: "КУДА",
         .deleteContact: "Удалить контакт", .deleteContactTitle: "Удалить этот контакт?",
         .deleteContactMessage: "Уже выписанные накладные сохранят имя.",
@@ -710,12 +699,9 @@ nonisolated enum L {
         .thisYear: "Ten rok", .everything: "Cały czas",
         .earnedCaps: "ZAROBIONE", .averageInvoice: "średnia",
         .salesOverTimeCaps: "SPRZEDAŻ W CZASIE",
-        .mostProfitableCaps: "NAJBARDZIEJ DOCHODOWE",
-        .mostSoldCaps: "NAJCZĘŚCIEJ SPRZEDAWANE",
         .topBuyersCaps: "NAJLEPSI KUPUJĄCY",
         .noSalesInPeriod: "Brak sprzedaży w tym okresie",
-        .perDayLower: "dziennie", .perMonthLower: "miesięcznie",
-        .shelfWorthCaps: "MAGAZYN WART", .modelsWithoutPrice: "modeli bez ceny",
+        .perDayLower: "dziennie", .perMonthLower: "miesięcznie", .modelsWithoutPrice: "modeli bez ceny",
         .nothingHereYet: "Na razie pusto",
         .pricePerPiece: "Cena za sztukę", .setPrice: "Ustal cenę",
         .noPriceYet: "Brak ceny",
@@ -726,7 +712,7 @@ nonisolated enum L {
         .noContacts: "Brak kontaktów",
         .noContactsHint: "Dodaj odbiorcę, a pole \"Do\" go znajdzie",
         .firstName: "Imię", .lastName: "Nazwisko", .phone: "Telefon",
-        .city: "Miasto", .novaPoshtaOne: "Nova Poshta 1", .novaPoshtaTwo: "Nova Poshta 2",
+        .city: "Miasto",
         .whoCaps: "KTO", .reachThemCaps: "KONTAKT", .whereToCaps: "DOKĄD",
         .deleteContact: "Usuń kontakt", .deleteContactTitle: "Usunąć ten kontakt?",
         .deleteContactMessage: "Wystawione faktury zachowają nazwę.",

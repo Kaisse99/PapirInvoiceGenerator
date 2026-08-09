@@ -57,14 +57,14 @@ enum DataExport {
         return root
     }
 
-    private static func invoiceSheet(_ invoices: [Invoice], currencySymbol: String) -> XLSXSheet {
+    static func invoiceSheet(_ invoices: [Invoice], currencySymbol: String) -> XLSXSheet {
         let columns = [
             XLSXColumn(title: L.t(.date), width: 12),
             XLSXColumn(title: L.t(.draft) + " / " + L.t(.shipped), width: 11),
             XLSXColumn(title: L.t(.sender), width: 18),
             XLSXColumn(title: L.t(.receiver), width: 22),
             XLSXColumn(title: L.t(.city), width: 14),
-            XLSXColumn(title: L.t(.novaPoshtaOne), width: 16),
+            XLSXColumn(title: L.t(.shipmentAddress), width: 16),
             XLSXColumn(title: L.t(.phone), width: 15),
             XLSXColumn(title: L.t(.name), width: 26),
             XLSXColumn(title: L.t(.units), width: 8),
@@ -99,7 +99,7 @@ enum DataExport {
         return XLSXSheet(name: L.t(.invoices), columns: columns, rows: rows)
     }
 
-    private static func stockSheet(_ stock: [StockModel]) -> XLSXSheet {
+    static func stockSheet(_ stock: [StockModel]) -> XLSXSheet {
         let columns = [
             XLSXColumn(title: L.t(.modelCode), width: 22),
             XLSXColumn(title: L.t(.color), width: 18),
@@ -124,14 +124,13 @@ enum DataExport {
         return XLSXSheet(name: L.t(.stockTitle), columns: columns, rows: rows)
     }
 
-    private static func contactSheet(_ contacts: [Contact]) -> XLSXSheet {
+    static func contactSheet(_ contacts: [Contact]) -> XLSXSheet {
         let columns = [
             XLSXColumn(title: L.t(.firstName), width: 16),
             XLSXColumn(title: L.t(.lastName), width: 18),
             XLSXColumn(title: L.t(.phone), width: 16),
             XLSXColumn(title: L.t(.city), width: 16),
-            XLSXColumn(title: L.t(.novaPoshtaOne), width: 18),
-            XLSXColumn(title: L.t(.novaPoshtaTwo), width: 18),
+            XLSXColumn(title: L.t(.shipmentAddress), width: 18),
             XLSXColumn(title: L.t(.invoices), width: 10)
         ]
 
@@ -151,7 +150,7 @@ enum DataExport {
         return XLSXSheet(name: L.t(.addressBook), columns: columns, rows: rows)
     }
 
-    private static func historySheet(_ movements: [StockMovement]) -> XLSXSheet {
+    static func historySheet(_ movements: [StockMovement]) -> XLSXSheet {
         let columns = [
             XLSXColumn(title: L.t(.date), width: 12),
             XLSXColumn(title: L.t(.modelCode), width: 22),
