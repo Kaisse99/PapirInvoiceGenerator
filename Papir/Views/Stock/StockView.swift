@@ -7,6 +7,14 @@
 //  out of it. Owns the @Query and the navigation stack; tapping a
 //  card opens StockModelDetailView. Rows animate on the identity of what is
 //  showing, the same way the invoice list does.
+//  The button beside the search field is the invoice list's filter menu again,
+//  down to its size and its two sections, because the two lists are read the
+//  same way and one of them teaching the other's habits is the whole point. It
+//  fills in only for the filter, never for the order: a hidden model is worth
+//  a mark on the button, a rearranged one is already visible. Its chrome hangs
+//  on the Menu rather than inside the label, for the reason raisedShadow gives.
+//  The query still asks for code order so the first frame is sorted before the
+//  view model has said anything; every order after that is the view model's.
 //  Used by: HomeView.
 //
 
@@ -24,7 +32,7 @@ struct StockView: View {
     private var allModels: [StockModel]
 
     private var models: [StockModel] {
-        viewModel.filtered(allModels)
+        viewModel.filteredAndSorted(allModels)
     }
 
     var body: some View {
@@ -34,7 +42,7 @@ struct StockView: View {
                     emptyState
                 } else {
                     VStack(spacing: 14) {
-                        searchBar
+                        searchAndSortBar
 
                         if models.isEmpty {
                             noResultsState
@@ -163,36 +171,84 @@ struct StockView: View {
         }
     }
 
-    private var searchBar: some View {
+    private var searchAndSortBar: some View {
         HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass")
-                .font(.callout)
-                .foregroundStyle(.secondary)
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
 
-            TextField(L.t(.searchStock), text: $viewModel.searchText)
-                .font(.scaled(size: 15, weight: .medium, design: .monospaced))
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
+                TextField(L.t(.searchStock), text: $viewModel.searchText)
+                    .font(.scaled(size: 15, weight: .medium, design: .monospaced))
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
 
-            if !viewModel.searchText.isEmpty {
-                Button {
-                    withAnimation(AppAnimation.list) { viewModel.searchText = "" }
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
+                if !viewModel.searchText.isEmpty {
+                    Button {
+                        withAnimation(AppAnimation.list) { viewModel.searchText = "" }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
                 }
-                .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
+            .padding(.horizontal, 16)
+            .frame(height: 52)
+            .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)).raisedShadow())
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(.primary.opacity(0.40), lineWidth: 1)
+            )
+            .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
+
+            Menu {
+                ForEach(StockViewModel.StockFilter.allCases) { option in
+                    Button {
+                        Haptics.light()
+                        withAnimation(AppAnimation.list) {
+                            viewModel.stockFilter = option
+                        }
+                    } label: {
+                        Label(
+                            option.title,
+                            systemImage: viewModel.stockFilter == option ? "checkmark" : option.systemImage
+                        )
+                    }
+                }
+
+                Divider()
+
+                ForEach(StockViewModel.SortOption.allCases) { option in
+                    Button {
+                        Haptics.light()
+                        withAnimation(AppAnimation.list) {
+                            viewModel.sortOption = option
+                        }
+                    } label: {
+                        Label(
+                            option.title,
+                            systemImage: viewModel.sortOption == option ? "checkmark" : option.systemImage
+                        )
+                    }
+                }
+            } label: {
+                Image(systemName: viewModel.stockFilter == .all
+                      ? "line.3.horizontal.decrease.circle"
+                      : "line.3.horizontal.decrease.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(Color.primary)
+                    .frame(width: 52, height: 52)
+                    .contentShape(RoundedRectangle(cornerRadius: 18))
+            }
+            .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)).raisedShadow())
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(Color.primary.opacity(0.55), lineWidth: 1)
+            )
+            .tint(Color.primary)
         }
-        .padding(.horizontal, 16)
-        .frame(height: 52)
-        .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)).raisedShadow())
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(.primary.opacity(0.40), lineWidth: 1)
-        )
-        .animation(AppAnimation.list, value: viewModel.searchText.isEmpty)
         .padding(.horizontal, 20)
     }
 

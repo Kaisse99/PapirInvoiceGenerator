@@ -295,6 +295,10 @@ nonisolated enum LKey: String, CaseIterable {
     case allInvoices = "All invoices"
     case draftsOnly = "Drafts only"
     case shippedOnly = "Shipped only"
+    case mostPacks = "Most packs"
+    case fewestPacks = "Fewest packs"
+    case colorAtZero = "A color at zero"
+    case understocked = "Understocked"
     case addUp = "Add up"
     case welcomeTitle = "Papir"
     case welcomeSubtitle = "Everything is one swipe from here."
@@ -340,6 +344,8 @@ nonisolated enum L {
         .welcomeStart: "Почати",
         .addUp: "Додати",
         .allInvoices: "Усі накладні", .draftsOnly: "Лише чернетки", .shippedOnly: "Лише відвантажені",
+        .mostPacks: "Більше пачок", .fewestPacks: "Менше пачок",
+        .colorAtZero: "Колір на нулі", .understocked: "Мало на складі",
         .shipmentAddress: "Адреса доставки", .unitsInStock: "штук на складі",
         .itemsSoldLower: "штук продано", .itemsSoldLabel: "Штук продано",
         .invoicesShipped: "накладних", .packsSoldLower: "пачок продано",
@@ -490,6 +496,8 @@ nonisolated enum L {
         .welcomeStart: "Начать",
         .addUp: "Добавить",
         .allInvoices: "Все накладные", .draftsOnly: "Только черновики", .shippedOnly: "Только отгруженные",
+        .mostPacks: "Больше пачек", .fewestPacks: "Меньше пачек",
+        .colorAtZero: "Цвет на нуле", .understocked: "Мало на складе",
         .shipmentAddress: "Адрес доставки", .unitsInStock: "штук на складе",
         .itemsSoldLower: "штук продано", .itemsSoldLabel: "Штук продано",
         .invoicesShipped: "накладных", .packsSoldLower: "пачек продано",
@@ -640,6 +648,8 @@ nonisolated enum L {
         .welcomeStart: "Zacznij",
         .addUp: "Dodaj",
         .allInvoices: "Wszystkie faktury", .draftsOnly: "Tylko szkice", .shippedOnly: "Tylko wysłane",
+        .mostPacks: "Więcej paczek", .fewestPacks: "Mniej paczek",
+        .colorAtZero: "Kolor na zerze", .understocked: "Niski stan",
         .shipmentAddress: "Adres dostawy", .unitsInStock: "sztuk w magazynie",
         .itemsSoldLower: "sztuk sprzedanych", .itemsSoldLabel: "Sztuk sprzedanych",
         .invoicesShipped: "faktur wysłanych", .packsSoldLower: "paczek sprzedanych",
