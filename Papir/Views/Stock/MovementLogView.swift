@@ -11,7 +11,8 @@
 //  Opening it from a model's own screen starts filtered to that model. Changing
 //  a filter animates on the identity of the entries on screen, the same way the
 //  invoice list does, so rows leave and arrive rather than the page redrawing
-//  under the finger.
+//  under the finger. Both filters wear their chrome on the Menu rather than
+//  inside the label, for the reason raisedShadow gives.
 //  Used by: StockView, StockModelDetailView.
 //
 
@@ -185,15 +186,16 @@ struct MovementLogView: View {
             .foregroundStyle(Color.primary)
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity, minHeight: 38)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.primary.opacity(isActive ? 0.12 : 0.05))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(isActive ? 0.40 : 0.15), lineWidth: 1)
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 12))
         }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.primary.opacity(isActive ? 0.12 : 0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.primary.opacity(isActive ? 0.40 : 0.15), lineWidth: 1)
+        )
         .tint(Color.primary)
         .animation(AppAnimation.list, value: isActive)
     }

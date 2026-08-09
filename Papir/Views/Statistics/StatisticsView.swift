@@ -20,6 +20,9 @@
 //  colour is one glance, and buyers group by contact when the invoice was
 //  addressed to one, by typed name when not. The shelf card stays last: it is
 //  the one figure that comes from stock rather than from invoices.
+//  The period button wears its pill on the Menu rather than inside the label,
+//  which is what stopped a squared-off plate sitting over its corners and its
+//  shadow for a second after every choice. raisedShadow says why.
 //  Used by: HomeView.
 //
 
@@ -135,9 +138,10 @@ struct StatisticsView: View {
             .padding(.horizontal, 20)
             .frame(maxWidth: .infinity)
             .frame(height: 46)
-            .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)).raisedShadow())
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(.primary.opacity(0.40), lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: 16))
         }
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemGray6)).raisedShadow())
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(.primary.opacity(0.40), lineWidth: 1))
         .padding(.horizontal, 20)
     }
 

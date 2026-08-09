@@ -15,6 +15,13 @@
 //  shadow applied to a composed view is cast by everything drawn inside it, so
 //  hanging it on the card gave every field box and every notched label its own
 //  little halo, which read as grubby rather than as raised.
+//  On a Menu it goes on the Menu, never inside the label. UIKit lifts a menu's
+//  label into its own presentation and hands the space back covered by an
+//  opaque rectangle at the label's bounds, which for about a second after a
+//  choice is made squares off the rounded corners and swallows the shadow.
+//  Anything the label does not draw cannot be taken: leave the label as bare
+//  content with a contentShape for its hit area, and put the fill, the stroke
+//  and this shadow on the Menu itself.
 //  Font.scaled is how every fixed-size font in the app honours the system
 //  text size: the point size the design was tuned at, run through
 //  UIFontMetrics so a user who set larger text actually gets it. The

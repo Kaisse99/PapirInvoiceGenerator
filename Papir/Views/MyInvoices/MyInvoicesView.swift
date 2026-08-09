@@ -20,6 +20,8 @@
 //  and the same card stay on screen and a checkbox slides in beside them, so
 //  turning it on reads as the list making room rather than as every row being
 //  replaced mid-animation by something that looks almost the same.
+//  The filter button wears its chrome on the Menu rather than inside the label,
+//  for the reason raisedShadow gives.
 //  Used by: HomeView.
 //
 
@@ -287,12 +289,13 @@ struct MyInvoicesView: View {
                     .font(.title3)
                     .foregroundStyle(Color.primary)
                     .frame(width: 52, height: 52)
-                    .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)).raisedShadow())
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 18)
-                            .stroke(Color.primary.opacity(0.55), lineWidth: 1)
-                    )
+                    .contentShape(RoundedRectangle(cornerRadius: 18))
             }
+            .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemGray6)).raisedShadow())
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(Color.primary.opacity(0.55), lineWidth: 1)
+            )
             .tint(Color.primary)
         }
         .padding(.horizontal, 20)
