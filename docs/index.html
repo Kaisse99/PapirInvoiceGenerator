@@ -69,32 +69,108 @@
   <p class="lede">Write an invoice, hand your customer a clean A4 PDF, and watch the
   packs come off the shelf as you ship. One iPhone app instead of a notebook and a
   spreadsheet that disagree by Friday.</p>
-  <a class="cta" href="support.html">How it works</a>
-  <a class="cta secondary" href="#what">What it does</a>
+  <!-- When Papir is live on the App Store, replace the span below with:
+       <a class="cta store" href="https://apps.apple.com/app/id6771679178">
+         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.7 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-2.9.9-3.7 2.2-1.6 2.7-.4 6.8 1.1 9 .8 1.1 1.7 2.3 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.2 0 2-1.1 2.8-2.2.9-1.3 1.2-2.5 1.3-2.6-.1 0-2.5-1-2.5-3.5zM14.5 5.9c.6-.8 1-1.9.9-3-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+         Download on the App Store
+       </a>
+       and add "downloadUrl" with the same address to the JSON-LD block above. -->
+  <span class="cta store pending" aria-disabled="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.7 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-2.9.9-3.7 2.2-1.6 2.7-.4 6.8 1.1 9 .8 1.1 1.7 2.3 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.2 0 2-1.1 2.8-2.2.9-1.3 1.2-2.5 1.3-2.6-.1 0-2.5-1-2.5-3.5zM14.5 5.9c.6-.8 1-1.9.9-3-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+    Coming to the App Store
+  </span>
+  <a class="cta secondary" href="support.html">How it works</a>
   <p class="note">iPhone · iOS 18 or later · English, Українська, Русский, Polski</p>
 </header>
 
-<div class="screens">
-  <figure>
-    <img src="img/1-home.png" alt="Papir home screen: swipe up to write an invoice, down for invoices, left for stock, right for statistics" width="620" height="1348" loading="lazy">
-    <figcaption>Everything is one swipe away</figcaption>
-  </figure>
-  <figure>
-    <img src="img/2-invoices.png" alt="A list of invoices in Papir, each showing its total and whether it is a draft or shipped" width="620" height="1348" loading="lazy">
-    <figcaption>Drafts and shipped, never mixed</figcaption>
-  </figure>
-  <figure>
-    <img src="img/3-statistics.png" alt="Papir statistics: money earned this month, a sales chart, and the most profitable models" width="620" height="1348" loading="lazy">
-    <figcaption>What actually sold</figcaption>
-  </figure>
-  <figure>
-    <img src="img/4-invoice.png" alt="An invoice open in Papir, showing its rows with colours, quantities and the total" width="620" height="1348" loading="lazy">
-    <figcaption>Rows, colours, totals</figcaption>
-  </figure>
-  <figure>
-    <img src="img/5-pdf.png" alt="The A4 PDF Papir renders from an invoice, with the customer's city and branch under their name" width="620" height="1348" loading="lazy">
-    <figcaption>The document your customer gets</figcaption>
-  </figure>
+<h2 id="tour">A look inside</h2>
+
+<div class="tour">
+
+  <section class="step">
+    <figure class="shot">
+      <img src="img/1-home.jpg" alt="Papir home screen: swipe up to write an invoice, down for invoices, left for stock, right for statistics" width="620" height="1347" loading="lazy">
+    </figure>
+    <div class="says">
+      <span class="step-index">01</span>
+      <h3>Everything is one swipe from here</h3>
+      <p>The home screen is four directions and nothing else. Up writes an
+      invoice, down opens the ones you have already written, left is the shelf,
+      right is what sold. No tab bar to squint at, nothing nested three menus
+      deep.</p>
+    </div>
+  </section>
+
+  <section class="step">
+    <figure class="shot">
+      <img src="img/2-write.jpg" alt="Writing an invoice row in Papir: model, units, pieces per pack and price, with each colour carrying its own pack count and its stock shown beside it" width="620" height="1347" loading="lazy">
+    </figure>
+    <div class="says">
+      <span class="step-index">02</span>
+      <h3>Write the row, watch the shelf</h3>
+      <p>A row is a model, how many packs, how many pieces in a pack, and the
+      price. Add the colours and they carry the packs between them, so the
+      quantity can never disagree with the breakdown. What you actually have
+      shows next to every colour while you type, so you find out you are short
+      before you promise it.</p>
+    </div>
+  </section>
+
+  <section class="step">
+    <figure class="shot">
+      <img src="img/3-pdf.jpg" alt="The A4 PDF Papir renders from an invoice: both parties, numbered rows with their colours and quantities, and the total" width="620" height="1347" loading="lazy">
+    </figure>
+    <div class="says">
+      <span class="step-index">03</span>
+      <h3>The document your customer gets</h3>
+      <p>Save, and Papir draws an A4 PDF: your name, theirs, every row with its
+      colours and counts, the total. English, Ukrainian, Russian or Polish, and
+      the document can be in a different language from the app, because the
+      person reading it often is.</p>
+    </div>
+  </section>
+
+  <section class="step">
+    <figure class="shot">
+      <img src="img/4-invoices.jpg" alt="The invoice list in Papir, each card showing its total, the customer, the date and whether it is a draft or shipped" width="620" height="1347" loading="lazy">
+    </figure>
+    <div class="says">
+      <span class="step-index">04</span>
+      <h3>Drafts and shipped, never mixed</h3>
+      <p>Everything you have written, newest first, with its total and where it
+      stands. A draft is still a promise; shipped means the packs have left the
+      shelf. Search by customer or by model, or filter down to one kind.</p>
+    </div>
+  </section>
+
+  <section class="step">
+    <figure class="shot">
+      <img src="img/5-stock.jpg" alt="The stock screen in Papir: a card per model with its total packs and a chip per colour, one of them low and marked in red" width="620" height="1347" loading="lazy">
+    </figure>
+    <div class="says">
+      <span class="step-index">05</span>
+      <h3>The shelf keeps itself</h3>
+      <p>Count packs by model and by colour. Mark an invoice shipped and exactly
+      those packs come off; pull it back to draft and they go straight back on.
+      A colour running low says so in red, and one that has run out says so
+      louder.</p>
+    </div>
+  </section>
+
+  <section class="step">
+    <figure class="shot">
+      <img src="img/6-statistics.jpg" alt="Papir statistics: money earned this year, a sales chart by month, and the most profitable models with the colours that sold" width="620" height="1347" loading="lazy">
+    </figure>
+    <div class="says">
+      <span class="step-index">06</span>
+      <h3>What actually sold</h3>
+      <p>Money by month, your most profitable models with the colours that
+      carried them, and the customers worth keeping. Shipped invoices only,
+      because a draft is not money yet and a screen that pretended otherwise
+      would teach you to distrust every number on it.</p>
+    </div>
+  </section>
+
 </div>
 
 <h2 id="what">What it does</h2>
