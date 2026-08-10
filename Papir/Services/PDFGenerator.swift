@@ -9,7 +9,12 @@
 //  and line total stay on the row's first line so the columns still read
 //  across. A party with no name is left off the page entirely rather than
 //  printed as a label over a dash, so an invoice with only a receiver puts that
-//  receiver where the sender would have been. Input is an InvoiceSnapshot
+//  receiver where the sender would have been. Every color on a row prints its
+//  pack count, including a one. The count used to be dropped when every color
+//  on the row happened to be a single pack, on the reasoning that a one adds
+//  nothing, which put two conventions in one document: a row of three and one
+//  printed its numbers while the row under it, one and one, printed bare names
+//  and left the reader to divide. Input is an InvoiceSnapshot
 //  rather than the model, because rendering happens off the main thread.
 //  The type is nonisolated for that reason. The project defaults every type to
 //  MainActor, which made render's Task.detached a main-actor method being run
@@ -366,9 +371,8 @@ nonisolated struct PDFGenerator {
     private static func colorsText(for item: InvoiceSnapshot.Item) -> String? {
         let breakdown = item.colorBreakdown
         guard !breakdown.isEmpty else { return nil }
-        let uniform = breakdown.allSatisfy { $0.packs == 1 }
         return breakdown
-            .map { uniform ? $0.color : "\($0.color) \($0.packs)" }
+            .map { "\($0.color) \($0.packs)" }
             .joined(separator: " · ")
     }
 

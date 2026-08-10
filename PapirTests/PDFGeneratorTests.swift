@@ -61,6 +61,37 @@ struct PDFGeneratorTests {
         #expect(longPages > 1)
     }
 
+    @Test func aColorWithOnePackStillPrintsItsNumber() async {
+        let invoice = InvoiceSnapshot(
+            id: UUID(),
+            number: 105,
+            currencySymbol: "$",
+            date: Date(timeIntervalSince1970: 1_700_000_000),
+            sender: "ItemsStuff Inc.",
+            receiver: "Sophia Davis",
+            receiverDetails: [],
+            items: [
+                InvoiceSnapshot.Item(
+                    name: "3128 Windbreaker",
+                    unitCount: 2,
+                    itemsPerUnit: 6,
+                    price: 39,
+                    colors: ["Beige", "Olive"],
+                    colorBreakdown: [
+                        ColorAllocation(color: "Beige", packs: 1),
+                        ColorAllocation(color: "Olive", packs: 1)
+                    ]
+                )
+            ]
+        )
+
+        let data = await PDFGenerator.render(invoice, language: .english, currencySymbol: "$")
+        let text = PDFDocument(data: data)?.string ?? ""
+
+        #expect(text.contains("Beige 1"))
+        #expect(text.contains("Olive 1"))
+    }
+
     @Test func thePartiesAndTheTotalReachThePage() async {
         let invoice = snapshot(rows: 2)
         let data = await PDFGenerator.render(invoice, language: .english, currencySymbol: "₴")
